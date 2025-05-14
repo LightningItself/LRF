@@ -19,7 +19,6 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-
 module hhssim #(parameter HIM_LEN=16'd520,HKER_SIZE=8'd3) (                      // CALCULATES HSSIM VALUE OF INPUT BASED ON EDGE MAP OF INPUT AND REF. IMAGE
     input clk,
     input rst,
