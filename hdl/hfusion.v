@@ -79,6 +79,7 @@ module hfusion #(parameter FUSEDIMAGE_DATA_WIDTH=8'd8,HIM_LEN=16'd520, HIM_WID=1
     assign hclearbuffer_sig = (img_addr == (HIM_LEN*HIM_WID-1)) ? 1'b1 : 1'b0; 
 
     hstatecontroller #(HIM_LEN,HIM_WID,LOG2_NO_OF_IMAGES)state_controller ( clk,rst,img_addr,hstate);
+    rowend_sig_genr
     //  hstop #(LOG2_NO_OF_IMAGES) hstop_1 (clk,rst,hstate,hstop_sig);
       
     // HSSIM CALCULATION------------------------------------------------------------
