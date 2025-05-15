@@ -1,0 +1,1487 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company:
+// Engineer:
+//
+// Create Date: 06/02/2020 05:33:14 PM
+// Design Name:
+// Module Name: hpipeline
+// Project Name:
+// Target Devices:
+// Tool Versions:
+// Description:
+//
+// Dependencies:
+//
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+//
+//////////////////////////////////////////////////////////////////////////////////
+
+module hhalfdelaypos #(parameter DATA_WIDTH = 17,hinitial=1'b0)  (     // To create  ONE CLK CYCLE  delayed version of addresses to write  in correct order into hmemory_avg
+input hclk,
+input hres,
+input [DATA_WIDTH-1:0] hin,
+output reg [DATA_WIDTH-1:0] hout);
+    always@(posedge hres or posedge hclk)
+    begin
+        if(hres)
+        hout<={DATA_WIDTH{hinitial}};
+
+        else
+        hout<=hin;
+    end
+
+endmodule
+
+
+
+module hhalfdelayneg #(parameter DATA_WIDTH = 17,hinitial=1'b0)  (     // To create HALF CLK CYCLE delayed version of input pixel intensity
+input hclk,
+input hres,
+input [DATA_WIDTH-1:0] hin,
+output reg [DATA_WIDTH-1:0] hout);
+
+    always@(posedge hres or negedge hclk)
+    begin
+        if(hres)
+        hout<={DATA_WIDTH{hinitial}};
+
+        else
+        hout<=hin;
+    end
+
+endmodule
+
+
+ 
+
+module honedelay #(parameter DATA_WIDTH = 17,hinitial=1'b0)  (     // To create **ONE CLK CYCLE delayed version of input  using cascaded effect of half edge delayby negedge and then posedge
+input hclk,
+input hres,
+input [DATA_WIDTH-1:0] hin,
+output [DATA_WIDTH-1:0] hout);
+
+wire [DATA_WIDTH-1:0] hintermediate;
+
+    hhalfdelayneg #(DATA_WIDTH,hinitial) hhdn1 (hclk,hres,hin,hintermediate);
+    hhalfdelaypos #(DATA_WIDTH,hinitial) hhdp1 (hclk,hres,hintermediate,hout);
+
+endmodule
+
+
+
+
+       module hmultipledelay #(parameter DATA_WIDTH = 17 , NUM_DELAY=5, hinitial=1'b0) (    // To delay input by MORE THAN ONE CLK CYCLE
+       input hclk,
+       input hres,
+       input [DATA_WIDTH-1:0] hin,
+       output [DATA_WIDTH-1:0] hout);
+       
+       wire [DATA_WIDTH-1:0] hintermediate[0:NUM_DELAY]; //stores intermediate output
+       
+       genvar hvar;
+       
+       generate
+       
+            for( hvar=0;hvar<NUM_DELAY;hvar=hvar+1)
+            begin : hmul_delay
+           
+                honedelay #(DATA_WIDTH,hinitial) hod(hclk,hres,hintermediate[hvar],hintermediate[hvar+1]);  // Generating multiple clk cycle delay using cascaded effect of many single cycle delay
+           
+            end
+           
+       endgenerate
+       
+       
+       assign hintermediate[0]=hin;           // First element of hintermedite will the INPUT
+       assign hout=hintermediate[NUM_DELAY];  // Last element of hintermedite will be the reqd DELAYED version of input
+       
+       endmodule
+
+
+
+
+
+module h_rowend_sig_genr #(parameter HIM_LEN=16'd300, HKER_SIZE = 3 ) (
+    input clk,
+    input hres,
+    input hclrbuffer,
+    output reg [HKER_SIZE-2:0] hout
+    );
+   
+    reg [10:0] hctr;
+    integer i;
+   
+    always@(posedge hres or negedge clk)
+    begin
+        if(hres|hclrbuffer)   // reset block
+        begin    
+            hctr<=(11'd0);      
+        end
+       
+        else
+        begin
+   
+                if(hctr+1==HIM_LEN) // Generate the h_last_pixel signal
+                begin
+                    hctr<='d0;  
+                end
+
+                else
+                begin
+                    hctr<=hctr+1;
+                end
+       
+        end
+   
+   end    
+   
+   always@(*)
+   begin
+   for( i=0; i<HKER_SIZE-1;i=i+1)
+   begin
+    hout[i]=(hctr==(HIM_LEN-1-i))?1'b0:1'b1;
+   end
+   end
+   
+   
+    endmodule
+
+
+module hconvx #(parameter HIM_LEN=16'd300, hker = 3 ) (
+    input clk,
+    input hres,
+    input [7:0] hin,
+    input hclrbuffer,
+    input [hker-2:0] hrowend,
+    output [7:0] hout
+    );
+    integer i;
+   
+    //parameter hbuffend=(HIM_LEN+1)*(hker-1);
+   
+    reg signed [10:0] hbuff [0:(HIM_LEN+1)*(hker-1)-1]; // 11bits =1 sign bit + 10 bits for output, since max output can be 4*256                        //**MARKS** THE POSITIVE EDGE CORRESPONDING TO LAST PIXEL , TO INDICATE LAST PIXEL OF THE ROW ARRIVED
+    reg signed [10:0] temp_out;
+    wire signed [10:0] temp_hin_mulby2;
+    wire [10:0] hout_beforebitselect; // takes absolute value from temp
+   
+    always@(posedge hres or posedge clk)
+    begin
+   
+        if(hres|hclrbuffer)   // reset block
+        begin
+           
+            for(i=0;i<(HIM_LEN+1)*(hker-1);i=i+1)
+            begin
+                hbuff[i]<='d0;
+            end
+            temp_out<='d0;
+           
+        end
+       
+        else
+        begin
+             
+                for(i=3;i<HIM_LEN*(hker-1);i=i+1)  // KEEP ON PASSING VALUE WITHOUT ANY OPERATION
+                begin
+                    hbuff[i]<=hbuff[i-1];        
+                end
+
+            // OPERATION BLOCK-------------------------------------------
+   
+               
+                //temp_hin_mulby2=hin<<1;
+             
+                hbuff[0]<=(hrowend[0]&hrowend[1])?(-hin):'d0;
+                hbuff[1]<=(hrowend[0])?(hbuff[0]-(temp_hin_mulby2)):hbuff[0];
+                hbuff[2]<=(hbuff[1]-hin);
+
+                hbuff[(HIM_LEN+1)*(hker-1)-2]<=((hrowend[0]&hrowend[1]))?(hbuff[(HIM_LEN+1)*(hker-1)-3]+hin):hbuff[(HIM_LEN+1)*(hker-1)-3];
+                hbuff[(HIM_LEN+1)*(hker-1)-1]<=(hrowend[0])?(hbuff[(HIM_LEN+1)*(hker-1)-2]+temp_hin_mulby2):hbuff[(HIM_LEN+1)*(hker-1)-2];
+                temp_out<=(hbuff[(HIM_LEN+1)*(hker-1)-1]+hin);
+             
+           
+             //-------------------------------------------------------------
+
+             
+             
+       end
+           
+    end
+             // ASYNCHRONOUS PART OF OPERATION BLOCK-------------------------
+             
+             assign temp_hin_mulby2=hin<<1;  
+             
+             //--------------------------------------------------------------
+             
+             
+             // ASSIGNING OUTPUT VALUE BY TAKING ABSOLUTE VALUE----------
+   
+             assign hout_beforebitselect=(temp_out[10] == 1'b1)?(-temp_out[10:0]):(temp_out[10:0]); // ***CHANGED HERE, Takes absolute value from temp
+             assign hout=hout_beforebitselect[9:2];  // ***CHANGED HERE Takes most significant 8 bits, EXCLUDING the sign bit
+             
+                                               
+             
+             //---------------------------------------------------------
+       
+ 
+       
+
+endmodule
+
+
+module hconvy #(parameter HIM_LEN=16'd300, hker = 8'd3 ) (
+    input clk,
+    input hres,
+    input [7:0] hin,
+    input hclrbuffer,
+    input [hker-2:0] hrowend,
+    output [7:0] hout
+    );
+    integer i,p;
+   
+    //parameter hbuffend=(HIM_LEN+1)*(hker-1);
+   
+        reg signed [10:0] hbuff [0:(HIM_LEN+1)*(hker-1)-1]; // 11bits =1 sign bit + 10 bits for output, since max output can be 4*256
+        reg signed [10:0] temp_out;
+        wire [10:0] hout_beforebitselect; // takes absolute value from temp
+       
+        always@(posedge hres or posedge clk)
+        begin
+       
+        if(hres|hclrbuffer)   // reset block
+        begin
+           
+            for(i=0;i<(HIM_LEN+1)*(hker-1);i=i+1)
+            begin
+                hbuff[i]<='d0;
+            end
+            temp_out<='d0;
+           
+        end
+       
+        else
+        begin
+
+             for(p=0;p<hker-1;p=p+1) // Keep on passing values
+             begin
+             for(i=3;i<HIM_LEN;i=i+1)
+             begin
+                hbuff[p*HIM_LEN+i]<=hbuff[p*HIM_LEN+i-1];        
+             end
+             end
+
+             
+    // OPERATION BLOCK-------------------------------------------
+
+             
+             hbuff[1]<=hbuff[0];
+             hbuff[2]<=(hbuff[1]+hin);
+             
+             hbuff[HIM_LEN+1]<=hbuff[HIM_LEN];
+             hbuff[HIM_LEN+2]<=(hbuff[HIM_LEN+1]+(hin<<1));
+             
+             hbuff[(HIM_LEN+1)*(hker-1)-1]<=hbuff[(HIM_LEN+1)*(hker-1)-2];
+             temp_out<=(hbuff[(HIM_LEN+1)*(hker-1)-1]+hin);  // These 7 are common operations
+         
+             if(hrowend[0]&hrowend[1])                              //****** MAKEs product additions differently when row changes
+                begin
+                hbuff[0]<=(-hin);
+               
+                hbuff[HIM_LEN]<=(hbuff[HIM_LEN-1]-(hin<<1));
+
+                hbuff[(HIM_LEN+1)*(hker-1)-2]<=(hbuff[(HIM_LEN+1)*(hker-1)-3]-hin);
+               
+                end
+               
+             else
+                begin
+                hbuff[0]<=8'd0;
+               
+                hbuff[HIM_LEN]<=hbuff[HIM_LEN-1];
+               
+                hbuff[(HIM_LEN+1)*(hker-1)-2]<=hbuff[(HIM_LEN+1)*(hker-1)-3];
+               
+                end
+               
+               //------------------------------------------------------------------
+       end
+       end
+
+             // ASSIGNING OUTPUT VALUE BY TAKING ABSOLUTE VALUE----------
+
+             assign hout_beforebitselect=(temp_out[10] == 1'b1)?(-temp_out[10:0]):(temp_out[10:0]); // ***CHANGED HERE Takes absolute value from temp
+             assign hout=hout_beforebitselect[9:2];                                     // ***CHANGED HERE Takes most significant 8 bits, EXCLUDING the sign bit
+           
+             //----------------------------------------------------------
+
+       
+       
+       endmodule
+
+
+module hconvg8 #(parameter HIM_LEN=16'd300, hker = 8'd3 ) (
+                 input clk,
+                 input hres,
+                 input [7:0] hin,
+                 input hclrbuffer,
+                 input [hker-2:0] hrowend,
+                 output [7:0] hout
+                 );
+                 integer i,p;
+                 
+                 // parameter hbuffend=(HIM_LEN+1)*(hker-1);
+                 
+                 reg [14:0] hbuff [0:(HIM_LEN+1)*(hker-1)-1];
+                 reg [14:0] temp_out;
+             
+                 wire [8:0] temp_times2;
+                 wire [11:0] temp_times16;
+                 wire [9:0] temp_times3;
+                 wire [11:0] temp_times14;
+                 wire [13:0] temp_times60;
+                 
+                 wire hclrbuffer_delayedbyone;
+                 
+             
+                 //honedelay #(1'b1) hod_hclrbffr (clk,hres,hclrbuffer,hclrbuffer_delayedbyone);
+                 
+             
+        always@(posedge hres or posedge clk)
+        begin
+       
+        if(hres|hclrbuffer)   // reset block
+        begin
+           
+            for(i=0;i<(HIM_LEN+1)*(hker-1);i=i+1)
+            begin
+                hbuff[i]<='d0;
+            end
+            temp_out<='d0;
+           
+        end
+       
+        else
+        begin
+
+            for(p=0;p<hker-1;p=p+1)   // KEEP ON PASSING VALUES
+            begin
+                 for(i=3;i<HIM_LEN;i=i+1)
+                 begin
+                      hbuff[p*HIM_LEN+i]<=hbuff[p*HIM_LEN+i-1];        
+                 end
+            end
+ 
+   // OPERATION BLOCK-------------------------------------------------------------
+             
+             
+             
+            hbuff[2]<=(hbuff[1]+temp_times3);
+            hbuff[HIM_LEN+2]<=(hbuff[HIM_LEN+1]+temp_times14);
+            temp_out<=(hbuff[(HIM_LEN+1)*(hker-1)-1]+temp_times3);
+                             
+            hbuff[0]<=(hrowend[0]&hrowend[1])?temp_times3:15'd0;
+            hbuff[1]<=(hrowend[0])?(hbuff[0]+temp_times14):hbuff[0];
+                             
+            hbuff[HIM_LEN]<=(hrowend[0]&hrowend[1])?(hbuff[HIM_LEN-1]+temp_times14):hbuff[HIM_LEN-1];
+            hbuff[HIM_LEN+1]<=(hrowend[0])?(hbuff[HIM_LEN]+temp_times60):hbuff[HIM_LEN];
+                             
+            hbuff[(HIM_LEN+1)*(hker-1)-2]<=(hrowend[0]&hrowend[1])?(hbuff[(HIM_LEN+1)*(hker-1)-3]+temp_times3):hbuff[(HIM_LEN+1)*(hker-1)-3];
+            hbuff[(HIM_LEN+1)*(hker-1)-1]<=(hrowend[0])?(hbuff[(HIM_LEN+1)*(hker-1)-2]+temp_times14):hbuff[(HIM_LEN+1)*(hker-1)-2];
+
+
+   //-----------------------------------------------------------------------------------------
+       
+             
+       end
+       end
+             
+
+            // ASYNCHRONOUS PART OF OPERATION BLOCK---------------------------------------------------
+           
+            assign temp_times2=(hin<<1); // times2
+            //assign temp_times4=(hin<<2); // times4
+            assign temp_times16=(hin<<4); // times16
+             
+            assign temp_times3=(temp_times2+hin);    // times 3
+            assign temp_times14=(temp_times16-temp_times2);  // times 14
+            assign temp_times60={(temp_times16-hin),2'b00}; // times 60                
+           
+            //---------------------------------------------------------------------------------------
+           
+           
+           
+            // ASSIGNMENT OF FINAL OUTPUT VALUE--------------------------------------------------------      
+                     
+               assign hout=temp_out[14:7];
+                     
+            //-----------------------------------------------------------------------------------------
+           
+       endmodule
+       
+       
+       module hconvg16 #(parameter HIM_LEN=16'd300, hker = 8'd3 )(
+                 input clk,
+                 input hres,
+                 input [15:0] hin,
+                 input hclrbuffer,
+                 input [hker-2:0] hrowend,
+                 output [15:0] hout
+                 );
+                 integer i,p;
+                 
+                 // parameter hbuffend=(HIM_LEN+1)*(hker-1);
+                 
+                 reg [22:0] hbuff [0:(HIM_LEN+1)*(hker-1)-1];
+                 reg [22:0] temp_out;
+             
+                 wire [16:0] temp_times2;
+                 wire [19:0] temp_times16;
+                 wire [17:0] temp_times3;
+                 wire [19:0] temp_times14;
+                 wire [21:0] temp_times60;
+
+                 
+                 wire hclrbuffer_delayedbyone;
+                 
+             
+                 //honedelay #(1'b1) hod_hclrbffr (clk,hres,hclrbuffer,hclrbuffer_delayedbyone);
+                 
+             
+        always@(posedge hres or posedge clk)
+        begin
+       
+        if(hres|hclrbuffer)   // reset block
+        begin
+           
+            for(i=0;i<(HIM_LEN+1)*(hker-1);i=i+1)
+            begin
+                hbuff[i]<='d0;
+            end
+            temp_out<='d0;
+           
+        end
+       
+        else
+        begin
+
+            for(p=0;p<hker-1;p=p+1)   // KEEP ON PASSING VALUES
+            begin
+                 for(i=3;i<HIM_LEN;i=i+1)
+                 begin
+                      hbuff[p*HIM_LEN+i]<=hbuff[p*HIM_LEN+i-1];        
+                 end
+            end
+ 
+   // OPERATION BLOCK-------------------------------------------------------------
+             
+             
+             
+            hbuff[2]<=(hbuff[1]+temp_times3);
+            hbuff[HIM_LEN+2]<=(hbuff[HIM_LEN+1]+temp_times14);
+            temp_out<=(hbuff[(HIM_LEN+1)*(hker-1)-1]+temp_times3);
+                             
+            hbuff[0]<=(hrowend[0]&hrowend[1])?temp_times3:23'd0;
+            hbuff[1]<=(hrowend[0])?(hbuff[0]+temp_times14):hbuff[0];
+                             
+            hbuff[HIM_LEN]<=(hrowend[0]&hrowend[1])?(hbuff[HIM_LEN-1]+temp_times14):hbuff[HIM_LEN-1];
+            hbuff[HIM_LEN+1]<=(hrowend[0])?(hbuff[HIM_LEN]+temp_times60):hbuff[HIM_LEN];
+                             
+            hbuff[(HIM_LEN+1)*(hker-1)-2]<=(hrowend[0]&hrowend[1])?(hbuff[(HIM_LEN+1)*(hker-1)-3]+temp_times3):hbuff[(HIM_LEN+1)*(hker-1)-3];
+            hbuff[(HIM_LEN+1)*(hker-1)-1]<=(hrowend[0])?(hbuff[(HIM_LEN+1)*(hker-1)-2]+temp_times14):hbuff[(HIM_LEN+1)*(hker-1)-2];
+
+
+   //-----------------------------------------------------------------------------------------
+       
+             
+        end
+        end
+             
+
+            // ASYNCHRONOUS PART OF OPERATION BLOCK---------------------------------------------------
+           
+            assign temp_times2=(hin<<1); // times2
+            //assign temp_times4=(hin<<2); // times4
+            assign temp_times16=(hin<<4); // times16
+             
+            assign temp_times3=(temp_times2+hin);    // times 3
+            assign temp_times14=(temp_times16-temp_times2);  // times 14
+            assign temp_times60={(temp_times16-hin),2'b00}; // times 60        
+           
+            //---------------------------------------------------------------------------------------
+           
+           
+           
+            // ASSIGNMENT OF FINAL OUTPUT VALUE--------------------------------------------------------      
+                     
+               assign hout=temp_out[22:7];
+                     
+            //-----------------------------------------------------------------------------------------
+                     
+       endmodule
+       
+       
+       
+       module hsqrt(input clk,                                          // CALCULATES SQUARE ROOT BASED ON CORDIC IP
+                    input [15:0] hin,
+                    output [7:0] hout
+           );
+           
+           wire [15:0] hinter;
+           wire houtvalid,houtvalid_delby3;
+           
+           cordic_0 hsqrtop (
+             .aclk(clk),                                        // input wire aclk
+             .s_axis_cartesian_tvalid(1'b1),  // input wire s_axis_cartesian_tvalid
+             .s_axis_cartesian_tdata(hin),    // input wire [15 : 0] s_axis_cartesian_tdata
+             .m_axis_dout_tvalid(houtvalid),            // output wire m_axis_dout_tvalid
+             .m_axis_dout_tdata(hinter)              // output wire [15 : 0] m_axis_dout_tdata
+           );
+           
+           hmultipledelay #(8'd1,8'd3) hmd_tvalide_bymore3 (clk,1'b0,houtvalid,houtvalid_delby3);  
+       
+           assign hout=(houtvalid_delby3)?hinter[7:0]:8'd0;
+           
+       endmodule
+       
+       
+       
+
+
+       module hhssim #(parameter HIM_LEN=16'd150,HKER_SIZE=8'd3) (                      // CALCULATES HSSIM VALUE OF INPUT BASED ON EDGE MAP OF INPUT AND REF. IMAGE
+                                     input clk,
+                                     input rst,
+                                     input [7:0] hin_orig,
+                                     input [7:0] href_orig,
+                                     input hclearbuffer_sig,
+                                     
+                                     output signed [34:0] hout_numr,
+                                     output signed [30:0] hout_deno,
+                                     
+                                     input hclearbuffer_sig_delayedby_more1,
+                                     input hclearbuffer_sig_delayedby_more10,
+                                     
+                                     input [HKER_SIZE-2:0] hrowend,
+                                     input [HKER_SIZE-2:0] hrowend_delayedby_more1,
+                                     input [HKER_SIZE-2:0] hrowend_delayedby_more10,
+                                     
+                                     input [7:0] href_edgemap,
+                                     input [7:0] hmu_ref,
+                                     input [15:0] hmu_refref,
+                                     input signed [16:0] hsig_ref_sqrd
+                                     
+                                     );
+                                     integer i,p;
+                                     
+                                  //   parameter HIM_LEN=16'd150;
+                                 //    parameter hker=4'd3;
+                                 //    parameter (HIM_LEN+1)*(hker-1)=(HIM_LEN+1)*(hker-1);
+                                     parameter signed c1=18'd8;
+                                     parameter signed c2=18'd50;
+                                     
+                                 
+                                     wire [7:0] hmu_in; // mean
+                                     wire [15:0] hin_edgemap_sqrd,hinref_edgemap,hmu_inin,hmu_inref,hin_edgemap_sqrd_g,hinref_edgemap_g;
+                                   
+                                     wire signed [16:0] hsig_in_sqrd,hsig_inref; // variance and covariance
+                                 
+                                     wire signed [17:0] temp1,temp2; // Temp variables 16 bits, 1sign bit
+                                     reg signed [17:0] hnumr_1,hnumr_2;   // Numerator requires 17 bits, 1sign bit
+                                     reg signed [19:0] hdeno_1_temp,hdeno_2_temp;   // Denominator requires 18bits, 1sign bit
+                                     wire signed [17:0] hdeno_1,hdeno_2;   // Denominator requires 18bits, 1sign bit
+                                     wire signed [30:0] hdeno;       // Numr and Denor requires 34 bits, 1sign bit
+                                     reg signed [34:0] hnumr;       // Numr and Denor requires 34 bits, 1sign bit
+                                     reg signed [34:0] hdeno_temp;       // Numr and Denor requires 34 bits, 1sign bit
+                                     reg signed [34:0] hdiv;
+                                 
+                                     wire [7:0] hinedgex,hinedgey;
+                                     //wire [7:0] hrefedgex,hrefedgey;
+                                     wire [7:0] hin_edgemap;
+                                     wire [15:0] hinedgex_squared,hinedgey_squared;
+                                     //wire [15:0] hrefedgex_squared,hrefedgey_squared;
+
+                                     
+                                     //wire hclearbuffer_sig_delayedby_more10,hclearbuffer_sig_delayedby_more1;
+                                     //wire [HKER_SIZE-2:0] hrowend_delayedby_more10;
+                                     //wire [HKER_SIZE-2:0] hrowend_delayedby_more1 ;
+                                     wire [15:0] hin_edgemap_sqrd_g_delayedby9;
+                                     
+                                     
+                                     //hmultipledelay #(1'b1,8'd10) hmd_clrbuffer_bymore10 (clk,rst,hclearbuffer_sig,hclearbuffer_sig_delayedby_more10);
+                                     //hmultipledelay #(1'b1,8'd1) hmd_clrbuffer_bymore1 (clk,rst,hclearbuffer_sig,hclearbuffer_sig_delayedby_more1);  
+                                     
+                                     //hmultipledelay #(HKER_SIZE-1,8'd10,1'b1) hmd_rowend_bymore9 (~clk,rst,hrowend,hrowend_delayedby_more10);
+                                     //hmultipledelay #(HKER_SIZE-1,8'd1,1'b1) hmd_rowend_bymore1 (~clk,rst,hrowend,hrowend_delayedby_more1);
+                                   
+                                     hmultipledelay #(8'd16,8'd9) hmd_hin_edgemap_sqrd_g_bymore9 (clk,rst,hin_edgemap_sqrd_g,  hin_edgemap_sqrd_g_delayedby9  );
+                                     //hmultipledelay #(8'd16,8'd9) hmd_href_edgemap_sqrd_g_bymore9 (clk,rst,href_edgemap_sqrd_g,  href_edgemap_sqrd_g_delayedby9  );
+                                     
+                                 
+                                 
+                                     hconvx #(HIM_LEN) hconvx1(clk,rst,hin_orig,hclearbuffer_sig,hrowend,hinedgex);     // Generating the HORIZONTAL AND VERTICAL EDGE MAPs
+                                     //hconvx #(HIM_LEN) hconvx2(clk,rst,href_orig,hclearbuffer_sig,hrowend,hrefedgex);
+                                     hconvy #(HIM_LEN) hconvy1(clk,rst,hin_orig,hclearbuffer_sig,hrowend,hinedgey);
+                                     //hconvy #(HIM_LEN) hconvy2(clk,rst,href_orig,hclearbuffer_sig,hrowend,hrefedgey);
+                                     
+                   
+                                 
+                                     assign hinedgex_squared=hinedgex*hinedgex;                         //--------- Creating a COMBINED INPUT IMAGE EDGE MAP from HORIZONTAL AND VERTICAL EDGE MAPs
+                                     assign hinedgey_squared=hinedgey*hinedgey;
+                                     assign hin_edgemap_sqrd=(hinedgex_squared+hinedgey_squared)>>1;
+                                     hsqrt hsqrt_in(clk,hin_edgemap_sqrd,hin_edgemap);                  //--------- Creating a COMBINED INPUT IMAGE EDGE MAP from HORIZONTAL AND VERTICAL EDGE MAPs
+                                     
+                                     //assign hrefedgex_squared=hrefedgex*hrefedgex;                      //--------- Creating a COMBINED REFERENCE IMAGE EDGE MAP from HORIZONTAL AND VERTICAL EDGE MAPs
+                                     //assign hrefedgey_squared=hrefedgey*hrefedgey;
+                                     //assign href_edgemap_sqrd=(hrefedgex_squared+hrefedgey_squared)>>1;
+                                     //hsqrt hsqrt_ref(clk,href_edgemap_sqrd,href_edgemap);               //--------- Creating a COMBINED REFERENCE IMAGE EDGE MAP from HORIZONTAL AND VERTICAL EDGE MAPs
+                                     
+                   
+                                     assign hinref_edgemap=href_edgemap*hin_edgemap; // Multiplying INPUT and REFERENCE edge maps
+                   
+                   
+                                     (* use_dsp = "yes" *)hconvg8 #(HIM_LEN) hconvg81(clk,rst,  hin_edgemap,  hclearbuffer_sig_delayedby_more10,  hrowend_delayedby_more10,hmu_in);    // Mean calculation on input image edge map  //****CHECK FOR DELAY
+                                     //hconvg8 #(HIM_LEN) hconvg82(clk,rst,  href_edgemap,  hclearbuffer_sig_delayedby_more10,  hrowend_delayedby_more10,hmu_ref);  // Mean calculation on reference image edge map
+                                 
+                                     (* use_dsp = "yes" *)hconvg16 #(HIM_LEN) hconvg161(clk,rst,  hin_edgemap_sqrd,  hclearbuffer_sig_delayedby_more1,  hrowend_delayedby_more1,  hin_edgemap_sqrd_g  );   // Mean calculation on squared input image edge map//****CHECK FOR DELAY
+                                     //hconvg16 #(HIM_LEN) hconvg162(clk,rst,  href_edgemap_sqrd,  hclearbuffer_sig_delayedby_more1,  hrowend_delayedby_more1,  href_edgemap_sqrd_g  ); // Mean calculation on squared reference image edge map
+                                     (* use_dsp = "yes" *)hconvg16 #(HIM_LEN) hconvg163(clk,rst,  hinref_edgemap,  hclearbuffer_sig_delayedby_more10,  hrowend_delayedby_more10,  hinref_edgemap_g  );       // Mean calculation on product of reference and input image edge map
+                                 
+                                     
+                                     
+                                     assign hmu_inin= hmu_in*hmu_in;                       // Generating reqd mean(MU) values  //****CHECK FOR DELAY
+                                     //assign hmu_refref= hmu_ref*hmu_ref;
+                                     assign hmu_inref= hmu_in*hmu_ref;
+                                 
+                                     assign hsig_in_sqrd= hin_edgemap_sqrd_g_delayedby9 - hmu_inin;   // Generating reqd co-variance(SIGMA) values //****CHECK FOR DELAY
+                                     //assign hsig_ref_sqrd= href_edgemap_sqrd_g_delayedby9 - hmu_refref;
+                                     assign hsig_inref= hinref_edgemap_g - hmu_inref;
+                                 
+                                 
+                                 
+                                     assign temp1=(hmu_inref);                    // Multiplication by 2 as per SSIM calculation //****CHECK FOR DELAY
+                                     assign temp2=(hsig_inref);                        // Multiplication by 2 as per SSIM calculation
+//                                     assign hnumr_1=(c1+temp1);                             // Numerator terms ,17 bits each
+//                                     assign hnumr_2=(c2+temp2);
+//                                     assign hdeno_1_temp=c1+(hmu_inin)+(hmu_refref); // Denominator terms, 18bits each
+//                                     assign hdeno_2_temp=c2+hsig_in_sqrd+hsig_ref_sqrd;
+                                     assign hdeno_1=hdeno_1_temp>>>2;
+                                     assign hdeno_2=hdeno_2_temp>>>2;
+                                     
+                                     assign hdeno=(hdeno_temp>>>4);
+                                     
+                                 
+                                     always@(posedge clk)
+                                     begin
+                                     hnumr_1<=(c1+temp1);                             // Numerator terms ,17 bits each
+                                     hnumr_2<=(c2+temp2);
+                                     hdeno_1_temp<=(18'd16+(hmu_inin)+(hmu_refref)); // Denominator terms, 18bits each
+                                     hdeno_2_temp<=(18'd100+hsig_in_sqrd+hsig_ref_sqrd);
+                                     
+                                     hnumr<=(hnumr_1)*(hnumr_2);              //****CHECK FOR DELAY
+                                     hdeno_temp<=(hdeno_1)*(hdeno_2);
+                                     
+                                      //hdiv<=hnumr; //******* DIVISION REMOVED
+                                 
+                                      //hout<=(hdeno[29:0]==30'd0)?(((hdeno[30]^hnumr[34])==1'b1)? {1'b1,{34{1'b0}}} : {1'b0,{34{1'b1}}}  ) : (hdiv); // required bit shifts to generate a 8 bit output //****CHECK FOR DELAY
+                                     end
+                                     
+                                     assign hout_numr=hnumr;
+                                     assign hout_deno=hdeno;
+                                     
+                                     
+                                 endmodule
+                                 
+                                 
+                                 
+
+ module hcommon_hssim #(parameter HIM_LEN=16'd300,HKER_SIZE=8'd3)(  // GENERATES COMMON HSSIM SIGNALS TO SAVE RESOURCES
+     
+ input clk,
+ input rst,
+ input [7:0] href_orig,
+ input hclearbuffer_sig,
+ 
+ output hclearbuffer_sig_delayedby_more1,
+ output hclearbuffer_sig_delayedby_more10,
+ 
+ output [HKER_SIZE-2:0] hrowend,
+ output [HKER_SIZE-2:0] hrowend_delayedby_more1,
+ output [HKER_SIZE-2:0] hrowend_delayedby_more10,
+ 
+ output [7:0] href_edgemap,
+ output [7:0] hmu_ref,
+ output [15:0] hmu_refref,
+ output signed [16:0] hsig_ref_sqrd
+           );
+           
+           wire [7:0] hrefedgex,hrefedgey;
+           wire [15:0] hrefedgex_squared,hrefedgey_squared;
+           wire [15:0] href_edgemap_sqrd,href_edgemap_sqrd_g,href_edgemap_sqrd_g_delayedby9;
+           
+           
+           // COMMON  SIGNALS FOR DIFFERENT HSSIM MODULES---------------------------------
+           
+           h_rowend_sig_genr #(HIM_LEN,HKER_SIZE)h5(clk,rst,hclearbuffer_sig,hrowend[1:0]);
+           
+           hmultipledelay #(1'b1,8'd10) hmd_clrbuffer_bymore10 (clk,rst,hclearbuffer_sig,hclearbuffer_sig_delayedby_more10);
+           hmultipledelay #(1'b1,8'd1) hmd_clrbuffer_bymore1 (clk,rst,hclearbuffer_sig,hclearbuffer_sig_delayedby_more1);  
+           
+           hmultipledelay #(HKER_SIZE-1,8'd10,1'b1) hmd_rowend_bymore9 (~clk,rst,hrowend,hrowend_delayedby_more10);
+           hmultipledelay #(HKER_SIZE-1,8'd1,1'b1) hmd_rowend_bymore1 (~clk,rst,hrowend,hrowend_delayedby_more1);
+           
+           hmultipledelay #(8'd16,8'd9) hmd_href_edgemap_sqrd_g_bymore9 (clk,rst,href_edgemap_sqrd_g,  href_edgemap_sqrd_g_delayedby9  );
+           
+           hconvx #(HIM_LEN) hconvx2(clk,rst,href_orig,hclearbuffer_sig,hrowend,hrefedgex);
+           hconvy #(HIM_LEN) hconvy2(clk,rst,href_orig,hclearbuffer_sig,hrowend,hrefedgey);
+           
+           assign hrefedgex_squared=hrefedgex*hrefedgex;                      //--------- Creating a COMBINED REFERENCE IMAGE EDGE MAP from HORIZONTAL AND VERTICAL EDGE MAPs
+           assign hrefedgey_squared=hrefedgey*hrefedgey;
+           assign href_edgemap_sqrd=(hrefedgex_squared+hrefedgey_squared)>>1;
+           hsqrt hsqrt_ref(clk,href_edgemap_sqrd,href_edgemap);               //--------- Creating a COMBINED REFERENCE IMAGE EDGE MAP from HORIZONTAL AND VERTICAL EDGE MAPs
+           
+           (* use_dsp = "yes" *)hconvg8 #(HIM_LEN) hconvg82(clk,rst,  href_edgemap,  hclearbuffer_sig_delayedby_more10,  hrowend_delayedby_more10,hmu_ref);  // Mean calculation on reference image edge map
+           
+           (* use_dsp = "yes" *)hconvg16 #(HIM_LEN) hconvg162(clk,rst,  href_edgemap_sqrd,  hclearbuffer_sig_delayedby_more1,  hrowend_delayedby_more1,  href_edgemap_sqrd_g  ); // Mean calculation on squared reference image edge map
+           
+           assign hmu_refref= hmu_ref*hmu_ref;          
+           
+           assign hsig_ref_sqrd= href_edgemap_sqrd_g_delayedby9 - hmu_refref;
+           
+           //-------------------------------------------------------------------------------
+           
+           
+           
+endmodule
+
+
+
+ module hfusion #(parameter HNO_IMAGES=8'd1,HIM_LEN=16'd300,FUSEDIMAGE_DATA_WIDTH=8'd8,HKER_SIZE=8'd3)(  // CREATES ALL THE NEW FUSED IMAGES BASED ON INPUT and OLD FUSED IMAGES
+     
+           input clk,
+           input rst,
+           input [0:HNO_IMAGES-1] hstop_sig,
+           input [FUSEDIMAGE_DATA_WIDTH*HNO_IMAGES-1:0] hfuse_bus,                // previous fused image
+           input [7:0] hnew,        // new incoming image
+           input [7:0] href,        // reference image
+           input hclearbuffer_sig,
+           output reg [FUSEDIMAGE_DATA_WIDTH*HNO_IMAGES-1:0] hout_newfused_bus);    // new fused image combining previous fused and new incoming image
+           //output signed [34:0] hdiv);
+           
+           
+           reg [7:0] hfuse[0:HNO_IMAGES-1];
+           reg [7:0] hout_newfused[0:HNO_IMAGES-1];
+           
+           wire signed [34:0] hhssim_out_fuse_numr[0:HNO_IMAGES-1];
+           wire signed [30:0] hhssim_out_fuse_deno[0:HNO_IMAGES-1];
+           wire signed [34:0] hhssim_out_new_numr;
+           wire signed [30:0] hhssim_out_new_deno;
+     
+
+//           wire [15:0] hinterprod_fuse[0:HNO_IMAGES-1],hinterprod_new[0:HNO_IMAGES-1],hcombo[0:HNO_IMAGES-1];    //--------------- IS THIS REQD?
+//           wire [16:0] hintersum[0:HNO_IMAGES-1];
+//           wire [8:0] hhssim_sum[0:HNO_IMAGES-1];                                                                //--------------- IS THIS REQD?
+           
+           
+           wire [FUSEDIMAGE_DATA_WIDTH-1:0] hfuse_delayed_more18 [0:HNO_IMAGES-1];
+           wire [FUSEDIMAGE_DATA_WIDTH-1:0] hnew_delayed_more18;
+           wire hstop_sig_more18 [0:HNO_IMAGES-1];
+           
+           reg  [FUSEDIMAGE_DATA_WIDTH-1:0] hdel[0:HNO_IMAGES-1];
+           wire [FUSEDIMAGE_DATA_WIDTH-1:0] hdel_out_fuse[0:HNO_IMAGES-1];
+           reg  [FUSEDIMAGE_DATA_WIDTH-1:0] hdel_out_new[0:HNO_IMAGES-1];
+           
+           
+           reg [7:0] hcombo1[0:HNO_IMAGES-1];
+           reg [15:0] hinterprod_fuse1[0:HNO_IMAGES-1];
+           reg [15:0] hinterprod_new1[0:HNO_IMAGES-1];
+           reg [16:0] hintersum1[0:HNO_IMAGES-1];
+           reg [8:0] hhssim_sum1[0:HNO_IMAGES-1];
+           
+           wire signed [64:0] fuse_numr_X_new_deno[0:HNO_IMAGES-1];
+           wire signed [64:0] fuse_deno_X_new_numr[0:HNO_IMAGES-1];
+           
+           wire hclearbuffer_sig_delayedby_more1;
+           wire hclearbuffer_sig_delayedby_more10,hclearbuffer_sig_delayedby_more11;
+           
+           wire [HKER_SIZE-2:0] hrowend;
+           wire [HKER_SIZE-2:0] hrowend_delayedby_more1;
+           wire [HKER_SIZE-2:0] hrowend_delayedby_more10,hrowend_delayedby_more11;
+           
+           wire [7:0] href_edgemap;
+           wire [7:0] hmu_ref;
+           wire [15:0] hmu_refref;
+           wire signed [16:0] hsig_ref_sqrd;
+           reg hgrtorsml[0:3][0:HNO_IMAGES-1];
+          // wire [34:0] hdiv;
+
+           genvar hgenvar;
+           integer g;
+     
+     
+           // UNPACKNG INPUT ARRAY INTO RESPECTIVE SIGNALS,----DEFLATENING-----------------
+         
+               always@(*)
+               begin
+               
+                for(  g=0;g<HNO_IMAGES;g=g+1)  
+                hfuse[g][7:0]=hfuse_bus[g*8+:8];  
+               
+               end
+               
+           //------------------------------------------------------------------------------
+           
+           
+
+
+           // HSSIM CALCULATION------------------------------------------------------------
+
+              (* use_dsp = "yes" *) hhssim #(HIM_LEN) hssim_new(clk, rst, hnew, href, hclearbuffer_sig, hhssim_out_new_numr, hhssim_out_new_deno, hclearbuffer_sig_delayedby_more1, hclearbuffer_sig_delayedby_more10, hrowend, hrowend_delayedby_more1, hrowend_delayedby_more10, href_edgemap, hmu_ref, hmu_refref, hsig_ref_sqrd);
+              (* use_dsp = "yes" *) hcommon_hssim #(HIM_LEN,HKER_SIZE) hcommon_hssim_ref(clk, rst, href, hclearbuffer_sig, hclearbuffer_sig_delayedby_more1, hclearbuffer_sig_delayedby_more10, hrowend, hrowend_delayedby_more1, hrowend_delayedby_more10, href_edgemap, hmu_ref, hmu_refref, hsig_ref_sqrd);
+               
+                   generate
+           
+                       for(hgenvar=0;hgenvar<HNO_IMAGES;hgenvar=hgenvar+1)
+                       begin: hhssim_calc
+                               (* use_dsp = "yes" *)hhssim #(HIM_LEN) hssim_fuse_inst(clk, rst, hfuse[hgenvar], href, hclearbuffer_sig, hhssim_out_fuse_numr[hgenvar], hhssim_out_fuse_deno[hgenvar], hclearbuffer_sig_delayedby_more1, hclearbuffer_sig_delayedby_more10, hrowend, hrowend_delayedby_more1, hrowend_delayedby_more10, href_edgemap, hmu_ref, hmu_refref, hsig_ref_sqrd);
+                       end
+           
+                   endgenerate
+
+           //-------------------------------------------------------------------------------
+           
+
+
+           // DELAY BLOCKS------------------------------------------------------------------
+           
+             hmultipledelay #(HKER_SIZE-1,8'd17,1'b1) hmd_rowend_bymore11 (~clk,rst,hrowend,hrowend_delayedby_more11); // ***THIS CAN BE OPTIMISED
+
+             hmultipledelay #(1'b1,8'd17) hmd_clrbuffer_bymore10 (clk,rst,hclearbuffer_sig,hclearbuffer_sig_delayedby_more11);
+             
+                   generate
+           
+                       for(hgenvar=0;hgenvar<HNO_IMAGES;hgenvar=hgenvar+1)
+                       begin : hdelay_elements
+                       
+                            hmultipledelay #(FUSEDIMAGE_DATA_WIDTH,8'd18) hod_fuse1 (clk,rst,hfuse[hgenvar],hfuse_delayed_more18[hgenvar]);    // DELAYED FOR GIVING TIME TO HSSIM CALCULATION
+       
+                            hmultipledelay #(1'b1,8'd18) hod_stop (clk,rst,hstop_sig[hgenvar],hstop_sig_more18[hgenvar]);            
+       
+                       end
+           
+                   endgenerate
+
+              hmultipledelay #(FUSEDIMAGE_DATA_WIDTH,8'd18) hod_new1 (clk,rst,hnew,hnew_delayed_more18);
+             
+              //hmultipledelay #(1'b1,8'd12) hod_rst_18 (clk,rst,rst,rst_delayed_more18);
+
+           //----------------------------------------------------------------------------------
+                   
+                   
+       
+//                   assign hinterprod_new=(hhssim_out_new*hnew_delayed_more15);                // CAREFUL IT SHOULD BE more 15 ,  NOT more 18 since 3 clk cycle delay from gaussian bluring
+//                   assign hinterprod_fuse=(hhssim_out_fuse*hfuse_delayed_more15);             // CAREFUL IT SHOULD BE more 15 ,  NOT more 18 since 3 clk cycle delay from gaussian bluring
+//                   assign hintersum=(hinterprod_new+hinterprod_fuse);
+//                   assign hhssim_sum=(hhssim_out_fuse+hhssim_out_new);
+//                   assign hcombo=(hhssim_sum=={16{1'b0}})?hfuse_delayed_more18:(hintersum/hhssim_sum);
+
+
+
+            // OPERATION BLOCKS------------------------------------------------------------------
+
+                   generate
+           
+                       for(hgenvar=0;hgenvar<HNO_IMAGES;hgenvar=hgenvar+1)
+                       begin : hdel_conv
+
+                           (* use_dsp = "yes" *) hconvg8 #(HIM_LEN) hconvg8_del(clk, rst, hdel[hgenvar], hclearbuffer_sig_delayedby_more11, hrowend_delayedby_more11, hdel_out_fuse[hgenvar]); // BLURRING the hdel signal ,for spreading to nearby pixels
+                           (* use_dsp = "yes" *) h34X30_multiplier h34X30_multiplier_inst_1(clk,rst,hhssim_out_new_numr,hhssim_out_fuse_deno[hgenvar],fuse_deno_X_new_numr[hgenvar]) ;
+                           (* use_dsp = "yes" *) h34X30_multiplier h34X30_multiplier_inst_2(clk,rst,hhssim_out_fuse_numr[hgenvar],hhssim_out_new_deno,fuse_numr_X_new_deno[hgenvar]) ;
+                       end
+           
+                   endgenerate
+                   
+
+              always@(*)
+              begin
+             
+                   for(g=0;g<HNO_IMAGES;g=g+1)
+                   begin
+                   
+                       //hdel[g]=(hhssim_out_fuse[g]>hhssim_out_new)?{FUSEDIMAGE_DATA_WIDTH{1'b1}}:{FUSEDIMAGE_DATA_WIDTH{1'b0}}; // hdel signal based hssimvalues of new and old fused image
+                       hdel_out_new[g]=~(hdel_out_fuse[g]);                                  // hdel value for new image will be complement of fused image signal
+                       hinterprod_new1[g]=(hdel_out_new[g]*hnew_delayed_more18);             // Generating the reqd partial products
+                       hinterprod_fuse1[g]=(hdel_out_fuse[g]*hfuse_delayed_more18[g]);
+                       hintersum1[g]=(hinterprod_new1[g]+hinterprod_fuse1[g]);               // Generating the reqd sum
+                       hcombo1[g]=(hintersum1[g]=='d0)?hfuse_delayed_more18[g]:(hintersum1[g]>>8);
+                       //hcombo1[g]=(hintersum1[g]=={16{1'b0}})?hfuse_delayed_more18[g]:((hintersum1[g]>>8)); // assigning value to new fused image OR COMBO image
+                   
+                   end
+                   
+              end
+             
+             
+              always@(posedge clk or posedge rst)
+              begin
+             
+                if(rst)
+                begin
+               
+                   for(g=0;g<HNO_IMAGES;g=g+1)
+                   begin
+                   
+                     hdel[g]='d0;
+                     hgrtorsml[0][g]<='d0;
+                     hgrtorsml[1][g]<='d0;
+                     hgrtorsml[2][g]<='d0;
+                     hgrtorsml[3][g]<='d0;
+                     hout_newfused[g]<='d0;
+                     
+                   end
+               
+                end
+             
+                else
+                begin
+               
+                   for(g=0;g<HNO_IMAGES;g=g+1)
+                   begin
+                   
+                     (* use_dsp = "yes" *)hdel[g]=(fuse_numr_X_new_deno[g]>fuse_deno_X_new_numr[g])?((hgrtorsml[3][g])?{FUSEDIMAGE_DATA_WIDTH{1'b0}}:{FUSEDIMAGE_DATA_WIDTH{1'b1}}):((hgrtorsml[3][g])?{FUSEDIMAGE_DATA_WIDTH{1'b1}}:{FUSEDIMAGE_DATA_WIDTH{1'b0}});
+                     hgrtorsml[0][g]<=hhssim_out_fuse_deno[g][30]^hhssim_out_new_deno[30];
+                     hgrtorsml[1][g]<=hgrtorsml[0][g];
+                     hgrtorsml[2][g]<=hgrtorsml[1][g];
+                     hgrtorsml[3][g]<=hgrtorsml[2][g];
+                     //hgrtorsml[4][g]<=hgrtorsml[3][g];
+                     hout_newfused[g]<=(hstop_sig_more18[g]==1'b0)?(hcombo1[g]):{FUSEDIMAGE_DATA_WIDTH{1'b0}};
+                     
+                   end
+                   
+                end
+               
+              end
+             
+             
+
+            //----------------------------------------------------------------------------------
+           
+           
+       
+            // FINAL STABLE OUTPUT ASSIGNMENT AT NEGEDDGE---------------------------------------
+           
+//            always@(negedge clk)
+//            begin
+           
+//                for(g=0;g<HNO_IMAGES;g=g+1)
+//                begin
+//                                                                // hout_newfused<=(hhssim_out_new>hhssim_out_fuse)?hnew_delayed_more7:hfuse_delayed_more7;
+//                hout_newfused[g]<=(hstop_sig_more18[g]==1'b0)?(hcombo1[g]):{FUSEDIMAGE_DATA_WIDTH{1'b0}}; //****CHECK FOR DELAY AND LOGIC
+           
+//                end
+       
+//            end
+           
+           
+           
+            //-----------------------------------------------------------------------------------
+           
+           
+           
+            // FLATENING THE OUTPUT,  -------------------------------------------------------------
+           
+            always@(*)
+            for(g=0;g<HNO_IMAGES;g=g+1)   // INPUTs are delayed by ONE CLK cycle, because AVERAGE calculation takes ONE CLK cycle
+            hout_newfused_bus[g*8+:8]=hout_newfused[g][7:0];    
+           
+            //-----------------------------------------------------------------------------------
+       
+           //assign hdiv=hhssim_out_fuse_numr[0]/hhssim_out_fuse_deno[0];
+           
+           endmodule
+           
+           
+           
+ module h34X30_multiplier (  // CREATES ALL THE NEW FUSED IMAGES BASED ON INPUT and OLD FUSED IMAGES
+     
+           input clk,
+           input rst,
+           input signed [34:0] a,
+           input signed [30:0] b,              
+           output reg signed [64:0] hprod    // new fused image combining previous fused and new incoming image
+           );
+           
+           wire [16:0] a_lower,a_upper;
+           wire [14:0] b_lower,b_upper;
+           reg [31:0] alow_X_bup,alow_X_blow,aup_X_blow,aup_X_bup;
+           reg [47:0] sum1,sum2;
+           reg signed [64:0] sum_absolute;
+           wire assign_sign;
+           reg assign_sign_delayedby_1,assign_sign_delayedby_2,assign_sign_delayedby_3,assign_sign_delayedby_4;
+           wire [33:0] a_mag;
+           wire [29:0] b_mag;
+           wire signed [64:0] hprod_calc;
+           
+//           assign a_lower={a[34],a[16:0]};
+//           assign a_upper={a[34],a[33:17]};
+//           assign b_lower={b[30],b[14:0]};
+//           assign b_upper={b[30],b[29:15]};
+
+
+                    assign a_mag=(a[34])?-a:a;
+                    assign b_mag=(b[30])?-b:b;
+                    assign assign_sign=a[34]^b[30];
+                   
+                    assign a_lower={a_mag[16:0]};
+                    assign a_upper={a_mag[33:17]};
+                    assign b_lower={b_mag[14:0]};
+                    assign b_upper={b_mag[29:15]};
+                   
+                    assign hprod_calc=(assign_sign_delayedby_3)?(-sum_absolute):sum_absolute;
+                   
+                   
+                   
+           
+           
+           always@(posedge clk)  // NO CLEAR BUFFER SIGNAL NEEDED SINCE NO EXTRA OUTPUTS CREATED LIKE IN CASE OF CONVOLUTION MODULES WHICH CREATES A LARGER OUTPUT
+           begin
+           
+                if(rst)
+                begin
+//                a_mag<='d0;
+//                b_mag<='d0;
+//                assign_sign='d0;
+                   
+//                a_lower<='d0;
+//                a_upper<='d0;
+//                b_lower<='d0;
+//                b_upper<='d0;
+//                assign_sign_delayedby_1<='d0;
+               
+                alow_X_bup<='d0;
+                alow_X_blow<='d0;
+                aup_X_blow<='d0;
+                aup_X_bup<='d0;
+                assign_sign_delayedby_1<='d0;
+                   
+                sum1<='d0;
+                sum2<='d0;
+                assign_sign_delayedby_2<='d0;
+               
+                sum_absolute<='d0;
+                assign_sign_delayedby_3<='d0;
+               
+                hprod<='d0;
+                end
+               
+                else
+                begin
+               
+//                    a_mag<=(a[34])?-a:a;
+//                    b_mag<=(b[30])?-b:b;
+//                    assign_sign=a[34]^b[30];
+                   
+//                    a_lower<={a_mag[16:0]};
+//                    a_upper<={a_mag[33:17]};
+//                    b_lower<={b_mag[14:0]};
+//                    b_upper<={b_mag[29:15]};
+//                    assign_sign_delayedby_1<=assign_sig;
+                   
+                    alow_X_bup<=a_lower*b_upper;
+                    alow_X_blow<=a_lower*b_lower;
+                    aup_X_blow<=a_upper*b_lower;
+                    aup_X_bup<=a_upper*b_upper;
+                    assign_sign_delayedby_1<=assign_sign;
+                   
+                    sum1<=alow_X_blow+{alow_X_bup,15'd0};
+                    sum2<=aup_X_blow+{aup_X_bup,15'd0};
+                    assign_sign_delayedby_2<=assign_sign_delayedby_1;
+                   
+                    sum_absolute<=sum1+{sum2,17'd0};
+                    assign_sign_delayedby_3<=assign_sign_delayedby_2;
+                   
+                    hprod<=hprod_calc;
+                end
+                   
+           end    
+           
+         
+           
+           endmodule
+           
+           
+           
+           
+       module hstatecontroller #(parameter DATA_WIDTH = 9 ,HNO_IMAGES=2,HIM_LEN=16'd2, HIM_WID=16'd2, LOG2_NO_OF_IMAGES = 3 )  (   // The state signal genrator which controls the WHOLE pipeline
+       input hclk,
+       input hres,
+       input [DATA_WIDTH-1:0] hfsm_avg,    
+       output reg [LOG2_NO_OF_IMAGES-1:0] hstate);  // No. of bits in hstate = log2(No of images being combined together).
+       
+           always@( posedge hres or posedge hclk)
+           begin
+               if(hres)
+               hstate<={LOG2_NO_OF_IMAGES{1'b1}};
+               //hstate<={{(LOG2_NO_OF_IMAGES-2'd2){1'b0}},{2'b01}}; //starts from 1 because, when it STARTS, ONE INCREMENTS happens
+       
+               else
+               begin
+               
+                   if(hfsm_avg+1>=(HIM_LEN*HIM_WID))
+                   begin
+                       hstate<=(hstate+1);  // Increment when one image processing is complete
+                   end
+                   
+                   else
+                   hstate<=hstate; //keep refreshing
+       
+               end
+       
+           end
+       
+       endmodule    
+           
+           
+           
+           
+     
+     
+       (* black_box *)module  hmemory #(parameter DATA_WIDTH = 8, ADDR_WIDTH = 17, HNO_IMAGES = 8, HIM_LEN=16'd150, HIM_WID=16'd150 )(    //  Stores the INPUT images
+       input hclk,
+       input hres,
+       input [ADDR_WIDTH-1:0] hw_addr,  // ***** No. of address lines = greatest_integer(log2( No of images being stored * size of each image))
+       input [DATA_WIDTH-1:0] hw_data,
+       input [ADDR_WIDTH-1:0] hr_addr,
+       output [DATA_WIDTH-1:0] hr_data);
+       
+       
+       (*ram_style="block"*)reg [DATA_WIDTH-1:0] hmem[0:(HNO_IMAGES*HIM_LEN*HIM_WID)-1];
+       
+       reg [30:0] i;
+       
+           always@(posedge hres or posedge hclk)
+           begin
+           
+               if(hres)
+               begin
+                   for(i=0;i<HNO_IMAGES*HIM_LEN*HIM_WID;i=i+1)
+                   hmem[i]<={DATA_WIDTH{1'b0}};
+               end
+       
+               else
+               begin
+                   hmem[hw_addr]<=hw_data;  // SYNCHRONUS WRITE AT POSEDGE
+                   //hr_data<=hmem[hr_addr];
+               end
+               
+           end
+       
+       assign hr_data=hmem[hr_addr];   // ASYNCHRONUS READ
+       
+       endmodule
+     
+           
+           
+           
+           
+      module haddr_fsm #(parameter ADDR_WIDTH=17,HNO_IMAGES=8,HIM_LEN=16'd150, HIM_WID=16'd150)(      // Creates sequence of addresses for storing SINGLE or MULTIPLE INPUT image
+       input hclk,
+       input hres,
+       output reg [ADDR_WIDTH-1:0] hout);
+       
+       
+           always@(posedge hres or posedge hclk)
+           begin
+               if(hres)
+               hout<=({ADDR_WIDTH{1'b0}}-1);  //starts from ({ADDR_WIDTH{1'b0}}-1) because, when it STARTS, ONE INCREMENT happens, Then it can start from ZERO
+       
+               else
+               begin
+               
+                   if(hout+1>=(HNO_IMAGES*HIM_LEN*HIM_WID))   // 8*100*100=80000
+                   hout<={ADDR_WIDTH{1'b0}};
+                   
+                   else
+                   hout<=hout+1;
+                   
+               end
+           end
+       
+       endmodule
+           
+           
+           
+           
+       module hstop #(parameter LOG2_NO_OF_IMAGES = 3 )(      // STOP signal generator, which delays the begining of pipeline operations, till required no. of images have been acquired
+       input hclk,
+       input hres,
+       input [LOG2_NO_OF_IMAGES-1:0] hstate,        
+       output reg hstopsig);
+       
+           always@( posedge hres or posedge hclk)
+           begin
+           
+               if(hres)
+               hstopsig<=1'd1;   // stop signal should be initially HIGH
+       
+               else
+               begin
+                       if((hstopsig==1'd1)&&(hstate=={LOG2_NO_OF_IMAGES{1'b0}}))  // ** CHANGE THIS TO TWO OR MAKE STATE CONTROLLER START FROM 0 minus 1
+                       hstopsig<=1'd0;
+                       
+                       else
+                       hstopsig<=hstopsig; //Keep refreshing the signal
+       
+               end
+       
+           end
+       
+       endmodule
+       
+       
+              module hdff_stop (
+       input hclk,
+       input hres,
+       input hin,
+       output reg hout);
+       
+           always@(posedge hres or posedge hclk)
+           begin
+               if(hres)
+               hout<=1'b1;
+       
+               else
+               hout<=hin;
+           end
+       
+       endmodule
+           
+           
+           
+           
+           module hpipeline #(parameter HIM_LEN=40'd640, HIM_WID=40'd480, SUM_ADDR_WIDTH=8'd19, LOG2_NO_OF_IMAGES=8'd4)(   // HANDLES THE WHOLE PIPELINE
+               input clk,
+               input rst,
+               input [7:0] hin,
+               output [7:0] hout); //***SIZE MAY HAVE TO BE CHANGED
+           
+           
+           //parameter HIM_LEN=20'd100;    
+           //parameter HIM_WID=20'd100;
+           
+          // parameter SUM_ADDR_WIDTH=8'd15;        // log2( SIZE OF IMAGE)
+           
+           //parameter LOG2_NO_OF_IMAGES=8'd3;      // log2(NO OF IMAGES TO BE COMBINED TO PRODUCE 1 FUSED IMAGE)
+           
+           parameter FUSEDIMAGE_ADDR_WIDTH=SUM_ADDR_WIDTH;                    // SAME AS SUM_ADDR_WIDTH
+           parameter INPIMAGES_ADDR_WIDTH=SUM_ADDR_WIDTH + LOG2_NO_OF_IMAGES; // SINCE SIZE OF INPUT IMAGE MEMEORY = ( MEMORY SIZE OF SUM )* ( LOG2_NO_OF_IMAGES)
+           
+           parameter HNO_IMAGES=8'd1<<LOG2_NO_OF_IMAGES;
+           
+           parameter FUSEDIMAGE_DATA_WIDTH=8'd8;
+           parameter INPIMAGES_DATA_WIDTH=8'd8;
+           parameter SUM_DATA_WIDTH=INPIMAGES_DATA_WIDTH + LOG2_NO_OF_IMAGES;
+           
+           genvar hgenvar;    
+           integer e;
+           
+               wire tempclk;
+           
+               wire [SUM_ADDR_WIDTH-1:0] hsum_addr,hsum_addr_delayed,hsum_addr_delayed_half;
+               wire [INPIMAGES_ADDR_WIDTH-1:0] hinpimages_addr,hinpimages_addr_delayed,hinpimages_addr_delayed_half;
+               wire [FUSEDIMAGE_ADDR_WIDTH-1:0] hfused_addr;
+               wire [FUSEDIMAGE_ADDR_WIDTH-1:0] hfused_addr_delayed;
+               wire [FUSEDIMAGE_ADDR_WIDTH-1:0] hfused_addr_delayed_more20;
+           
+           
+               wire [SUM_DATA_WIDTH-1:0] hsum_data_new,hsum_data_old,hsum_intermediate,hsum_data_old_delayed_half;
+               wire [INPIMAGES_DATA_WIDTH-1:0] hin_delayed_one,hin_delayed_half,havg_data_stable,hin_delayed_more19,hinp_old,hinp_old_delayed_half;
+           
+               wire [FUSEDIMAGE_DATA_WIDTH-1:0] hfused_data_old[0:HNO_IMAGES-1];
+               wire [FUSEDIMAGE_DATA_WIDTH-1:0] hfused_data_old_delayed[0:HNO_IMAGES-1];            // Delayed by ONE clk cycle
+               wire [FUSEDIMAGE_DATA_WIDTH-1:0] hfused_data_old_delayed_more19[0:HNO_IMAGES-1]; // Output fused image comes after (5+1)=6 clk cycles, 1 clk delay becuase of average calculation
+               reg [FUSEDIMAGE_DATA_WIDTH-1:0] hfused_data_new[0:HNO_IMAGES-1];
+               wire [FUSEDIMAGE_DATA_WIDTH-1:0] hfused_newdata_half_delayed[0:HNO_IMAGES-1];
+               reg [FUSEDIMAGE_DATA_WIDTH-1:0] hnewdata_mem[0:HNO_IMAGES-1];
+               
+               reg [FUSEDIMAGE_DATA_WIDTH*HNO_IMAGES-1:0] hfused_data_old_delayed_bus;
+               wire [FUSEDIMAGE_DATA_WIDTH*HNO_IMAGES-1:0] hfused_data_new_bus;
+           
+               wire [LOG2_NO_OF_IMAGES-1:0] hstate_sig,hstate_sig_delayedby20;
+               wire [0:HNO_IMAGES-1] hstop_sig;
+               wire [0:HNO_IMAGES-1] hstop_sig_delayedby20;
+               wire hclearbuffer_sig;
+           
+           
+               //wire [SUM_DATA_WIDTH-1:0] havgsum_data_old,havgsum_data_new,haa_data;
+               
+               
+                  // DELAY BLOCK------------------------------------------------------------------------------------------------------------------------------------
+                 
+           
+                   honedelay #(SUM_ADDR_WIDTH) hod_sum (clk,rst,hsum_addr,hsum_addr_delayed);                                            // DELAYED ADDRESS FOR SUM OF IMAGES
+                   honedelay #(INPIMAGES_ADDR_WIDTH) hod_inp_images_ADDR (clk,rst,hinpimages_addr,hinpimages_addr_delayed);              // DELAYED ADDRESS FOR INPUT IMAGES
+                   
+                   hhalfdelayneg #(SUM_ADDR_WIDTH) hod_sum_halfdelay (clk,rst,hsum_addr,hsum_addr_delayed_half);                                            // DELAYED ADDRESS FOR SUM OF IMAGES
+                   hhalfdelayneg #(INPIMAGES_ADDR_WIDTH) hod_inp_images_ADDR_halfdelay (clk,rst,hinpimages_addr,hinpimages_addr_delayed_half);              // DELAYED ADDRESS FOR INPUT IMAGES
+           
+                 
+                   honedelay #(FUSEDIMAGE_ADDR_WIDTH) hod_fused_addr1 (clk,rst,hfused_addr,hfused_addr_delayed);                            // DELAYED ADDRESS FOR FUSED IMAGES by One clk cycle
+                   hmultipledelay #(FUSEDIMAGE_ADDR_WIDTH,8'd20) hmd_fused_addr5 (clk,rst,hfused_addr_delayed,hfused_addr_delayed_more20);  // DELAYED ADDRESS FOR FUSED IMAGES by (One+19=)20 clk cycle    
+             
+                   hhalfdelayneg #(INPIMAGES_DATA_WIDTH) hhdn_inp_DATA_ (clk,rst,hin,hin_delayed_half);              // CRAETING REQD HALF DELAYED VERSIONS FOR ERROR CALCULATION OF NEW IMAGE SUM
+                   hhalfdelayneg #(SUM_DATA_WIDTH) hhdn_sum_DATA (clk,rst,hsum_data_old,hsum_data_old_delayed_half);
+                   hhalfdelayneg #(INPIMAGES_DATA_WIDTH) hhdn_old_inp_DATA (clk,rst,hinp_old,hinp_old_delayed_half);
+           
+                   honedelay #(INPIMAGES_DATA_WIDTH) hod_inp_DATA1 (clk,rst,hin,hin_delayed_one);                          // INPUT IMAGE DELAYED BY ONE CLK CYCLES
+                   hmultipledelay #(INPIMAGES_DATA_WIDTH,8'd19) hmd_inp_DATA5(clk,rst,hin_delayed_one,hin_delayed_more19);  // INPUT IMAGE DELAYED BY (One+19=) 20 CLK CYCLES
+           
+           
+           
+                   generate
+           
+                       for(hgenvar=0;hgenvar<HNO_IMAGES;hgenvar=hgenvar+1)
+                       begin
+                               honedelay #(FUSEDIMAGE_DATA_WIDTH) hod_fused_DATA (clk,rst,hfused_data_old[hgenvar],hfused_data_old_delayed[hgenvar]);
+                       end
+           
+                   endgenerate
+           
+           
+                   hhalfdelayneg #(INPIMAGES_DATA_WIDTH) hhdn_inp_DATA (clk,rst,hin,hin_delayed_half);          
+                   hhalfdelaypos #(INPIMAGES_DATA_WIDTH) hhdn_avg_DATA (clk,rst,(hsum_data_new[SUM_DATA_WIDTH-1:SUM_DATA_WIDTH-8]),havg_data_stable);
+           
+                   generate
+           
+                       for(hgenvar=0;hgenvar<HNO_IMAGES;hgenvar=hgenvar+1)  
+                       begin
+                       hhalfdelaypos #(FUSEDIMAGE_DATA_WIDTH) hhdn_fused_DATA (clk,rst,hfused_data_new[hgenvar],hfused_newdata_half_delayed[hgenvar]);
+                       end
+           
+                   endgenerate
+           
+                   
+                   //-----------------------------------------------------------------------------------------------------------------------------------------------------
+       
+           
+           
+                   // ADDRESS GENERATION---------------------------------------------------------
+           
+                   haddr_fsm #(SUM_ADDR_WIDTH,1'b1,HIM_LEN,HIM_WID) haf_sum (clk,rst,hsum_addr);                                 // GENERATE ADDRESS FOR SUM OF IMAGES
+                   haddr_fsm #(INPIMAGES_ADDR_WIDTH,HNO_IMAGES,HIM_LEN,HIM_WID) haf_inpimages (clk,rst,hinpimages_addr);         // GENERATE ADDRESS FOR INPUT IMAGES
+           
+                   haddr_fsm #(FUSEDIMAGE_ADDR_WIDTH,1'b1,HIM_LEN,HIM_WID) haf_fused (clk,rst,hfused_addr);                      // GENERATE ADDRESS FOR FUSED IMAGES
+           
+                   //---------------------------------------------------------------------------
+           
+           
+           
+                   // MEMORY INSTANTIONS--------------------------------------------------------
+           
+                   hmemory #(SUM_DATA_WIDTH,SUM_ADDR_WIDTH,1'b1,HIM_LEN,HIM_WID) hmem_sum (clk,rst,hsum_addr_delayed_half,hsum_data_new,hsum_addr,hsum_data_old);                                                    //MEMORY FOR SUM OF IMAGES
+                   hmemory #(INPIMAGES_DATA_WIDTH,INPIMAGES_ADDR_WIDTH,HNO_IMAGES,HIM_LEN,HIM_WID) hmem_inp_images (clk,rst,hinpimages_addr_delayed_half,hin_delayed_half,hinpimages_addr,hinp_old);                    //MEMORY FOR INPUT IMAGES
+           
+                   generate
+           
+                       for(hgenvar=0;hgenvar<HNO_IMAGES;hgenvar=hgenvar+1)
+                       begin
+                       hmemory #(FUSEDIMAGE_DATA_WIDTH,FUSEDIMAGE_ADDR_WIDTH,1'b1,HIM_LEN,HIM_WID) hmem_fused (clk,rst,hfused_addr_delayed_more20,hnewdata_mem[hgenvar],hfused_addr,hfused_data_old[hgenvar]);        //MEMORY FOR FUSED IMAGES
+                       end
+               
+                   endgenerate    
+                   
+                   //-----------------------------------------------------------------------------
+                   
+                   
+                   
+                   // CALCULATION OF NEW SUM OF IMAGES----------------------------------------------
+           
+                   assign hsum_intermediate = (  hsum_data_old_delayed_half  -  hinp_old_delayed_half  );
+                   assign hsum_data_new = (  hsum_intermediate  +  hin_delayed_half);
+           
+                   //-------------------------------------------------------------------------------
+           
+           
+                   // FUSION MODULES INSTANTIATED-------------------------------------------------
+                       
+                   always@(*)                   // FLATENING FUSED IMAGE SIGNAL INTO ONE COMPOSITE SIGNALS
+                   for( e=0;e<HNO_IMAGES;e=e+1)  
+                   hfused_data_old_delayed_bus[e*8+:8]=hfused_data_old_delayed[e][7:0];
+
+                       hfusion #(HNO_IMAGES,HIM_LEN,FUSEDIMAGE_DATA_WIDTH) hfusion_inst (clk,rst,hstop_sig,hfused_data_old_delayed_bus,hin_delayed_one,havg_data_stable,hclearbuffer_sig,hfused_data_new_bus);  
+             
+                   always@(*)                  // DEFLATENING COMPOSITE OUTPUT SIGNAL INTO DIFFERENT SIGNALS
+                   for( e=0;e<HNO_IMAGES;e=e+1)
+                   hfused_data_new[e][7:0]=hfused_data_new_bus[e*8+:8];            
+           
+                   //------------------------------------------------------------------------------
+           
+
+                   
+                   // STATE SIGNAL GENERATION AND DELAYED VERSION-----------------------------------
+           
+                   hstatecontroller #(SUM_ADDR_WIDTH, HNO_IMAGES, HIM_LEN, HIM_WID, LOG2_NO_OF_IMAGES) hstate(clk,rst,hsum_addr,hstate_sig);  // The state signal genrator which controls the WHOLE pipeline
+                   hmultipledelay #(LOG2_NO_OF_IMAGES,8'd20) hmd_state_sig (clk,rst,hstate_sig,hstate_sig_delayedby20);
+           
+                    //-------------------------------------------------------------------------------
+          // parameter DATA_WIDTH = 9 ,HNO_IMAGES=2,HIM_LEN=16'd2, HIM_WID=16'd2, LOG2_NO_OF_IMAGES = 3
+                   
+                   
+                   
+                   // MUX TO CHOSE BETWEEN INPUT AND NEW FUSED IMAGE--------------------------------
+                   always@(*)
+                   for(  e=0;e<HNO_IMAGES;e=e+1)   // INPUTs are delayed by ONE CLK cycle, because AVERAGE calculation takes ONE CLK cycle
+                   begin
+                    hnewdata_mem[e]=(hstate_sig_delayedby20==e)?hin_delayed_more19:hfused_newdata_half_delayed[e];
+                   end
+           
+                   //-------------------------------------------------------------------------------
+           
+           
+           
+                   // CLEAR BUFFER SIGNAL GENERATION------------------------------------------------
+           
+                   assign hclearbuffer_sig=(hsum_addr==(HIM_LEN*HIM_WID-1))?1'b1:1'b0; //done
+           
+                   //-------------------------------------------------------------------------------
+           
+           
+           
+                   // INITIAL STOP SIGNAL GENERATION------------------------------------------------
+           
+                   assign tempclk=(hsum_addr==(HIM_LEN*HIM_WID-1))?1'b1:1'b0;
+           
+                   //hstop  #(LOG2_NO_OF_IMAGES)  hstop_1 (clk,rst,hstate_sig,hstop_sig[0]);
+                   assign hstop_sig[0]=1'b0;
+                   
+                   generate
+           
+                       for(hgenvar=0;hgenvar<HNO_IMAGES-1;hgenvar=hgenvar+1)  
+                       begin
+                       hdff_stop hdff_stop_inst (tempclk,rst,hstop_sig[hgenvar],hstop_sig[hgenvar+1]);     // GENERATE CONSECTIVE STOP SIGNALS REQUIRED for different FUSION MODULES
+                       end
+           
+                   endgenerate
+                   
+                   generate
+           
+                       for(hgenvar=0;hgenvar<HNO_IMAGES;hgenvar=hgenvar+1)  
+                       begin
+                       hmultipledelay #(1'b1,8'd20) hmd_stop_inst (clk,rst,hstop_sig[hgenvar],hstop_sig_delayedby20[hgenvar]);     // DELAY by 9 CLK CYCLES for DELAY from I/P to FUSION O/P
+                       end
+           
+                   endgenerate
+           
+                   //-------------------------------------------------------------------------------
+           
+           
+           
+                   // OUTPUT IMAGE GENERATION-------------------------------------------------------
+           
+                   assign hout=(hstop_sig_delayedby20[0]==1'b0)?hfused_newdata_half_delayed[hstate_sig_delayedby20]:{FUSEDIMAGE_DATA_WIDTH{1'b0}}; // -1 removed
+           
+                   //-------------------------------------------------------------------------------
+                   
+           
+           
+           endmodule
