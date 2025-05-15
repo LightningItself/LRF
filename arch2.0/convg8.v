@@ -3,18 +3,21 @@
 module convg8 #(parameter IM_LEN = 16'd520, ker = 8'd3, NO_PARALLEL_UNITS = 4 ) (
     input clk,
     input res,
-    input [7:0] in [NO_PARALLEL_UNITS-1 : 0],
+    input [NO_PARALLEL_UNITS*8 - 1:0] data_in,
     input clrbuffer,
     input [ker-2:0] rowend,
-    output [7:0] out [NO_PARALLEL_UNITS-1 : 0],
+    output [NO_PARALLEL_UNITS*8 - 1:0] data_out,
     input stall
     );
     integer i,p;
 
     // parameter hbuffend=(IM_LEN+1)*(ker-1);
-
     reg [14:0] buff [0:(IM_LEN+1)*(ker-1)-1];
+
+    reg [7:0] in [NO_PARALLEL_UNITS-1 : 0];
+    wire [7:0] out [NO_PARALLEL_UNITS-1 : 0];
     reg [14:0] temp_out [NO_PARALLEL_UNITS-1 : 0];
+
 
     wire [8:0] temp_times2 [NO_PARALLEL_UNITS-1 : 0];
     wire [11:0] temp_times16 [NO_PARALLEL_UNITS-1 : 0];
@@ -28,7 +31,19 @@ module convg8 #(parameter IM_LEN = 16'd520, ker = 8'd3, NO_PARALLEL_UNITS = 4 ) 
 
     genvar k;
     generate
-        for (k = 0; k < NO_PARALLEL_UNITS; k++) begin
+        for (k = 0; k < NO_PARALLEL_UNITS; k = k+1) begin
+            in[k] = data_in[8*k-1 +: 8]
+        end
+    endgenerate
+
+    generate
+        for (k = 0; k < NO_PARALLEL_UNITS; k = k+1) begin
+            data_out[8*k-1 +: 8] = out[k]
+        end
+    endgenerate
+
+    generate
+        for (k = 0; k < NO_PARALLEL_UNITS; k = k+1) begin
             if (k == 0) begin
                 assign rowend_new[k] = rowend; // use actual rowend values
             end else begin
@@ -43,8 +58,8 @@ module convg8 #(parameter IM_LEN = 16'd520, ker = 8'd3, NO_PARALLEL_UNITS = 4 ) 
         if(res | clrbuffer) begin
             for(i = 0; i < (IM_LEN+1)*(ker-1); i = i+1) begin
                 buff[i] <= 'd0;
+                temp_out[i] <= 'd0;     
             end
-            temp_out <= 'd0;    
         end
        
         else begin
@@ -54,7 +69,7 @@ module convg8 #(parameter IM_LEN = 16'd520, ker = 8'd3, NO_PARALLEL_UNITS = 4 ) 
                 end
             end
  
-            for (i = 0; i < NO_PARALLEL_UNITS; i++) begin
+            for (i = 0; i < NO_PARALLEL_UNITS; i = i+1) begin
                 buff[0 + i] <= (rowend[i][0] & rowend[i][1]) ? temp_times3[i] : 15'd0;
                 buff[1 + i] <= (rowend[i][0]) ? (buff[0 + i] + temp_times14[i]) : buff[0 + i];
                 buff[2 + i] <= (buff[1 + i] + temp_times3[i]);
@@ -73,7 +88,7 @@ module convg8 #(parameter IM_LEN = 16'd520, ker = 8'd3, NO_PARALLEL_UNITS = 4 ) 
     // ASYNCHRONOUS PART OF OPERATION BLOCK---------------------------------------------------
     genvar z;
     generate
-        for (z = 0; z < NO_PARALLEL_UNITS; z++) begin
+        for (z = 0; z < NO_PARALLEL_UNITS; z = z+1) begin
             assign temp_times2[z] = (in[z] << 1); // times 2
             assign temp_times16[z] = (in[z] << 4); // times 16
             assign temp_times3[z] = (temp_times2[z] + in[z]);    // times 3
