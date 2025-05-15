@@ -22,7 +22,7 @@ module fusionTop
     input wire                          axi_clk,
     input wire                          axi_aresetn,
     input wire                          s_axis_tvalid,
-    input wire [INPUT_DATA_WIDTH-1:0]   s_axis_tdata,
+    input wire [INPUT_DATA_WIDTH-1:0]   s_axis_tdata,   // currently unpackaging it
     output reg                          s_axis_tready,
     output reg                          m_axis_tvalid,
     output reg [OUTPUT_DATA_WIDTH-1:0]  m_axis_tdata,
@@ -33,11 +33,11 @@ module fusionTop
     reg [OUTPUT_DATA_WIDTH-1:0] m_axis_output_reg;
 
     // Input & computation pipeline
-    wire [DATA_WIDTH-1:0] new_image [NO_PARALLEL_UNITS - 1 : 0];
-    wire [DATA_WIDTH-1:0] old_image [NO_PARALLEL_UNITS - 1 : 0];
+    wire [DATA_WIDTH-1:0] new_image [NO_PARALLEL_UNITS - 1 : 0];    // from DDR
+    wire [DATA_WIDTH-1:0] old_image [NO_PARALLEL_UNITS - 1 : 0];    // from DDR
     wire [DATA_WIDTH-1:0] avg_image [NO_PARALLEL_UNITS - 1 : 0];    // from BRAM
     wire [DATA_WIDTH-1:0] fused_image [NO_PARALLEL_UNITS - 1 : 0];  // from BRAM
-    wire [DATA_WIDTH-1:0] new_average_delayed_more20 [NO_PARALLEL_UNITS - 1 : 0];
+    wire [DATA_WIDTH-1:0] new_average_delayed_more20 [NO_PARALLEL_UNITS - 1 : 0];   // write to BRAM
     wire [DATA_WIDTH-1:0] new_fused_image [NO_PARALLEL_UNITS - 1 : 0];
     wire [OUTPUT_DATA_WIDTH-1:0] output_data;
 
