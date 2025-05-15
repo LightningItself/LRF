@@ -1,28 +1,41 @@
 `timescale 1ns / 1ps
 
-module convg8 #(parameter IM_LEN = 16'd520, ker = 8'd3 ) (
+module convg8 #(parameter IM_LEN = 16'd520, ker = 8'd3, NO_PARALLEL_UNITS = 4 ) (
     input clk,
     input res,
-    input [7:0] in,
+    input [7:0] in [NO_PARALLEL_UNITS-1 : 0],
     input clrbuffer,
     input [ker-2:0] rowend,
-    output [7:0] out,
-    input step
+    output [7:0] out [NO_PARALLEL_UNITS-1 : 0],
+    input stall
     );
     integer i,p;
 
     // parameter hbuffend=(IM_LEN+1)*(ker-1);
 
     reg [14:0] buff [0:(IM_LEN+1)*(ker-1)-1];
-    reg [14:0] temp_out;
+    reg [14:0] temp_out [NO_PARALLEL_UNITS-1 : 0];
 
-    wire [8:0] temp_times2;
-    wire [11:0] temp_times16;
-    wire [9:0] temp_times3;
-    wire [11:0] temp_times14;
-    wire [13:0] temp_times60;
+    wire [8:0] temp_times2 [NO_PARALLEL_UNITS-1 : 0];
+    wire [11:0] temp_times16 [NO_PARALLEL_UNITS-1 : 0];
+    wire [9:0] temp_times3 [NO_PARALLEL_UNITS-1 : 0];
+    wire [11:0] temp_times14 [NO_PARALLEL_UNITS-1 : 0];
+    wire [13:0] temp_times60 [NO_PARALLEL_UNITS-1 : 0];
 
     wire clrbuffer_delayedbyone;
+
+    wire [1:0] rowend_new [NO_PARALLEL_UNITS - 1 : 0];
+
+    genvar k;
+    generate
+        for (k = 0; k < NO_PARALLEL_UNITS; k++) begin
+            if (k == 0) begin
+                assign rowend_new[k] = rowend; // use actual rowend values
+            end else begin
+                assign rowend_new[k] = 2'b00;     // append zeros in the last 2
+            end
+        end
+    endgenerate
 
     //honedelay #(1'b1) hod_hclrbffr (clk,res,clrbuffer,clrbuffer_delayedbyone);
 
@@ -41,30 +54,40 @@ module convg8 #(parameter IM_LEN = 16'd520, ker = 8'd3 ) (
                 end
             end
  
-            // OPERATION BLOCK-------------------------------------------------------------
-            buff[2] <= (buff[1] + temp_times3);
-            buff[IM_LEN+2] <= (buff[IM_LEN+1] + temp_times14);
-            temp_out <= (buff[(IM_LEN+1)*(ker-1)-1]+temp_times3);
-                             
-            buff[0] <= (rowend[0] & rowend[1]) ? temp_times3 : 15'd0;
-            buff[1] <= (rowend[0]) ? (buff[0] + temp_times14) : buff[0];
-                             
-            buff[IM_LEN] <= (rowend[0] & rowend[1]) ? (buff[IM_LEN-1] + temp_times14) : buff[IM_LEN-1];
-            buff[IM_LEN+1] <= (rowend[0]) ? (buff[IM_LEN] + temp_times60) : buff[IM_LEN];
-                             
-            buff[(IM_LEN+1)*(ker-1)-2] <= (rowend[0] & rowend[1]) ? (buff[(IM_LEN+1)*(ker-1)-3] + temp_times3) : buff[(IM_LEN+1)*(ker-1)-3];
-            buff[(IM_LEN+1)*(ker-1)-1] <= (rowend[0]) ? (buff[(IM_LEN+1)*(ker-1)-2] + temp_times14) : buff[(IM_LEN+1)*(ker-1)-2];
+            for (i = 0; i < NO_PARALLEL_UNITS; i++) begin
+                buff[0 + i] <= (rowend[i][0] & rowend[i][1]) ? temp_times3 : 15'd0;
+                buff[1 + i] <= (rowend[i][0]) ? (buff[0 + i] + temp_times14) : buff[0 + i];
+                buff[2 + i] <= (buff[1 + i] + temp_times3);
+
+                buff[IM_LEN + i] <= (rowend[i][0] & rowend[i][1]) ? (buff[IM_LEN-1 + i] + temp_times14) : buff[IM_LEN-1 + i];
+                buff[IM_LEN + 1 + i] <= (rowend[i][0]) ? (buff[IM_LEN] + temp_times60) : buff[IM_LEN + i];
+                buff[IM_LEN + 2 + i] <= (buff[IM_LEN+1 + i] + temp_times14);
+
+                buff[(IM_LEN+1)*(ker-1)-1 + i] <= (rowend[i][0]) ? (buff[(IM_LEN+1)*(ker-1)-2 + i] + temp_times14) : buff[(IM_LEN+1)*(ker-1)-2 + i];
+                buff[(IM_LEN+1)*(ker-1)-2 + i] <= (rowend[i][0] & rowend[i][1]) ? (buff[(IM_LEN+1)*(ker-1)-3 + i] + temp_times3) : buff[(IM_LEN+1)*(ker-1)-3 + i];
+                temp_out[i] <= (buff[(IM_LEN+1)*(ker-1)-1 + i] + temp_times3);    
+            end           
         end
-    end         
+    end
 
     // ASYNCHRONOUS PART OF OPERATION BLOCK---------------------------------------------------
-    assign temp_times2 = (in << 1); // times 2
-    //assign temp_times4 = (in << 2); // times 4
-    assign temp_times16 = (in << 4); // times 16
-        
-    assign temp_times3 = (temp_times2 + in);    // times 3
-    assign temp_times14 = (temp_times16 - temp_times2);  // times 14
-    assign temp_times60 = {(temp_times16 - in), 2'b00}; // times 60                     
-    assign out = temp_out[14:7];
+    genvar z;
+    generate
+        for (z = 0; z < NO_PARALLEL_UNITS; z++) begin
+            assign temp_times2[z] = (in[z] << 1); // times 2
+            assign temp_times16[z] = (in[z] << 4); // times 16
+            assign temp_times3[z] = (temp_times2[z] + in[z]);    // times 3
+            assign temp_times14[z] = (temp_times16[z] - temp_times2[z]);  // times 14
+            assign temp_times60[z] = {(temp_times16[z] - in[z]), 2'b00}; // times 60                     
+            assign out[z] = temp_out[z][14:7];
+        end
+    endgenerate
+
+    always@* begin
+        if(rowend[0] & rowend[1]) begin
+            out[0] = 8'b0;
+            out[1] = 8'b0;
+        end
+    end
                     
 endmodule

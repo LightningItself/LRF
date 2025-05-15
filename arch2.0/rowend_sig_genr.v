@@ -5,7 +5,7 @@ module rowend_sig_genr #(parameter IM_LEN=16'd520, KER_SIZE = 3, NO_PARALLEL_UNI
     input res,
     input clrbuffer,
     input stall,
-    output reg [KER_SIZE-2:0] out [NO_PARALLEL_UNITS-1:0]
+    output reg [KER_SIZE-2:0] out
     );
    
     reg [10:0] cnt;
