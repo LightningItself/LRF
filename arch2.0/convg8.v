@@ -55,17 +55,17 @@ module convg8 #(parameter IM_LEN = 16'd520, ker = 8'd3, NO_PARALLEL_UNITS = 4 ) 
             end
  
             for (i = 0; i < NO_PARALLEL_UNITS; i++) begin
-                buff[0 + i] <= (rowend[i][0] & rowend[i][1]) ? temp_times3 : 15'd0;
-                buff[1 + i] <= (rowend[i][0]) ? (buff[0 + i] + temp_times14) : buff[0 + i];
-                buff[2 + i] <= (buff[1 + i] + temp_times3);
+                buff[0 + i] <= (rowend[i][0] & rowend[i][1]) ? temp_times3[i] : 15'd0;
+                buff[1 + i] <= (rowend[i][0]) ? (buff[0 + i] + temp_times14[i]) : buff[0 + i];
+                buff[2 + i] <= (buff[1 + i] + temp_times3[i]);
 
-                buff[IM_LEN + i] <= (rowend[i][0] & rowend[i][1]) ? (buff[IM_LEN-1 + i] + temp_times14) : buff[IM_LEN-1 + i];
-                buff[IM_LEN + 1 + i] <= (rowend[i][0]) ? (buff[IM_LEN] + temp_times60) : buff[IM_LEN + i];
-                buff[IM_LEN + 2 + i] <= (buff[IM_LEN+1 + i] + temp_times14);
+                buff[IM_LEN + i] <= (rowend[i][0] & rowend[i][1]) ? (buff[IM_LEN-1 + i] + temp_times14[i]) : buff[IM_LEN-1 + i];
+                buff[IM_LEN + 1 + i] <= (rowend[i][0]) ? (buff[IM_LEN] + temp_times60[i]) : buff[IM_LEN + i];
+                buff[IM_LEN + 2 + i] <= (buff[IM_LEN+1 + i] + temp_times14[i]);
 
-                buff[(IM_LEN+1)*(ker-1)-1 + i] <= (rowend[i][0]) ? (buff[(IM_LEN+1)*(ker-1)-2 + i] + temp_times14) : buff[(IM_LEN+1)*(ker-1)-2 + i];
-                buff[(IM_LEN+1)*(ker-1)-2 + i] <= (rowend[i][0] & rowend[i][1]) ? (buff[(IM_LEN+1)*(ker-1)-3 + i] + temp_times3) : buff[(IM_LEN+1)*(ker-1)-3 + i];
-                temp_out[i] <= (buff[(IM_LEN+1)*(ker-1)-1 + i] + temp_times3);    
+                buff[(IM_LEN+1)*(ker-1)-1 + i] <= (rowend[i][0]) ? (buff[(IM_LEN+1)*(ker-1)-2 + i] + temp_times14[i]) : buff[(IM_LEN+1)*(ker-1)-2 + i];
+                buff[(IM_LEN+1)*(ker-1)-2 + i] <= (rowend[i][0] & rowend[i][1]) ? (buff[(IM_LEN+1)*(ker-1)-3 + i] + temp_times3[i]) : buff[(IM_LEN+1)*(ker-1)-3 + i];
+                temp_out[i] <= (buff[(IM_LEN+1)*(ker-1)-1 + i] + temp_times3[i]);    
             end           
         end
     end
