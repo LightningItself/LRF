@@ -13,6 +13,7 @@ ind = -floor(n/2):floor(n/2);
 hgauss = exp(-(X.^2+Y.^2)/(2*hsi*hsi));
 size(hgauss)
 hgaussianfilter = hgauss/sum(hgauss(:)); % gaussian matrix
+%hgaussianfilter = [1 2 1; 2 4 2; 1 2 1]/16;
 
 hsobely = [ -1 0 1; -2 0 2; -1 0 1]; % sobel filters for horizontal and vertical edges
 hsobelx = [ -1 -2 -1; 0 0 0; 1 2 1];

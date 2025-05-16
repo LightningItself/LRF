@@ -124,6 +124,9 @@ end
 //DUMMY DUT MODEL
 assign s_axis_tready = 1;
 
+//CONV DUT MODEL
+convg8 #(.NO_PARALLEL_UNITS(16)) dut (clk, ~aresetn, s_axis_tdata, 0, );
+
 initial begin
 
     //LOAD IMAGE FILES ONTO DDR MEM-------------------------------------
