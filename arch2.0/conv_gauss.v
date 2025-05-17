@@ -47,21 +47,16 @@ end
 
 wire [DATA_WIDTH-1:0] buff_a_out_frame, buff_b_out_frame, buff_c_out_frame;
 
-ROW_BUFF #(PIXELS_PER_BEAT,IMAGE_DIM) buff_a (clk,aresetn,buff_a_read_en,buff_a_write_en,inp_frame,buff_a_out_frame);
-ROW_BUFF #(PIXELS_PER_BEAT,IMAGE_DIM) buff_b (clk,aresetn,buff_b_read_en,buff_b_write_en,inp_frame,buff_b_out_frame);
-ROW_BUFF #(PIXELS_PER_BEAT,IMAGE_DIM) buff_c (clk,aresetn,buff_c_read_en,buff_c_write_en,inp_frame,buff_c_out_frame);
+ROW_BUFF #(PIXELS_PER_BEAT,IMAGE_DIM) buff_a (clk,aresetn,buff_a_read_en&~stall,buff_a_write_en,inp_frame,buff_a_out_frame);
+ROW_BUFF #(PIXELS_PER_BEAT,IMAGE_DIM) buff_b (clk,aresetn,buff_b_read_en&~stall,buff_b_write_en,inp_frame,buff_b_out_frame);
+ROW_BUFF #(PIXELS_PER_BEAT,IMAGE_DIM) buff_c (clk,aresetn,buff_c_read_en&~stall,buff_c_write_en,inp_frame,buff_c_out_frame);
 
 //DATAPATH
 
 reg [8+4-1:0] conv_sum[PIXELS_PER_BEAT-1:0];
 reg [8+4-1:0] conv_sum_part1, conv_sum_part2; //part1 -> sum of 1 row, part2 -> sum of 2 rows
 
-reg [DATA_WIDTH-1:0] d_top, d_mid, d_bot, curr_frame;
-
-always @(posedge clk) begin
-    if(~stall)
-        curr_frame <= inp_frame; 
-end
+reg [DATA_WIDTH-1:0] d_top, d_mid, d_bot;
 
 always @(*) begin
     case(buff_counter)
@@ -104,7 +99,7 @@ always @(posedge clk) begin
         else begin
             conv_sum_part1 <=   d_top[(DATA_WIDTH-8)+:8]        + (d_mid[(DATA_WIDTH-8)+:8]<<1)     +   d_bot[(DATA_WIDTH-8)+:8];
             conv_sum_part2 <=   d_top[(DATA_WIDTH-16)+:8]       + (d_mid[(DATA_WIDTH-16)+:8]<<1)    +   d_bot[(DATA_WIDTH-16)+:8] 
-                            + (d_top[(DATA_WIDTH-8)+:8]<<1)    + (d_mid[(DATA_WIDTH-8)+:8]<<2)     +  (d_bot[(DATA_WIDTH-8)+:8]<<1); 
+                             + (d_top[(DATA_WIDTH-8)+:8]<<1)    + (d_mid[(DATA_WIDTH-8)+:8]<<2)     +  (d_bot[(DATA_WIDTH-8)+:8]<<1); 
         end
     end
 end
@@ -116,9 +111,9 @@ for(j=0; j<PIXELS_PER_BEAT-2; j=j+1) begin
     always @(posedge clk) begin
         if(~stall) begin
             //next N-2 outputs are directly generated
-            conv_sum[j+2] <=  d_top[(8*j)+:8]     + (d_top[(8*j+8)+:8]<<1) + d_top[(8*j+16)+:8]    + 
-                            (d_mid[(8*j)+:8]<<1)  + (d_mid[(8*j+8)+:8]<<2) + (d_mid[(8*j+16)+:8]<<1) + 
-                            d_bot[(8*j)+:8]     + (d_bot[(8*j+8)+:8]<<1) + d_bot[(8*j+16)+:8]; 
+            conv_sum[j+2] <=     d_top[(8*j)+:8]     + (d_top[(8*j+8)+:8]<<1) +  d_top[(8*j+16)+:8] + 
+                                (d_mid[(8*j)+:8]<<1) + (d_mid[(8*j+8)+:8]<<2) + (d_mid[(8*j+16)+:8]<<1) + 
+                                 d_bot[(8*j)+:8]     + (d_bot[(8*j+8)+:8]<<1) +  d_bot[(8*j+16)+:8]; 
         end
     end      
 end
@@ -126,11 +121,15 @@ endgenerate
 
 //send final output
 generate
-for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
+for(j=PIXELS_PER_BEAT-3; j>=0; j=j-1) begin
     always @(*) begin
         out_frame[(8*j)+:8] = conv_sum[j][11:4];
     end
 end
+    always @(*) begin
+        out_frame[(DATA_WIDTH-8)+:8] = (col_counter==1) ? 0 : conv_sum[0][11:4];
+        out_frame[(DATA_WIDTH-16)+:8] = (col_counter==1) ? 0 : conv_sum[1][11:4];
+    end
 endgenerate
 
 //CONTROL LOGIC

@@ -15,8 +15,8 @@ always #1
 
 //STALL
 always @(posedge clk)
-    stall <= 0;
-    // stall <= $random;
+//    stall <= 0;
+    stall <= $random;
 
 //RESET
 initial begin

@@ -88,7 +88,6 @@ wire [63:0] mem_old_ptr = old_frame_ptr*WORDS_PER_IMAGE+beat_ptr;
 always @(*) begin
     if(~s_axis_aresetn) begin
         s_axis_tvalid = 0;
-        s_axis_tdata  = 0;
         s_axis_tlast  = 0;
     end
     else begin
@@ -119,13 +118,11 @@ always @(posedge s_axis_aclk) begin
     end
 end
 
-
+wire step = m_axis_tready & s_axis_tvalid & s_axis_aresetn;
 
 //DUMMY DUT MODEL
 assign s_axis_tready = 1;
-
-//CONV DUT MODEL
-convg8 #(.NO_PARALLEL_UNITS(16)) dut (clk, ~aresetn, s_axis_tdata, 0, );
+CONV_GAUSS dut(s_axis_aclk,s_axis_aresetn,~step,s_axis_tdata,m_axis_tdata);
 
 initial begin
 
@@ -158,7 +155,7 @@ initial begin
 
     //-----------------------------------------------------------------
     //DISABLE ARESETN
-    #2 s_axis_aresetn = 1;
+    #3 s_axis_aresetn = 1;
 
 
 
