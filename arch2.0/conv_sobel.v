@@ -48,9 +48,9 @@ end
 
 wire [DATA_WIDTH-1:0] buff_a_out_frame, buff_b_out_frame, buff_c_out_frame;
 
-ROW_BUFF #(PIXELS_PER_BEAT,IMAGE_DIM) buff_a (clk,aresetn,buff_a_read_en&~stall,buff_a_write_en,inp_frame,buff_a_out_frame);
-ROW_BUFF #(PIXELS_PER_BEAT,IMAGE_DIM) buff_b (clk,aresetn,buff_b_read_en&~stall,buff_b_write_en,inp_frame,buff_b_out_frame);
-ROW_BUFF #(PIXELS_PER_BEAT,IMAGE_DIM) buff_c (clk,aresetn,buff_c_read_en&~stall,buff_c_write_en,inp_frame,buff_c_out_frame);
+ROW_BUFF #(PIXELS_PER_BEAT,8,IMAGE_DIM) buff_a (clk,aresetn,buff_a_read_en&~stall,buff_a_write_en,inp_frame,buff_a_out_frame);
+ROW_BUFF #(PIXELS_PER_BEAT,8,IMAGE_DIM) buff_b (clk,aresetn,buff_b_read_en&~stall,buff_b_write_en,inp_frame,buff_b_out_frame);
+ROW_BUFF #(PIXELS_PER_BEAT,8,IMAGE_DIM) buff_c (clk,aresetn,buff_c_read_en&~stall,buff_c_write_en,inp_frame,buff_c_out_frame);
 
 //DATAPATH
 reg [DATA_WIDTH-1:0] d_top, d_mid, d_bot;
@@ -77,13 +77,13 @@ always @(*) begin
     d_bot = (row_counter < 2) ? 0 : inp_frame;
 end
 
-reg signed [11:0] conv_sum_x[PIXELS_PER_BEAT-1:0];
-reg signed [11:0] conv_sum_y[PIXELS_PER_BEAT-1:0];
+reg signed [10:0] conv_sum_x[PIXELS_PER_BEAT-1:0];
+reg signed [10:0] conv_sum_y[PIXELS_PER_BEAT-1:0];
 
-reg signed [23:0] conv_sum_x2[PIXELS_PER_BEAT-1:0];
-reg signed [23:0] conv_sum_y2[PIXELS_PER_BEAT-1:0];
+reg signed [21:0] conv_sum_x2[PIXELS_PER_BEAT-1:0];
+reg signed [21:0] conv_sum_y2[PIXELS_PER_BEAT-1:0];
 
-reg signed [23:0] conv_sum[PIXELS_PER_BEAT-1:0];
+reg signed [20:0] conv_sum[PIXELS_PER_BEAT-1:0];
 
 
 wire [7:0] sobel_out[PIXELS_PER_BEAT-1:0];
@@ -145,7 +145,7 @@ endgenerate
 //calculate squared values of X and Y
 generate
 for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
-    cordic_0 sqrt(clk,~stall,conv_sum[j],,sobel_out[j]);
+    cordic_0 sqrt(clk,~stall,conv_sum[j][20:5],,sobel_out[j]);
     always @(posedge clk) begin
         if(~stall) begin
             conv_sum_x2[j] <= conv_sum_x[j]*conv_sum_x[j];
