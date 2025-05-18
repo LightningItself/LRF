@@ -26,6 +26,15 @@ reg [N_IMAGE_DIM+1:0] out_delay_counter;
 
 wire step = s_axis_tvalid & s_axis_tready;
 
+//LSU for current average frame and curr fused frame
+wire avg_read_enable, avg_write_enable, fused_read_enable_
+LSU #() avg_frame ();
+LSU #() fused_frame ();
+
+
+
+
+
 
 //FUSE COUNTER LOGIC
 always @(posedge s_axis_aclk) begin
@@ -46,6 +55,15 @@ always @(posedge s_axis_aclk) begin
         out_delay_counter <= out_delay_counter+1;
     end
 end
+
+//DATAPATH
+
+//HSSIM(new, ref) -> D1
+//HSSIM(curr, ref) -> D2
+
+//FUSION(D1,D2, new)
+
+
 
 always @(*) begin
     s_axis_tready = (fuse_counter==FUSE_COUNT-1) ? m_axis_tready : 1;
