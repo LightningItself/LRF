@@ -163,7 +163,7 @@ endgenerate
 generate
 for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
     always @(*) begin
-        out_frame[(DATA_WIDTH-8*(j+1))+:8] = sobel_out[j][11:4];
+        out_frame[(DATA_WIDTH-8*(j+1))+:8] = sobel_out[j][7:0];
     end
 end
 endgenerate

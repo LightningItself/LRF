@@ -1,8 +1,8 @@
 module CONV_GAUSS #(
     parameter PIXELS_PER_BEAT = 16,
-    parameter PIXEL_WIDTH = 8,
+    parameter INPUT_WIDTH = 8,
     parameter IMAGE_DIM = 512,
-    parameter DATA_WIDTH = PIXEL_WIDTH*PIXELS_PER_BEAT
+    parameter DATA_WIDTH = INPUT_WIDTH*PIXELS_PER_BEAT
 )(
     input wire clk,
     input wire aresetn,
@@ -49,14 +49,14 @@ end
 
 wire [DATA_WIDTH-1:0] buff_a_out_frame, buff_b_out_frame, buff_c_out_frame;
 
-ROW_BUFF #(PIXELS_PER_BEAT,PIXEL_WIDTH,IMAGE_DIM) buff_a (clk,aresetn,buff_a_read_en&~stall,buff_a_write_en,inp_frame,buff_a_out_frame);
-ROW_BUFF #(PIXELS_PER_BEAT,PIXEL_WIDTH,IMAGE_DIM) buff_b (clk,aresetn,buff_b_read_en&~stall,buff_b_write_en,inp_frame,buff_b_out_frame);
-ROW_BUFF #(PIXELS_PER_BEAT,PIXEL_WIDTH,IMAGE_DIM) buff_c (clk,aresetn,buff_c_read_en&~stall,buff_c_write_en,inp_frame,buff_c_out_frame);
+ROW_BUFF #(PIXELS_PER_BEAT,INPUT_WIDTH,IMAGE_DIM) buff_a (clk,aresetn,buff_a_read_en&~stall,buff_a_write_en,inp_frame,buff_a_out_frame);
+ROW_BUFF #(PIXELS_PER_BEAT,INPUT_WIDTH,IMAGE_DIM) buff_b (clk,aresetn,buff_b_read_en&~stall,buff_b_write_en,inp_frame,buff_b_out_frame);
+ROW_BUFF #(PIXELS_PER_BEAT,INPUT_WIDTH,IMAGE_DIM) buff_c (clk,aresetn,buff_c_read_en&~stall,buff_c_write_en,inp_frame,buff_c_out_frame);
 
 //DATAPATH
 
-reg [PIXEL_WIDTH+4-1:0] conv_sum[PIXELS_PER_BEAT-1:0];
-reg [PIXEL_WIDTH+4-1:0] conv_sum_part1, conv_sum_part2; //part1 -> sum of 1 row, part2 -> sum of 2 rows
+reg [INPUT_WIDTH+4-1:0] conv_sum[PIXELS_PER_BEAT-1:0];
+reg [INPUT_WIDTH+4-1:0] conv_sum_part1, conv_sum_part2; //part1 -> sum of 1 row, part2 -> sum of 2 rows
 
 reg [DATA_WIDTH-1:0] d_top, d_mid, d_bot;
 
@@ -90,14 +90,14 @@ always @(posedge clk) begin
     end
     else if(~stall) begin
         //first two outputs use previous partial results
-        conv_sum[0] <=      conv_sum_part2 + d_top[(DATA_WIDTH-PIXEL_WIDTH)+:PIXEL_WIDTH]    + (d_mid[(DATA_WIDTH-PIXEL_WIDTH)+:PIXEL_WIDTH]<<1) + d_bot[(DATA_WIDTH-PIXEL_WIDTH)+:PIXEL_WIDTH];
-        conv_sum[1] <=      conv_sum_part1 + (d_top[(DATA_WIDTH-PIXEL_WIDTH)+:PIXEL_WIDTH]<<1) + (d_mid[(DATA_WIDTH-PIXEL_WIDTH)+:PIXEL_WIDTH]<<2) + (d_bot[(DATA_WIDTH-PIXEL_WIDTH)+:PIXEL_WIDTH]<<1) +
-                                             d_top[(DATA_WIDTH-2*PIXEL_WIDTH)+:PIXEL_WIDTH]    + (d_mid[(DATA_WIDTH-2*PIXEL_WIDTH)+:PIXEL_WIDTH]<<1) + d_bot[(DATA_WIDTH-2*PIXEL_WIDTH)+:PIXEL_WIDTH];
+        conv_sum[0] <=      conv_sum_part2 + d_top[(DATA_WIDTH-INPUT_WIDTH)+:INPUT_WIDTH]    + (d_mid[(DATA_WIDTH-INPUT_WIDTH)+:INPUT_WIDTH]<<1) + d_bot[(DATA_WIDTH-INPUT_WIDTH)+:INPUT_WIDTH];
+        conv_sum[1] <=      conv_sum_part1 + (d_top[(DATA_WIDTH-INPUT_WIDTH)+:INPUT_WIDTH]<<1) + (d_mid[(DATA_WIDTH-INPUT_WIDTH)+:INPUT_WIDTH]<<2) + (d_bot[(DATA_WIDTH-INPUT_WIDTH)+:INPUT_WIDTH]<<1) +
+                                             d_top[(DATA_WIDTH-2*INPUT_WIDTH)+:INPUT_WIDTH]    + (d_mid[(DATA_WIDTH-2*INPUT_WIDTH)+:INPUT_WIDTH]<<1) + d_bot[(DATA_WIDTH-2*INPUT_WIDTH)+:INPUT_WIDTH];
         //store last two partial results for calculation in next cycle
        
-        conv_sum_part1 <=   d_top[0+:PIXEL_WIDTH]        + (d_mid[0+:PIXEL_WIDTH]<<1)     +   d_bot[0+:PIXEL_WIDTH];
-        conv_sum_part2 <=   d_top[PIXEL_WIDTH+:PIXEL_WIDTH]       + (d_mid[PIXEL_WIDTH+:PIXEL_WIDTH]<<1)    +   d_bot[PIXEL_WIDTH+:PIXEL_WIDTH] 
-                            + (d_top[0+:PIXEL_WIDTH]<<1)          + (d_mid[0+:PIXEL_WIDTH]<<2)              +  (d_bot[0+:PIXEL_WIDTH]<<1); 
+        conv_sum_part1 <=   d_top[0+:INPUT_WIDTH]        + (d_mid[0+:INPUT_WIDTH]<<1)     +   d_bot[0+:INPUT_WIDTH];
+        conv_sum_part2 <=   d_top[INPUT_WIDTH+:INPUT_WIDTH]       + (d_mid[INPUT_WIDTH+:INPUT_WIDTH]<<1)    +   d_bot[INPUT_WIDTH+:INPUT_WIDTH] 
+                            + (d_top[0+:INPUT_WIDTH]<<1)          + (d_mid[0+:INPUT_WIDTH]<<2)              +  (d_bot[0+:INPUT_WIDTH]<<1); 
     
     end
 end
@@ -109,9 +109,9 @@ for(j=0; j<PIXELS_PER_BEAT-2; j=j+1) begin
     always @(posedge clk) begin
         if(~stall) begin
             //next N-2 outputs are directly generated
-            conv_sum[PIXELS_PER_BEAT-1-j] <=     d_top[(PIXEL_WIDTH*j)+:PIXEL_WIDTH]     + (d_top[(PIXEL_WIDTH*j+PIXEL_WIDTH)+:PIXEL_WIDTH]<<1) +  d_top[(PIXEL_WIDTH*j+2*PIXEL_WIDTH)+:PIXEL_WIDTH] + 
-                                                (d_mid[(PIXEL_WIDTH*j)+:PIXEL_WIDTH]<<1) + (d_mid[(PIXEL_WIDTH*j+PIXEL_WIDTH)+:PIXEL_WIDTH]<<2) + (d_mid[(PIXEL_WIDTH*j+2*PIXEL_WIDTH)+:PIXEL_WIDTH]<<1) + 
-                                                 d_bot[(PIXEL_WIDTH*j)+:PIXEL_WIDTH]     + (d_bot[(PIXEL_WIDTH*j+PIXEL_WIDTH)+:PIXEL_WIDTH]<<1) +  d_bot[(PIXEL_WIDTH*j+2*PIXEL_WIDTH)+:PIXEL_WIDTH]; 
+            conv_sum[PIXELS_PER_BEAT-1-j] <=     d_top[(INPUT_WIDTH*j)+:INPUT_WIDTH]     + (d_top[(INPUT_WIDTH*j+INPUT_WIDTH)+:INPUT_WIDTH]<<1) +  d_top[(INPUT_WIDTH*j+2*INPUT_WIDTH)+:INPUT_WIDTH] + 
+                                                (d_mid[(INPUT_WIDTH*j)+:INPUT_WIDTH]<<1) + (d_mid[(INPUT_WIDTH*j+INPUT_WIDTH)+:INPUT_WIDTH]<<2) + (d_mid[(INPUT_WIDTH*j+2*INPUT_WIDTH)+:INPUT_WIDTH]<<1) + 
+                                                 d_bot[(INPUT_WIDTH*j)+:INPUT_WIDTH]     + (d_bot[(INPUT_WIDTH*j+INPUT_WIDTH)+:INPUT_WIDTH]<<1) +  d_bot[(INPUT_WIDTH*j+2*INPUT_WIDTH)+:INPUT_WIDTH]; 
         end
     end      
 end
@@ -121,12 +121,12 @@ endgenerate
 generate
 for(j=2; j<PIXELS_PER_BEAT; j=j+1) begin
     always @(*) begin
-        out_frame[(DATA_WIDTH-PIXEL_WIDTH*(j+1))+:PIXEL_WIDTH] = conv_sum[j][4+PIXEL_WIDTH-1:4];
+        out_frame[(DATA_WIDTH-INPUT_WIDTH*(j+1))+:INPUT_WIDTH] = conv_sum[j][4+INPUT_WIDTH-1:4];
     end
 end
     always @(*) begin
-        out_frame[(DATA_WIDTH-PIXEL_WIDTH)+:PIXEL_WIDTH] = (col_counter==1) ? 0 : conv_sum[0][4+PIXEL_WIDTH-1:4];
-        out_frame[(DATA_WIDTH-2*PIXEL_WIDTH)+:PIXEL_WIDTH] = (col_counter==1) ? 0 : conv_sum[1][4+PIXEL_WIDTH-1:4];
+        out_frame[(DATA_WIDTH-INPUT_WIDTH)+:INPUT_WIDTH] = (col_counter==1) ? 0 : conv_sum[0][4+INPUT_WIDTH-1:4];
+        out_frame[(DATA_WIDTH-2*INPUT_WIDTH)+:INPUT_WIDTH] = (col_counter==1) ? 0 : conv_sum[1][4+INPUT_WIDTH-1:4];
     end
 endgenerate
 

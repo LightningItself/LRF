@@ -121,10 +121,10 @@ always@(posedge s_axis_aclk) begin
     end
 end
 
-wire step = m_axis_tready & s_axis_tvalid & s_axis_aresetn;
+reg step;// = m_axis_tready & s_axis_tvalid & s_axis_aresetn;
 
-assign m_axis_tvalid = s_axis_aresetn && (beat_cnt > 1);
-assign m_axis_tlast = (beat_cnt == ((PIXEL_COUNT/PIXELS_PER_BEAT + 2)));
+assign m_axis_tvalid = s_axis_aresetn && (beat_cnt > 8);
+assign m_axis_tlast = (beat_cnt == ((PIXEL_COUNT/PIXELS_PER_BEAT + 9)));
 
 always @(posedge s_axis_aclk) begin
     if (m_axis_tvalid && m_axis_tready) begin
@@ -143,11 +143,13 @@ end
 
 //DUMMY DUT MODEL
 assign s_axis_tready = 1;
-CONV_GAUSS dut(s_axis_aclk,s_axis_aresetn,~step,s_axis_tdata,m_axis_tdata);
+// CONV_GAUSS dut(s_axis_aclk,s_axis_aresetn,~step,s_axis_tdata,m_axis_tdata);
+CONV_SOBEL dut(s_axis_aclk,s_axis_aresetn,~step,s_axis_tdata,m_axis_tdata);
 
 initial begin
 
-    #3 s_axis_aresetn = 1;
+    #2.99 s_axis_aresetn = 1;
+    #0.2 step = 1;
 
     for (img = 1; img <= N_IMAGES; img = img + 1) begin
 //        $sformat(hex_filename, "C:/Users/Indrayudh/Research/LRF/sim/hex_data/Door_%0d.hex", img);
