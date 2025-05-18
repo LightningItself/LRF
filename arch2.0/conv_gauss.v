@@ -89,9 +89,9 @@ always @(posedge clk) begin
     end
     else if(~stall) begin
         //first two outputs use previous partial results
-        conv_sum[0] <=      conv_sum_part2 + d_top[0+:8]    + (d_mid[0+:8]<<1) + d_bot[0+:8];
-        conv_sum[1] <=      conv_sum_part1 + (d_top[0+:8]<<1) + (d_mid[0+:8]<<2) + (d_bot[0+:8]<<1) +
-                                             d_top[8+:8]    + (d_mid[8+:8]<<1) + d_bot[8+:8];
+        conv_sum[0] <=      conv_sum_part2 + d_top[(DATA_WIDTH-8)+:8]    + (d_mid[(DATA_WIDTH-8)+:8]<<1) + d_bot[(DATA_WIDTH-8)+:8];
+        conv_sum[1] <=      conv_sum_part1 + (d_top[(DATA_WIDTH-8)+:8]<<1) + (d_mid[(DATA_WIDTH-8)+:8]<<2) + (d_bot[(DATA_WIDTH-8)+:8]<<1) +
+                                             d_top[(DATA_WIDTH-16)+:8]    + (d_mid[(DATA_WIDTH-16)+:8]<<1) + d_bot[(DATA_WIDTH-16)+:8];
         //store last two partial results for calculation in next cycle
         // if(row_counter==0) begin
         //     conv_sum_part1 <= 0;
