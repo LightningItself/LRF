@@ -1,11 +1,12 @@
-`timescale 1ns / 1ps
+`timescale 1ns/1ps
 
 module LRF_sim ();
 
 // Parameters
-parameter N_IMAGES = 2;  // Number of images (Door_1.hex to Door_N.hex)
+parameter N_IMAGES = 1;  // Number of images (Door_1.hex to Door_N.hex)
 parameter IMAGE_WIDTH = 512;
 parameter IMAGE_HEIGHT = 512;
+parameter IMAGE_DIM = 512;
 parameter PIXEL_COUNT = IMAGE_WIDTH * IMAGE_HEIGHT;  // 262144
 parameter PIXEL_WIDTH = 8;
 parameter WORD_WIDTH = 128;
@@ -78,8 +79,10 @@ always @(posedge s_axis_aclk) begin
 end
 
 always @(posedge s_axis_aclk) begin
-    rand_valid <= $random;
-    rand_ready <= $random;
+    // rand_valid <= $random;
+    // rand_ready <= $random;
+    rand_valid <= 1;
+    rand_ready <= 1;
 end
 
 wire [63:0] mem_new_ptr = new_frame_ptr*WORDS_PER_IMAGE+beat_ptr;
@@ -104,6 +107,23 @@ always @(*) begin
     m_axis_tready = rand_ready;
 end
 
+reg [63:0] beat_cnt = 0;
+
+always@(posedge s_axis_aclk) begin
+    if(~s_axis_aresetn) begin
+        beat_cnt <= 0;
+    end
+
+    else begin
+        beat_cnt <= beat_cnt + 1;
+    end
+end
+
+wire step = m_axis_tready & s_axis_tvalid & s_axis_aresetn;
+
+assign m_axis_tvalid = s_axis_aresetn && (beat_cnt > 1);
+assign m_axis_tlast = (beat_cnt == ((PIXEL_COUNT/PIXELS_PER_WORD + 2)));
+
 always @(posedge s_axis_aclk) begin
     if (m_axis_tvalid && m_axis_tready) begin
         for (i = 0; i < 16; i = i + 1) begin
@@ -118,7 +138,6 @@ always @(posedge s_axis_aclk) begin
     end
 end
 
-wire step = m_axis_tready & s_axis_tvalid & s_axis_aresetn;
 
 //DUMMY DUT MODEL
 assign s_axis_tready = 1;
@@ -126,11 +145,16 @@ CONV_GAUSS dut(s_axis_aclk,s_axis_aresetn,~step,s_axis_tdata,m_axis_tdata);
 
 initial begin
 
+    //-----------------------------------------------------------------
+    //DISABLE ARESETN
+    #3 s_axis_aresetn = 1;
+
     //LOAD IMAGE FILES ONTO DDR MEM-------------------------------------
 
     for (img = 1; img <= N_IMAGES; img = img + 1) begin
         // Generate filename
-        $sformat(hex_filename, "C:/Users/Indrayudh/Research/LRF/sim/hex_data/Door_%0d.hex", img);
+//        $sformat(hex_filename, "C:/Users/Indrayudh/Research/LRF/sim/hex_data/Door_%0d.hex", img);
+        $sformat(hex_filename, "/home/rahul/Documents/LRF/sim/hex_data/Door_%0d.hex", img);
         $display("Loading image: %s", hex_filename);
 
         // Read .hex file into temporary pixel array
@@ -146,22 +170,19 @@ initial begin
         end
     end
     // Display first few words (optional)
-    for (i = 0; i < MEM_DEPTH; i = i + 1) begin
-        $display("mem[%0d] = %032x", i, mem[i]);
-    end
+    // for (i = 0; i < MEM_DEPTH; i = i + 1) begin
+    //     $display("mem[%0d] = %032x", i, mem[i]);
+    // end
 
     //SETUP OUTFILE FOR WRITING OUTPUT
-    outfile = $fopen("output.hex", "w");
+    outfile = $fopen("conv_output.hex", "w");
+end
 
-    //-----------------------------------------------------------------
-    //DISABLE ARESETN
-    #3 s_axis_aresetn = 1;
-
-
-
-
+initial begin
+    wait (m_axis_tlast == 1'b1);
+    $display("end sim");
+    $finish;
 end
 
 
 endmodule
-

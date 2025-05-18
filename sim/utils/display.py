@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def read_hex_image(filepath, width=520, height=520):
+def read_hex_image(filepath, width=512, height=512):
     """
     Reads an 8-bit grayscale image from a .hex file and returns a 2D numpy array.
     
@@ -54,8 +54,9 @@ def display_image(images, titles=None):
 
 # -------- Main Execution --------
 if __name__ == "__main__":
-    fused_image_path = "../runs/fused_output.hex"
-    input_image_path = "../door_hex16/Door10.hex"
+    # fused_image_path = "../runs/fused_output.hex"
+    input_image_path = "../hex_data/Door_1.hex"
+    fused_image_path = "../runs/conv_output.hex"
     fused_image = read_hex_image(fused_image_path)
     input_image = read_hex_image(input_image_path)
     display_image([fused_image, input_image], ["fused image", "input_image"])

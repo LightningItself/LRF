@@ -12,12 +12,13 @@ module CONV_GAUSS #(
 
 localparam COUNTER_MAX = IMAGE_DIM/PIXELS_PER_BEAT;
 localparam COUNTER_WIDTH = $clog2(COUNTER_MAX);
+localparam ROW_COUNTER_WIDTH = $clog2(IMAGE_DIM);
 
 reg [1:0] buff_counter;
 
 //use column and row counters a write pointers
 reg [COUNTER_WIDTH-1:0] col_counter;
-reg [COUNTER_WIDTH-1:0] row_counter;
+reg [ROW_COUNTER_WIDTH-1:0] row_counter;
  
 reg buff_a_write_en, buff_b_write_en, buff_c_write_en;
 reg buff_a_read_en, buff_b_read_en, buff_c_read_en;
