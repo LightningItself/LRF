@@ -27,7 +27,7 @@ reg [N_IMAGE_DIM+1:0] out_delay_counter;
 wire step = s_axis_tvalid & s_axis_tready;
 
 //LSU for current average frame and curr fused frame
-wire avg_read_enable, avg_write_enable, fused_read_enable_
+wire avg_read_enable, avg_write_enable, fused_read_enable, fused_write_enable;
 LSU #() avg_frame ();
 LSU #() fused_frame ();
 

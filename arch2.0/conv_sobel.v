@@ -1,4 +1,4 @@
-module CONV_GAUSS #(
+module CONV_SOBEL #(
     parameter PIXELS_PER_BEAT = 16,
     parameter IMAGE_DIM = 512,
     parameter DATA_WIDTH = 8*PIXELS_PER_BEAT
@@ -53,10 +53,6 @@ ROW_BUFF #(PIXELS_PER_BEAT,IMAGE_DIM) buff_b (clk,aresetn,buff_b_read_en&~stall,
 ROW_BUFF #(PIXELS_PER_BEAT,IMAGE_DIM) buff_c (clk,aresetn,buff_c_read_en&~stall,buff_c_write_en,inp_frame,buff_c_out_frame);
 
 //DATAPATH
-
-reg signed [8+4:0] conv_sum[PIXELS_PER_BEAT-1:0];
-reg signed [8+4:0] conv_sum_part1, conv_sum_part2; //part1 -> sum of 1 row, part2 -> sum of 2 rows
-
 reg [DATA_WIDTH-1:0] d_top, d_mid, d_bot;
 
 always @(*) begin
@@ -81,20 +77,46 @@ always @(*) begin
     d_bot = (row_counter < 2) ? 0 : inp_frame;
 end
 
+reg signed [11:0] conv_sum_x[PIXELS_PER_BEAT-1:0];
+reg signed [11:0] conv_sum_y[PIXELS_PER_BEAT-1:0];
+
+reg signed [23:0] conv_sum_x2[PIXELS_PER_BEAT-1:0];
+reg signed [23:0] conv_sum_y2[PIXELS_PER_BEAT-1:0];
+
+reg signed [23:0] conv_sum[PIXELS_PER_BEAT-1:0];
+
+
+wire [7:0] sobel_out[PIXELS_PER_BEAT-1:0];
+
+reg signed [8+4:0] conv_sum_part1_x, conv_sum_part2_x; //part1 -> sum of 1 row, part2 -> sum of 2 rows
+reg signed [8+4:0] conv_sum_part1_y, conv_sum_part2_y; //part1 -> sum of 1 row, part2 -> sum of 2 rows
+
+
+
 //calculate N-2 complete output and 2 partial output
 always @(posedge clk) begin
     if(~aresetn) begin
-        conv_sum_part1 <= 0;
-        conv_sum_part2 <= 0;
+        conv_sum_part1_x <= 0;
+        conv_sum_part2_x <= 0;
+        conv_sum_part1_y <= 0;
+        conv_sum_part2_y <= 0;
     end
     else if(~stall) begin
-        //first two outputs use previous partial results
-        conv_sum[0] <=      conv_sum_part2 + d_top[(DATA_WIDTH-8)+:8]    + (d_mid[(DATA_WIDTH-8)+:8]<<1) + d_bot[(DATA_WIDTH-8)+:8];
-        conv_sum[1] <=      conv_sum_part1 + d_top[(DATA_WIDTH-16)+:8]    + (d_mid[(DATA_WIDTH-16)+:8]<<1) + d_bot[(DATA_WIDTH-16)+:8];
-        //store last two partial results for calculation in next cycle
-       
-        conv_sum_part1 <=   -d_top[0+:8]        - (d_mid[0+:8]<<1)     -   d_bot[0+:8];
-        conv_sum_part2 <=   -d_top[8+:8]      - (d_mid[8+:8]<<1)    - d_bot[8+:8];
+
+        //FOR SOBEL_X
+        conv_sum_x[0] <= (col_counter==0) ? 0 : conv_sum_part2_x + d_top[(DATA_WIDTH-8)+:8]   + (d_mid[(DATA_WIDTH-8)+:8]<<1)  + d_bot[(DATA_WIDTH-8)+:8];
+        conv_sum_x[1] <= (col_counter==0) ? 0 : conv_sum_part1_x + d_top[(DATA_WIDTH-16)+:8]  + (d_mid[(DATA_WIDTH-16)+:8]<<1) + d_bot[(DATA_WIDTH-16)+:8];
+        conv_sum_part1_x <= -d_top[0+:8] - (d_mid[0+:8]<<1) - d_bot[0+:8];
+        conv_sum_part2_x <= -d_top[8+:8] - (d_mid[8+:8]<<1) - d_bot[8+:8];
+
+        //FOR SOBEL_Y
+        conv_sum_y[0] <= (col_counter==0) ? 0 : conv_sum_part2_y - d_top[(DATA_WIDTH-8)+:8]       + d_bot[(DATA_WIDTH-8)+:8];
+        conv_sum_y[1] <= (col_counter==0) ? 0 : conv_sum_part1_y - d_top[(DATA_WIDTH-16)+:8]      + d_bot[(DATA_WIDTH-16)+:8]
+                                                                - (d_top[(DATA_WIDTH-8)+:8]<<1)  + (d_bot[(DATA_WIDTH-8)+:8]<<1);
+                                          
+        conv_sum_part1_y <= -d_top[0+:8] + d_bot[0+:8];
+        conv_sum_part2_y <= -d_top[8+:8] + d_bot[8+:8]
+                            -(d_top[0+:8]<<1) + (d_bot[0+:8]<<1);
     
     end
 end
@@ -106,25 +128,44 @@ for(j=0; j<PIXELS_PER_BEAT-2; j=j+1) begin
     always @(posedge clk) begin
         if(~stall) begin
             //next N-2 outputs are directly generated
-            conv_sum[PIXELS_PER_BEAT-1-j] <=     d_top[(8*j)+:8]      -  d_top[(8*j+16)+:8] + 
+
+            //FOR SOBEL_X
+            conv_sum_x[PIXELS_PER_BEAT-1-j] <=   d_top[(8*j)+:8]      -  d_top[(8*j+16)+:8]     + 
                                                 (d_mid[(8*j)+:8]<<1)  - (d_mid[(8*j+16)+:8]<<1) + 
                                                  d_bot[(8*j)+:8]      -  d_bot[(8*j+16)+:8]; 
+
+            //FOR SOBEL_Y
+            conv_sum_y[PIXELS_PER_BEAT-1-j] <=  -d_top[(8*j)+:8]     - (d_top[(8*j+8)+:8]<<1) -  d_top[(8*j+16)+:8] + 
+                                                 d_bot[(8*j)+:8]     + (d_bot[(8*j+8)+:8]<<1) +  d_bot[(8*j+16)+:8]; 
         end
     end      
 end
 endgenerate
 
+//calculate squared values of X and Y
+generate
+for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
+    cordic_0 sqrt(clk,~stall,conv_sum[j],,sobel_out[j]);
+    always @(posedge clk) begin
+        if(~stall) begin
+            conv_sum_x2[j] <= conv_sum_x[j]*conv_sum_x[j];
+            conv_sum_y2[j] <= conv_sum_y[j]*conv_sum_y[j];
+            conv_sum[j] <= conv_sum_x2[j]+conv_sum_y2[j];
+        end
+    end      
+end
+endgenerate
+
+
+
+
 //send final output
 generate
-for(j=2; j<PIXELS_PER_BEAT; j=j+1) begin
+for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
     always @(*) begin
-        out_frame[(DATA_WIDTH-8*(j+1))+:8] = conv_sum[j][11:0];
+        out_frame[(DATA_WIDTH-8*(j+1))+:8] = sobel_out[j];
     end
 end
-    always @(*) begin
-        out_frame[(DATA_WIDTH-8)+:8] = (col_counter==1) ? 0 : conv_sum[0][11:2];
-        out_frame[(DATA_WIDTH-16)+:8] = (col_counter==1) ? 0 : conv_sum[1][11:2];
-    end
 endgenerate
 
 //CONTROL LOGIC
@@ -152,3 +193,7 @@ end
 
 
 endmodule
+
+// 0 1 2
+// 40 41 42
+//80 81 82

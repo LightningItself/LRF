@@ -7,7 +7,7 @@ reg clk=0, aresetn=0, stall;
 reg [DATA_WIDTH-1:0] inp_frame=64'h0001020304050607;
 wire [DATA_WIDTH-1:0] out_frame;
 
-CONV_GAUSS #(PIXELS_PER_BEAT,IMAGE_DIM) dut (clk,aresetn,stall,inp_frame,out_frame);
+CONV_SOBEL #(PIXELS_PER_BEAT,IMAGE_DIM) dut (clk,aresetn,stall,inp_frame,out_frame);
 
 //CLOCKING
 always #1 
