@@ -86,7 +86,7 @@ reg signed [21:0] conv_sum_y2[PIXELS_PER_BEAT-1:0];
 reg signed [20:0] conv_sum[PIXELS_PER_BEAT-1:0];
 
 
-wire [7:0] sobel_out[PIXELS_PER_BEAT-1:0];
+wire [10:0] sobel_out[PIXELS_PER_BEAT-1:0];
 
 reg signed [8+4:0] conv_sum_part1_x, conv_sum_part2_x; //part1 -> sum of 1 row, part2 -> sum of 2 rows
 reg signed [8+4:0] conv_sum_part1_y, conv_sum_part2_y; //part1 -> sum of 1 row, part2 -> sum of 2 rows
@@ -145,7 +145,7 @@ endgenerate
 //calculate squared values of X and Y
 generate
 for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
-    cordic_0 sqrt(clk,~stall,conv_sum[j][20:5],,sobel_out[j]);
+    cordic_0 sqrt(clk,~stall,conv_sum[j],,sobel_out[j]);
     always @(posedge clk) begin
         if(~stall) begin
             conv_sum_x2[j] <= conv_sum_x[j]*conv_sum_x[j];
@@ -163,7 +163,7 @@ endgenerate
 generate
 for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
     always @(*) begin
-        out_frame[(DATA_WIDTH-8*(j+1))+:8] = sobel_out[j];
+        out_frame[(DATA_WIDTH-8*(j+1))+:8] = sobel_out[j][11:4];
     end
 end
 endgenerate
