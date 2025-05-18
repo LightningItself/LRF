@@ -93,15 +93,11 @@ always @(posedge clk) begin
         conv_sum[1] <=      conv_sum_part1 + (d_top[(DATA_WIDTH-8)+:8]<<1) + (d_mid[(DATA_WIDTH-8)+:8]<<2) + (d_bot[(DATA_WIDTH-8)+:8]<<1) +
                                              d_top[(DATA_WIDTH-16)+:8]    + (d_mid[(DATA_WIDTH-16)+:8]<<1) + d_bot[(DATA_WIDTH-16)+:8];
         //store last two partial results for calculation in next cycle
-        // if(row_counter==0) begin
-        //     conv_sum_part1 <= 0;
-        //     conv_sum_part2 <= 0;
-        // end
-        // else begin
-            conv_sum_part1 <=   d_top[(DATA_WIDTH-8)+:8]        + (d_mid[(DATA_WIDTH-8)+:8]<<1)     +   d_bot[(DATA_WIDTH-8)+:8];
-            conv_sum_part2 <=   d_top[(DATA_WIDTH-16)+:8]       + (d_mid[(DATA_WIDTH-16)+:8]<<1)    +   d_bot[(DATA_WIDTH-16)+:8] 
-                             + (d_top[(DATA_WIDTH-8)+:8]<<1)    + (d_mid[(DATA_WIDTH-8)+:8]<<2)     +  (d_bot[(DATA_WIDTH-8)+:8]<<1); 
-        // end
+       
+        conv_sum_part1 <=   d_top[0+:8]        + (d_mid[0+:8]<<1)     +   d_bot[0+:8];
+        conv_sum_part2 <=   d_top[8+:8]       + (d_mid[8+:8]<<1)    +   d_bot[8+:8] 
+                            + (d_top[0+:8]<<1)    + (d_mid[0+:8]<<2)     +  (d_bot[0+:8]<<1); 
+    
     end
 end
 
@@ -122,9 +118,9 @@ endgenerate
 
 //send final output
 generate
-for(j=PIXELS_PER_BEAT-3; j>=0; j=j-1) begin
+for(j=2; j<PIXELS_PER_BEAT; j=j+1) begin
     always @(*) begin
-        out_frame[(8*j)+:8] = conv_sum[j][11:4];
+        out_frame[(DATA_WIDTH-8*(j+1))+:8] = conv_sum[j][11:4];
     end
 end
     always @(*) begin
