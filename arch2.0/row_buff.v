@@ -1,7 +1,8 @@
 module ROW_BUFF #(
     parameter PIXELS_PER_BEAT = 16,
+    parameter PIXEL_WIDTH = 8,
     parameter IMAGE_DIM = 512,
-    parameter DATA_WIDTH = 8*PIXELS_PER_BEAT
+    parameter DATA_WIDTH = PIXEL_WIDTH*PIXELS_PER_BEAT
 )(
     input wire clk,
     input wire aresetn,
