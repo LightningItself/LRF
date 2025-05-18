@@ -10,8 +10,8 @@ parameter IMAGE_DIM = 512;
 parameter PIXEL_COUNT = IMAGE_WIDTH * IMAGE_HEIGHT;  // 262144
 parameter PIXEL_WIDTH = 8;
 parameter WORD_WIDTH = 128;
-parameter PIXELS_PER_WORD = WORD_WIDTH / PIXEL_WIDTH;  // 16
-parameter WORDS_PER_IMAGE = PIXEL_COUNT / PIXELS_PER_WORD;  // 16384
+parameter PIXELS_PER_BEAT = WORD_WIDTH / PIXEL_WIDTH;  // 16
+parameter WORDS_PER_IMAGE = PIXEL_COUNT / PIXELS_PER_BEAT;  // 16384
 parameter MEM_DEPTH = N_IMAGES * WORDS_PER_IMAGE;
 
 parameter MEM_BITS = $clog2(MEM_DEPTH);
@@ -95,10 +95,12 @@ always @(*) begin
     end
     else begin
         s_axis_tvalid = rand_valid;
-        s_axis_tdata  = state ? mem[mem_new_ptr] : mem[mem_old_ptr];
+        // s_axis_tdata  = state ? mem[mem_new_ptr] : mem[mem_old_ptr];
+        s_axis_tdata <= mem[beat_cnt - 1];
         s_axis_tlast  = beat_ptr == MAX_BEAT_PTR & new_frame_ptr == N_IMAGES-1 & state;
     end
 end
+
 
 //OUTPUT AXI CONTROLLER
 integer outfile;
@@ -122,11 +124,11 @@ end
 wire step = m_axis_tready & s_axis_tvalid & s_axis_aresetn;
 
 assign m_axis_tvalid = s_axis_aresetn && (beat_cnt > 1);
-assign m_axis_tlast = (beat_cnt == ((PIXEL_COUNT/PIXELS_PER_WORD + 2)));
+assign m_axis_tlast = (beat_cnt == ((PIXEL_COUNT/PIXELS_PER_BEAT + 2)));
 
 always @(posedge s_axis_aclk) begin
     if (m_axis_tvalid && m_axis_tready) begin
-        for (i = 0; i < 16; i = i + 1) begin
+        for (i = 15; i >= 0; i = i - 1) begin
             $fdisplay(outfile, "%02x", m_axis_tdata[i*8 +: 8]);
         end
 
@@ -145,14 +147,9 @@ CONV_GAUSS dut(s_axis_aclk,s_axis_aresetn,~step,s_axis_tdata,m_axis_tdata);
 
 initial begin
 
-    //-----------------------------------------------------------------
-    //DISABLE ARESETN
     #3 s_axis_aresetn = 1;
 
-    //LOAD IMAGE FILES ONTO DDR MEM-------------------------------------
-
     for (img = 1; img <= N_IMAGES; img = img + 1) begin
-        // Generate filename
 //        $sformat(hex_filename, "C:/Users/Indrayudh/Research/LRF/sim/hex_data/Door_%0d.hex", img);
         $sformat(hex_filename, "/home/rahul/Documents/LRF/sim/hex_data/Door_%0d.hex", img);
         $display("Loading image: %s", hex_filename);
@@ -160,21 +157,15 @@ initial begin
         // Read .hex file into temporary pixel array
         $readmemh(hex_filename, pixel_array);
 
-        // Pack 16 pixels into each 128-bit word
         for (i = 0; i < WORDS_PER_IMAGE; i = i + 1) begin
             mem[mem_index] = 128'b0;
-            for (j = 0; j < PIXELS_PER_WORD; j = j + 1) begin
-                mem[mem_index][j * PIXEL_WIDTH +: PIXEL_WIDTH] = pixel_array[i * PIXELS_PER_WORD + j];
+            for (j = 0; j < PIXELS_PER_BEAT; j = j + 1) begin
+                mem[mem_index][j * PIXEL_WIDTH +: PIXEL_WIDTH] = pixel_array[(i * PIXELS_PER_BEAT) + (PIXELS_PER_BEAT - 1) - j];
             end
             mem_index = mem_index + 1;
         end
     end
-    // Display first few words (optional)
-    // for (i = 0; i < MEM_DEPTH; i = i + 1) begin
-    //     $display("mem[%0d] = %032x", i, mem[i]);
-    // end
 
-    //SETUP OUTFILE FOR WRITING OUTPUT
     outfile = $fopen("conv_output.hex", "w");
 end
 
