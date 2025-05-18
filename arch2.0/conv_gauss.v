@@ -61,23 +61,23 @@ reg [DATA_WIDTH-1:0] d_top, d_mid, d_bot;
 always @(*) begin
     case(buff_counter)
         0: begin
-            d_top = buff_b_out_frame;
-            d_mid = buff_c_out_frame;
+            d_top = (row_counter < 2) ? 0 : buff_b_out_frame;
+            d_mid = (row_counter < 2) ? 0 : buff_c_out_frame;
         end
         1: begin
-            d_top = (row_counter==1) ? buff_a_out_frame : buff_c_out_frame;
-            d_mid = buff_a_out_frame;
+            d_top = (row_counter < 2) ? 0 : buff_c_out_frame;
+            d_mid = (row_counter < 2) ? 0 : buff_a_out_frame;
         end
         2: begin
-            d_top = buff_a_out_frame;
-            d_mid = buff_b_out_frame;
+            d_top = (row_counter < 2) ? 0 : buff_a_out_frame;
+            d_mid = (row_counter < 2) ? 0 : buff_b_out_frame;
         end
         default: begin
-            d_top = buff_b_out_frame;
-            d_mid = buff_c_out_frame;
+            d_top = (row_counter < 2) ? 0 : buff_b_out_frame;
+            d_mid = (row_counter < 2) ? 0 : buff_c_out_frame;
         end
     endcase
-    d_bot = (row_counter==0) ? d_mid : inp_frame;
+    d_bot = (row_counter < 2) ? 0 : inp_frame;
 end
 
 //calculate N-2 complete output and 2 partial output
