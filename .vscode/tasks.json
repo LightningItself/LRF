@@ -1,0 +1,35 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "xvlog Lint",
+      "type": "shell",
+      "command": "/tools/Xilinx/Vivado/2024.1/bin/xvlog",
+      "args": [
+        "-lint",
+        "-sv",
+        "${workspaceFolder}/src/**/*.v"
+      ],
+      "problemMatcher": {
+        "owner": "verilog",
+        "pattern": {
+          "regexp": "^(ERROR|WARNING):\\s+(.*)\\s+\\((.*):(\\d+)\\)",
+          "severity": 1,
+          "message": 2,
+          "file": 3,
+          "line": 4
+        }
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
+    }
+  ]
+}

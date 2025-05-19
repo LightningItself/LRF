@@ -37,7 +37,7 @@ reg state;                                  //first calculate average image, the
 reg [3:0] curr_frame;                       //which frame out of 16 is currently being fused
 
 
-always @(posedge s_axis_aclk) begin
+always @(posedge s_axis_clk) begin
     if(~s_axis_aresetn) begin
         state <= STATE_AVG;
         curr_frame <= 0;

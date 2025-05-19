@@ -8,67 +8,229 @@ module HSSIM #(
     parameter DENR_BIT_WIDTH = 36,
     parameter NUMR_WIDTH = NUMR_BIT_WIDTH*PIXELS_PER_BEAT,
     parameter DENR_WIDTH = DENR_BIT_WIDTH*PIXELS_PER_BEAT
-){
+)(
     input clk,
     input aresetn,
     input stall,
-    input [DATA_WIDTH-1:0] inp_frame,
-    input [DATA_WIDTH-1:0] ref_frame,
+    input [DATA_WIDTH-1:0] old_map,
+    input [DATA_WIDTH-1:0] avg_map,
+    input [DATA_WIDTH-1:0] new_map,
 
-    output reg signed [NUMR_WIDTH-1:0] numr_out,
-    output reg signed [DENR_WIDTH-1:0] denr_out
-};
-
-
-// edge map calculation
-CONV_SOBEL #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) inp_edge (clk, aresetn, stall, inp_frame, inp_edge);
-CONV_SOBEL #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) ref_edge (clk, aresetn, stall, ref_frame, ref_edge);
+    output reg [8*PIXELS_PER_BEAT-1:0] del_out
+);
 
 /*
 Mean and Variance Calculation
-Input Edge Map (inp_edge) -> X
-Refernce Edge Map (ref_edge) -> Y
+Old Edge Map (inp_edge) -> X
+Average Edge Map (avg_edge) -> Y
+New Edge Map -> Z
 
-mean calc -> 1 cycle dly => delay the result by 2 cycles
-variance(signed)  -> 3 cycle dly
+variance(signed)  -> 4 cycle dly
+mean calc -> 1 cycle dly => delay the result by 3 cycles to sync with co-var output
+    (2*muX*muY + c1), (muX^2 + muY^2 + c1) calculation <- divided into 3 stages
 */
-
+localparam CONV_GAUSS_INPUT_WIDTH = 8;  // mean calc
+localparam CONV_GAUSS_OUTPUT_WIDTH = 8; // mean calc
+localparam MEAN_DATA_WIDTH = 8*PIXELS_PER_BEAT;
 localparam c1 = 6;
 localparam c2 = 58;
-
 localparam DLY_VAL_MEAN = 2;
 
-localparam DLY_VAL_MEAN = 2;
+// mean and variance calculation
+wire [8*PIXELS_PER_BEAT-1:0] out_mu_x;
+wire [8*PIXELS_PER_BEAT-1:0] out_mu_y;
+wire [8*PIXELS_PER_BEAT-1:0] out_mu_z;
+
+wire [16*PIXELS_PER_BEAT-1:0] out_sig_sq_x;
+wire [16*PIXELS_PER_BEAT-1:0] out_sig_sq_y;
+wire [16*PIXELS_PER_BEAT-1:0] out_sig_sq_z;
+wire [16*PIXELS_PER_BEAT-1:0] out_sig_xy;
+wire [16*PIXELS_PER_BEAT-1:0] out_sig_zy;
+
+CONV_GAUSS #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) mu_x (clk, aresetn, stall, old_map, out_mu_x);
+CONV_GAUSS #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) mu_y (clk, aresetn, stall, avg_map, out_mu_y);
+CONV_GAUSS #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) mu_z (clk, aresetn, stall, new_map, out_mu_z);
+
+SIG_XY #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) sig_sq_x (clk, aresetn, stall, old_map, old_map, out_sig_sq_x);    // each co-variance unit is 4 stage pipelned
+SIG_XY #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) siq_sq_y (clk, aresetn, stall, avg_map, avg_map, out_siq_sq_y);
+SIG_XY #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) siq_sq_z (clk, aresetn, stall, new_map, new_map, out_siq_sq_z);
+
+SIG_XY #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) siq_xy (clk, aresetn, stall, old_map, avg_map, out_sig_xy);
+SIG_XY #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) siq_zy (clk, aresetn, stall, new_map, avg_map, out_sig_zy);
 
 
-reg [CONV_GAUSS_OUTPUT_WIDTH-1:0] out_mu_x_dly [0:DLY_VAL_MEAN-1];
-integer i;
+// stage - 1: muX^2, muY^2, muZ^2, 2*muX*muY, 2*muX*muZ calculation
+reg [((2*8+1)*PIXELS_PER_BEAT)-1:0] muX_muY_times2;
+reg [((2*8+1)*PIXELS_PER_BEAT)-1:0] muZ_muY_times2;
+reg [((2*8)*PIXELS_PER_BEAT)-1:0] muX_sq;
+reg [((2*8)*PIXELS_PER_BEAT)-1:0] muY_sq;
+reg [((2*8)*PIXELS_PER_BEAT)-1:0] muZ_sq;
 
-always @(posedge clk or negedge aresetn) begin
-    if (!aresetn) begin
-        for (i = 0; i < DLY_VAL_MEAN; i = i + 1) begin
-            out_mu_x_dly[i] <= 0;
-        end
-    end else if (!stall) begin
-        out_mu_x_dly[0] <= out_mu_x;
-        for (i = 1; i < DLY_VAL_MEAN; i = i + 1) begin
-            out_mu_x_dly[i] <= out_mu_x_dly[i-1];
+genvar j;
+generate
+for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
+    always@(posedge clk) begin
+        if(~stall) begin
+            muX_muY_times2[j*17+:17] <= (out_mu_x[j*8+:8] * out_mu_y[j*8+:8])<<1;
+            muZ_muY_times2[j*17+:17] <= (out_mu_z[j*8+:8] * out_mu_y[j*8+:8])<<1;
+
+            muX_sq[j*16+:16] <= out_mu_x[j*8+:8] * out_mu_x[j*8+:8];
+            muY_sq[j*16+:16] <= out_mu_y[j*8+:8] * out_mu_y[j*8+:8];
+            muZ_sq[j*16+:16] <= out_mu_z[j*8+:8] * out_mu_z[j*8+:8];
         end
     end
 end
-
-// Delayed output
-wire [CONV_GAUSS_OUTPUT_WIDTH-1:0] out_mu_x_delayed;
-assign out_mu_x_delayed = out_mu_x_dly[DLY_VAL_MEAN-1];
-
-CONV_GAUSS #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) mu_x (clk, aresetn, stall, inp_edge, out_mu_x);
-CONV_GAUSS #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) mu_y (clk, aresetn, stall, ref_edge, out_mu_y);
-
-SIG_XY #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) sig_sq_x (clk, aresetn, stall, inp_edge, inp_edge, out_sig_sq_x);
-SIG_XY #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) siq_sq_y (clk, aresetn, stall, ref_edge, ref_edge, out_siq_sq_y);
-
-SIG_XY #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) siq_xy (clk, aresetn, stall, inp_edge, ref_edge, out_sig_xy);
+endgenerate
 
 
+// stage - 2: muX^2 + muY^2, 2*muX*muY, 2*muZ*muY, muZ^2 + muY^2
+reg [((2*8+1)*PIXELS_PER_BEAT)-1:0] muX_muY_times2_dly1;
+reg [((2*8+1)*PIXELS_PER_BEAT)-1:0] muZ_muY_times2_dly1;
+reg [((2*8+1)*PIXELS_PER_BEAT)-1:0] muX_sq_plus_muY_sq;
+reg [((2*8+1)*PIXELS_PER_BEAT)-1:0] muZ_sq_plus_muY_sq;
+
+generate
+for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
+    always@(posedge clk) begin
+        if(~stall) begin
+            muX_muY_times2_dly1 <= muX_muY_times2;
+            muZ_muY_times2_dly1 <= muZ_muY_times2;
+
+            muX_sq_plus_muY_sq[j*17+:17] <= muX_sq[j*16+:16] + muY_sq[j*16+:16];
+            muZ_sq_plus_muY_sq[j*17+:17] <= muZ_sq[j*16+:16] + muY_sq[j*16+:16];
+        end
+    end
+end
+endgenerate
+
+
+// stage - 3, 4: add constant c1 to all the above stage values and delay by 2 cycles till part values are claculted. part 3 calc takes 1 cycle
+reg [((2*8+1+1)*PIXELS_PER_BEAT)-1:0] muX_muY_times2_dly1_plus_c1, numr_part_1_x_temp, numr_part_1_x;
+reg [((2*8+1+1)*PIXELS_PER_BEAT)-1:0] muZ_muY_times2_dly1_plus_c1, numr_part_1_z_temp, numr_part_1_z;
+reg [((2*8+1+1)*PIXELS_PER_BEAT)-1:0] muX_sq_plus_muY_sq_plus_c1, denr_part_1_x_temp, denr_part_1_x;
+reg [((2*8+1+1)*PIXELS_PER_BEAT)-1:0] muZ_sq_plus_muY_sq_plus_c1, denr_part_1_z_temp, denr_part_1_z;
+
+generate
+for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
+    always@(posedge clk) begin
+        if(~stall) begin
+            muX_muY_times2_dly1_plus_c1[j*18+:18] <= muX_muY_times2_dly1[j*17+:17] + c1;
+            numr_part_1_x_temp <= muX_muY_times2_dly1_plus_c1;
+            numr_part_1_x <= numr_part_1_x_temp;
+
+            muZ_muY_times2_dly1_plus_c1[j*18+:18] <= muX_muY_times2_dly1[j*17+:17] + c1;
+            numr_part_1_z_temp <= muZ_muY_times2_dly1_plus_c1;
+            numr_part_1_z <= numr_part_1_z_temp;
+
+            muX_sq_plus_muY_sq_plus_c1[j*18+:18] <= muX_sq_plus_muY_sq[j*17+:17] + c1;
+            denr_part_1_x_temp <= muX_sq_plus_muY_sq_plus_c1;
+            denr_part_1_x <= denr_part_1_x_temp;
+
+            muZ_sq_plus_muY_sq_plus_c1[j*18+:18] <= muZ_sq_plus_muY_sq[j*17+:17] + c1;
+            denr_part_1_z_temp <= muZ_sq_plus_muY_sq_plus_c1;
+            denr_part_1_z <= denr_part_1_z_temp;
+        end
+    end
+end
+endgenerate
+
+
+// add the constant c2 with variance values and multiply the result with above partial parts calculated (2 cycles)
+reg signed [((2*8+1+1)*PIXELS_PER_BEAT)-1:0] numr_part_2_x;
+reg signed [((2*8+1+1)*PIXELS_PER_BEAT)-1:0] numr_part_2_z;
+reg signed [((2*8+1+1)*PIXELS_PER_BEAT)-1:0] denr_part_2_x;
+reg signed [((2*8+1+1)*PIXELS_PER_BEAT)-1:0] denr_part_2_z;
+
+reg signed [(2*(2*8+1+1)*PIXELS_PER_BEAT)-1:0] numr_x;
+reg signed [(2*(2*8+1+1)*PIXELS_PER_BEAT)-1:0] denr_x;
+reg signed [(2*(2*8+1+1)*PIXELS_PER_BEAT)-1:0] numr_z;
+reg signed [(2*(2*8+1+1)*PIXELS_PER_BEAT)-1:0] denr_z;
+
+
+generate
+for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
+    always@(posedge clk) begin
+        if(~stall) begin
+            numr_part_2_x[j*18+:18] <= (out_sig_xy[j*16+:16]<<1) + c2;
+            numr_part_2_z[j*18+:18] <= (out_sig_zy[j*16+:16]<<1) + c2;
+
+            denr_part_2_x[j*18+:18] <= (out_sig_sq_x[j*16+:16] + out_sig_sq_y[j*16+:16]) + c2;
+            denr_part_2_z[j*18+:18] <= (out_sig_sq_z[j*16+:16] + out_sig_sq_y[j*16+:16]) + c2;
+
+            numr_x[j*36+:36] <= numr_part_1_x[j*18+:18] * numr_part_2_x[j*18+:18];
+            numr_z[j*36+:36] <= numr_part_1_z[j*18+:18] * numr_part_2_z[j*18+:18];
+
+            denr_x[j*36+:36] <= denr_part_1_x[j*18+:18] * denr_part_2_x[j*18+:18];
+            denr_z[j*36+:36] <= denr_part_1_z[j*18+:18] * denr_part_2_z[j*18+:18];
+        end
+    end
+end
+endgenerate
+
+
+/* 
+get products, P1=Nx*Dz and P2=Nz*Dx
+    numerator, denominator width -> 36
+HSSIM1 (old) = Nx/Dx
+HSSIM2 (new) = Nz/Dz
+*/
+reg signed [(36*PIXELS_PER_BEAT)-1:0] p1;
+reg signed [(36*PIXELS_PER_BEAT)-1:0] p2;
+
+generate
+for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
+    always@(posedge clk) begin
+        if(~stall) begin
+            p1[j*36+:36] <= numr_x[j*18+:18] * denr_z[j*18+:18];
+            p2[j*36+:36] <= numr_z[j*18+:18] * denr_x[j*18+:18];
+        end
+    end
+end
+endgenerate
+
+
+/* 
+compare p1 and p2 to get the selected value (0 or 255)
+    del = 255 when p2 > p1 (given both denr have same sign) else 0
+*/
+reg [8*PIXELS_PER_BEAT-1:0] del;
+reg [PIXELS_PER_BEAT-1:0] comp_val;
+
+
+generate
+for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
+    always@(*) begin
+        comp_val[j] <= p2[j*36+:36] > p1[j*36+:36];
+    end
+
+    always@(posedge clk) begin
+        if(~stall) begin
+            if(denr_x[(j+1)*36-1] ^ denr_z[(j+1)*36-1]) begin
+                del[j*8+:8] = ~comp_val[j] ? 8'd255 : 8'd0;
+            end
+
+            else begin
+                del[j*8+:8] = comp_val[j] ? 8'd255 : 8'd0;
+            end
+        end
+    end
+end
+endgenerate
+
+
+// gaussian blur of the del
+wire [8*PIXELS_PER_BEAT-1:0] del_gauss;
+
+generate
+for (j = 0; j < PIXELS_PER_BEAT; j = j + 1) begin
+    CONV_GAUSS #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) del_gauss (clk, aresetn, stall, del[j*8+:8], del_gauss[j*8+:8]);
+end
+
+always@(*) begin
+    if(~stall) begin
+        del_out[j*8+:8] <= del_gauss[j*8+:8];
+    end
+end
+endgenerate
 
 endmodule

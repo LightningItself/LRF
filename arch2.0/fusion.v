@@ -6,7 +6,7 @@ module hfusion
         IM_LEN                  = 16'd520, 
         IM_WID                  = 16'd520,
         HKER_SIZE               = 8'd3, 
-        LOG2_NO_OF_IMAGES       = 4,
+        LOG2_NO_OF_IMAGES       = 4
 
     )(  // CREATES ALL THE NEW FUSED IMAGES BASED ON INPUT and OLD FUSED IMAGES
      
