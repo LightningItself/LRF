@@ -6,7 +6,7 @@ module HSSIM #(
 
     parameter NUMR_BIT_WIDTH = 36,
     parameter DENR_BIT_WIDTH = 36,
-    parameter NUMR_WIDTH = NUMR_BIT_WIDTH*PIXELS_PER_BEAT
+    parameter NUMR_WIDTH = NUMR_BIT_WIDTH*PIXELS_PER_BEAT,
     parameter DENR_WIDTH = DENR_BIT_WIDTH*PIXELS_PER_BEAT
 ){
     input clk,

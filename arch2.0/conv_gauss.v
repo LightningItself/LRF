@@ -120,13 +120,17 @@ endgenerate
 //send final output
 generate
 for(j=2; j<PIXELS_PER_BEAT; j=j+1) begin
-    always @(*) begin
-        out_frame[(DATA_WIDTH-INPUT_WIDTH*(j+1))+:INPUT_WIDTH] = conv_sum[j][4+INPUT_WIDTH-1:4];
+    always @(posedge clk) begin
+        if(~stall) begin
+            out_frame[(DATA_WIDTH-INPUT_WIDTH*(j+1))+:INPUT_WIDTH] = conv_sum[j][4+INPUT_WIDTH-1:4];
+        end
     end
 end
-    always @(*) begin
-        out_frame[(DATA_WIDTH-INPUT_WIDTH)+:INPUT_WIDTH] = (col_counter==1) ? 0 : conv_sum[0][4+INPUT_WIDTH-1:4];
-        out_frame[(DATA_WIDTH-2*INPUT_WIDTH)+:INPUT_WIDTH] = (col_counter==1) ? 0 : conv_sum[1][4+INPUT_WIDTH-1:4];
+    always @(posedge clk) begin
+        if(~stall) begin
+            out_frame[(DATA_WIDTH-INPUT_WIDTH)+:INPUT_WIDTH] = (col_counter==1) ? 0 : conv_sum[0][4+INPUT_WIDTH-1:4];
+            out_frame[(DATA_WIDTH-2*INPUT_WIDTH)+:INPUT_WIDTH] = (col_counter==1) ? 0 : conv_sum[1][4+INPUT_WIDTH-1:4];
+        end
     end
 endgenerate
 
