@@ -55,6 +55,8 @@ reg state = 0;
 reg rand_valid;
 reg rand_ready;
 
+reg [63:0] beat_cnt = 0;
+
 always @(posedge s_axis_aclk) begin
     if(~s_axis_aresetn) begin
         new_frame_ptr   <= 0;
@@ -109,7 +111,7 @@ always @(*) begin
     m_axis_tready = rand_ready;
 end
 
-reg [63:0] beat_cnt = 0;
+
 
 always@(posedge s_axis_aclk) begin
     if(~s_axis_aresetn) begin
@@ -123,8 +125,8 @@ end
 
 reg step;// = m_axis_tready & s_axis_tvalid & s_axis_aresetn;
 
-assign m_axis_tvalid = s_axis_aresetn && (beat_cnt > 8);
-assign m_axis_tlast = (beat_cnt == ((PIXEL_COUNT/PIXELS_PER_BEAT + 9)));
+assign m_axis_tvalid = s_axis_aresetn && (beat_cnt > 9);
+assign m_axis_tlast = (beat_cnt == ((PIXEL_COUNT/PIXELS_PER_BEAT + 10)));
 
 always @(posedge s_axis_aclk) begin
     if (m_axis_tvalid && m_axis_tready) begin
@@ -152,8 +154,8 @@ initial begin
     #0.2 step = 1;
 
     for (img = 1; img <= N_IMAGES; img = img + 1) begin
-//        $sformat(hex_filename, "C:/Users/Indrayudh/Research/LRF/sim/hex_data/Door_%0d.hex", img);
-        $sformat(hex_filename, "/home/rahul/Documents/LRF/sim/hex_data/Door_%0d.hex", img);
+       $sformat(hex_filename, "C:/Users/Indrayudh/Research/LRF/sim/data/hex_data/Door_%0d.hex", img);
+        // $sformat(hex_filename, "/home/rahul/Documents/LRF/sim/hex_data/Door_%0d.hex", img);
         $display("Loading image: %s", hex_filename);
 
         // Read .hex file into temporary pixel array

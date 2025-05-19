@@ -88,8 +88,8 @@ reg signed [20:0] conv_sum[PIXELS_PER_BEAT-1:0];
 
 wire [10:0] sobel_out[PIXELS_PER_BEAT-1:0];
 
-reg signed [8+4:0] conv_sum_part1_x, conv_sum_part2_x; //part1 -> sum of 1 row, part2 -> sum of 2 rows
-reg signed [8+4:0] conv_sum_part1_y, conv_sum_part2_y; //part1 -> sum of 1 row, part2 -> sum of 2 rows
+reg signed [10:0] conv_sum_part1_x, conv_sum_part2_x; //part1 -> sum of 1 row, part2 -> sum of 2 rows
+reg signed [10:0] conv_sum_part1_y, conv_sum_part2_y; //part1 -> sum of 1 row, part2 -> sum of 2 rows
 
 
 
@@ -162,8 +162,10 @@ endgenerate
 //send final output
 generate
 for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
-    always @(*) begin
-        out_frame[(DATA_WIDTH-8*(j+1))+:8] = sobel_out[j][7:0];
+    always @(posedge clk) begin
+        if(~stall) begin
+            out_frame[(DATA_WIDTH-8*(j+1))+:8] = (sobel_out[j] > 8'hff) ? 8'hff : sobel_out[j][7:0];
+        end
     end
 end
 endgenerate

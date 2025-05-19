@@ -55,8 +55,8 @@ def display_image(images, titles=None):
 # -------- Main Execution --------
 if __name__ == "__main__":
     # fused_image_path = "../runs/fused_output.hex"
-    input_image_path = "../hex_data/Door_1.hex"
-    fused_image_path = "/home/rahul/Documents/BTP/RTL/LRF/LRF.sim/sim_1/behav/xsim/conv_output.hex"
+    input_image_path = "../data/hex_data/Door_1.hex"
+    fused_image_path = "C:/Users/Indrayudh/Research/LRF_vivado/LRF/LRF.sim/sim_1/behav/xsim/conv_output.hex"
     fused_image = read_hex_image(fused_image_path)
     input_image = read_hex_image(input_image_path)
     display_image([fused_image, input_image], ["fused image", "input_image"])
