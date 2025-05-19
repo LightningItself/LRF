@@ -1,7 +1,7 @@
 module LRF #(
     parameter PIXELS_PER_BEAT = 16,
     parameter IMAGE_DIM = 512,
-    parameter FUSE_COUNT = 16,
+    parameter N_FUSE_COUNT = 4,
     parameter DATA_WIDTH = 8*PIXELS_PER_BEAT,
     parameter OUT_DELAY = 10 //not correct
 ) (
@@ -19,8 +19,22 @@ module LRF #(
     output reg m_axis_tlast
 );
 
-localparam N_FUSE_COUNT = $clog2(FUSE_COUNT);
+localparam FUSE_COUNT = 1<<N_FUSE_COUNT;
 localparam N_IMAGE_DIM  = $clog2(IMAGE_DIM);
+
+localparam STATE_START = 0; //add the incoming frame * 16 to average frame
+localparam STATE_NEWFRAME = 1; //calculate new fused frame
+localparam STATE_OLDFRAME = 2; //calculate new average frame
+reg [1:0] state;
+
+always @(posedge s_axis_aclk) begin
+    if(~s_axis_aresetn) begin
+        state <= STATE_START;
+    end
+    else begin
+        
+    end
+end
 
 reg [N_FUSE_COUNT-1:0] fuse_counter;
 reg [N_IMAGE_DIM+1:0] out_delay_counter;
@@ -40,13 +54,31 @@ for every next frames, we sub f(0) and add f(n) to average sum.
 -> RECEIVE FIRST 16 IMAAGES -> keep updating 
 ***/
 
-//LSU for current average frame and curr fused frame
-wire avg_read_enable, avg_write_enable, fused_read_enable, fused_write_enable;
-LSU #() avg_frame ();
-LSU #() fused_frame ();
 
+//HANDLE AVERAGE FRAME CALCULATION
+reg avg_read_enable, avg_write_enable;
+wire [DATA_WIDTH-1:0] avg_frame, avg_write;
 
+// always @(posedge s_axis_aclk) begin
+//     if(~stall) begin
+//         avg_add <= (avg_frame<<N_FUSE_COUNT) + s_axis_tdata;
+//         avg_write <= avg_add - 
+//     end
+// end
 
+// always @(*) begin
+//     if(state == STATE_START)
+//         avg_read_enable = s_axis_tlast & step;
+//     else 
+//         avg_read_enable = step;
+//     avg_write_enable = step;
+//     if(state == STATE_START) 
+//         avg_write = s_axis_tdata;
+//     else if(state == STATE_OLDFRAME)
+//         avg_write = (avg_frame<<N_FUSE_COUNT)-
+// end
+// //LSU for current average frame and curr fused frame
+// LSU #(PIXELS_PER_BEAT,IMAGE_DIM) avg_frame (clk,aresetn,avg_read_enable,avg_frame,avg_write_enable,avg_write);
 
 
 

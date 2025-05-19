@@ -4,13 +4,11 @@ module LRF_sim ();
 
 // Parameters
 parameter N_IMAGES = 1;  // Number of images (Door_1.hex to Door_N.hex)
-parameter IMAGE_WIDTH = 512;
-parameter IMAGE_HEIGHT = 512;
 parameter IMAGE_DIM = 512;
-parameter PIXEL_COUNT = IMAGE_WIDTH * IMAGE_HEIGHT;  // 262144
+parameter PIXEL_COUNT = IMAGE_DIM*IMAGE_DIM;  // 262144
 parameter PIXEL_WIDTH = 8;
-parameter WORD_WIDTH = 128;
-parameter PIXELS_PER_BEAT = WORD_WIDTH / PIXEL_WIDTH;  // 16
+parameter PIXELS_PER_BEAT = 16;  // 16
+parameter WORD_WIDTH = PIXEL_WIDTH*PIXELS_PER_BEAT;
 parameter WORDS_PER_IMAGE = PIXEL_COUNT / PIXELS_PER_BEAT;  // 16384
 parameter MEM_DEPTH = N_IMAGES * WORDS_PER_IMAGE;
 

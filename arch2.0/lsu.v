@@ -1,7 +1,7 @@
 module LSU #(
+    parameter PIXELS_PER_BEAT = 16,
     parameter IMAGE_DIM  = 512,
-    parameter DATA_WIDTH = 128,
-    parameter ADDR_WIDTH = 14
+    parameter DATA_WIDTH = PIXELS_PER_BEAT*8
 ) (
     input wire clk,
     input wire aresetn,
@@ -12,8 +12,10 @@ module LSU #(
     input wire write_enable,
     input wire [DATA_WIDTH-1:0] write_data    
 );
-localparam PIXELS_PER_BEAT = 16;
+
 localparam MEM_DEPTH = IMAGE_DIM * IMAGE_DIM / PIXELS_PER_BEAT;
+localparam ADDR_WIDTH = $clog2(MEM_DEPTH);
+
 reg [DATA_WIDTH-1:0] ram [MEM_DEPTH-1:0];
 reg [ADDR_WIDTH-1:0] read_ptr, write_ptr;
 
