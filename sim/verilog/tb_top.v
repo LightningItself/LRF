@@ -152,8 +152,8 @@ initial begin
     #0.2 step = 1;
 
     for (img = 1; img <= N_IMAGES; img = img + 1) begin
-       $sformat(hex_filename, "C:/Users/Indrayudh/Research/LRF/sim/data/hex_data/Door_%0d.hex", img);
-        // $sformat(hex_filename, "/home/rahul/Documents/LRF/sim/hex_data/Door_%0d.hex", img);
+    //    $sformat(hex_filename, "C:/Users/Indrayudh/Research/LRF/sim/data/hex_data/Door_%0d.hex", img);
+        $sformat(hex_filename, "/home/rahul/Documents/LRF/sim/hex_data/Door_%0d.hex", img);
         $display("Loading image: %s", hex_filename);
 
         // Read .hex file into temporary pixel array

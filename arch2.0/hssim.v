@@ -32,8 +32,8 @@ mean calc -> 1 cycle dly => delay the result by 3 cycles to sync with co-var out
 localparam CONV_GAUSS_INPUT_WIDTH = 8;  // mean calc
 localparam CONV_GAUSS_OUTPUT_WIDTH = 8; // mean calc
 localparam MEAN_DATA_WIDTH = 8*PIXELS_PER_BEAT;
-localparam c1 = 6;
-localparam c2 = 58;
+localparam signed c1 = 17'd6;
+localparam signed c2 = 17'd58;
 localparam DLY_VAL_MEAN = 2;
 
 // mean and variance calculation
@@ -51,12 +51,14 @@ CONV_GAUSS #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) mu_x (clk, ares
 CONV_GAUSS #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) mu_y (clk, aresetn, stall, avg_map, out_mu_y);
 CONV_GAUSS #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) mu_z (clk, aresetn, stall, new_map, out_mu_z);
 
-SIG_XY #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) sig_sq_x (clk, aresetn, stall, old_map, old_map, out_sig_sq_x);    // each co-variance unit is 4 stage pipelned
-SIG_XY #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) siq_sq_y (clk, aresetn, stall, avg_map, avg_map, out_siq_sq_y);
-SIG_XY #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) siq_sq_z (clk, aresetn, stall, new_map, new_map, out_siq_sq_z);
+// SIG_XY #(PIXELS_PER_BEAT, IMAGE_DIM) sig_sq_x (clk, aresetn, stall, old_map, old_map, out_sig_sq_x);    // each co-variance unit is 4 stage pipelned
+SIG_XY #(PIXELS_PER_BEAT, IMAGE_DIM) sig_sq_x (clk, aresetn, stall, new_map, avg_map, out_sig_sq_x);    // to debug
+SIG_XY #(PIXELS_PER_BEAT, IMAGE_DIM) siq_sq_y (clk, aresetn, stall, avg_map, avg_map, out_sig_sq_y);
+SIG_XY #(PIXELS_PER_BEAT, IMAGE_DIM) siq_sq_z (clk, aresetn, stall, new_map, new_map, out_sig_sq_z);
+// SIG_XY #(PIXELS_PER_BEAT, IMAGE_DIM) siq_sq_z (clk, aresetn, stall, old_map, old_map, out_siq_sq_z); // to debug
 
-SIG_XY #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) siq_xy (clk, aresetn, stall, old_map, avg_map, out_sig_xy);
-SIG_XY #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) siq_zy (clk, aresetn, stall, new_map, avg_map, out_sig_zy);
+SIG_XY #(PIXELS_PER_BEAT, IMAGE_DIM) siq_xy (clk, aresetn, stall, old_map, avg_map, out_sig_xy);
+SIG_XY #(PIXELS_PER_BEAT, IMAGE_DIM) siq_zy (clk, aresetn, stall, new_map, avg_map, out_sig_zy);
 
 
 // stage - 1: muX^2, muY^2, muZ^2, 2*muX*muY, 2*muX*muZ calculation
@@ -196,6 +198,17 @@ compare p1 and p2 to get the selected value (0 or 255)
 reg [8*PIXELS_PER_BEAT-1:0] del;
 reg [PIXELS_PER_BEAT-1:0] comp_val;
 
+reg [3:0] del_start_cnt;
+always@(posedge clk) begin
+    if(~aresetn) begin
+        del_start_cnt <= 6;
+    end
+
+    else if(del_start_cnt != 0) begin
+        del_start_cnt <= del_start_cnt - 1;
+    end
+end
+
 
 generate
 for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
@@ -205,12 +218,18 @@ for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
 
     always@(posedge clk) begin
         if(~stall) begin
-            if(denr_x[(j+1)*36-1] ^ denr_z[(j+1)*36-1]) begin
-                del[j*8+:8] = ~comp_val[j] ? 8'd255 : 8'd0;
+            if(del_start_cnt > 0) begin
+                del[j*8+:8] <= 0;
             end
 
             else begin
-                del[j*8+:8] = comp_val[j] ? 8'd255 : 8'd0;
+                if(denr_x[(j+1)*36-1] ^ denr_z[(j+1)*36-1]) begin
+                    del[j*8+:8] = ~comp_val[j] ? 8'd255 : 8'd0;
+                end
+
+                else begin
+                    del[j*8+:8] = comp_val[j] ? 8'd255 : 8'd0;
+                end
             end
         end
     end
@@ -220,16 +239,13 @@ endgenerate
 
 // gaussian blur of the del
 wire [8*PIXELS_PER_BEAT-1:0] del_gauss;
+CONV_GAUSS #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) del_gauss1 (clk, aresetn, stall, del, del_gauss);
 
 generate
 for (j = 0; j < PIXELS_PER_BEAT; j = j + 1) begin
-    CONV_GAUSS #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) del_gauss (clk, aresetn, stall, del[j*8+:8], del_gauss[j*8+:8]);
-end
-
 always@(*) begin
-    if(~stall) begin
-        del_out[j*8+:8] <= del_gauss[j*8+:8];
-    end
+    del_out[j*8+:8] <= del_gauss[j*8+:8];
+end
 end
 endgenerate
 
