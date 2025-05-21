@@ -111,20 +111,20 @@ for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
     always@(posedge clk) begin
         if(~stall) begin
             muX_muY_times2_dly1_plus_c1[j*18+:18] <= muX_muY_times2_dly1[j*17+:17] + c1;
-            numr_part_1_x_temp <= muX_muY_times2_dly1_plus_c1;
-            numr_part_1_x <= numr_part_1_x_temp;
+            numr_part_1_x <= muX_muY_times2_dly1_plus_c1;
+            // numr_part_1_x <= numr_part_1_x_temp;
 
             muZ_muY_times2_dly1_plus_c1[j*18+:18] <= muX_muY_times2_dly1[j*17+:17] + c1;
-            numr_part_1_z_temp <= muZ_muY_times2_dly1_plus_c1;
-            numr_part_1_z <= numr_part_1_z_temp;
+            numr_part_1_z <= muZ_muY_times2_dly1_plus_c1;
+            // numr_part_1_z <= numr_part_1_z_temp;
 
             muX_sq_plus_muY_sq_plus_c1[j*18+:18] <= muX_sq_plus_muY_sq[j*17+:17] + c1;
-            denr_part_1_x_temp <= muX_sq_plus_muY_sq_plus_c1;
-            denr_part_1_x <= denr_part_1_x_temp;
+            denr_part_1_x <= muX_sq_plus_muY_sq_plus_c1;
+            // denr_part_1_x <= denr_part_1_x_temp;
 
             muZ_sq_plus_muY_sq_plus_c1[j*18+:18] <= muZ_sq_plus_muY_sq[j*17+:17] + c1;
-            denr_part_1_z_temp <= muZ_sq_plus_muY_sq_plus_c1;
-            denr_part_1_z <= denr_part_1_z_temp;
+            denr_part_1_z <= muZ_sq_plus_muY_sq_plus_c1;
+            // denr_part_1_z <= denr_part_1_z_temp;
         end
     end
 end
