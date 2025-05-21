@@ -9,9 +9,7 @@ module FUSION #(
     input stall,
     input [DATA_WIDTH-1:0] old_frame,
     input [DATA_WIDTH-1:0] new_frame,
-    input [DATA_WIDTH-1:0] old_map,
-    input [DATA_WIDTH-1:0] new_map,
-    input [DATA_WIDTH-1:0] avg_map,
+    input [DATA_WIDTH-1:0] del_gauss,
     output reg [DATA_WIDTH-1:0] fused_frame
 );
 
@@ -44,9 +42,9 @@ end
 
 
 // HSSIM
-wire [DATA_WIDTH-1:0] del_out;
+// wire [DATA_WIDTH-1:0] del_out;
 
-HSSIM #(PIXELS_PER_BEAT,IMAGE_DIM) hssim_mod (clk, aresetn, stall, old_map, avg_map, new_map, del_out);
+// HSSIM #(PIXELS_PER_BEAT,IMAGE_DIM) hssim_mod (clk, aresetn, stall, old_map, avg_map, new_map, del_out);
 
 /*
  z= y*d + x*~d
@@ -62,8 +60,8 @@ generate
 for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
     always@(posedge clk) begin
         if(~stall) begin
-            xd_bar[j*16+:16] <= old_frame_delayed[j*8+:8] * (~del_out[j*8+:8]);
-            yd[j*16+:16] <= new_frame_delayed[j*8+:8] * del_out[j*8+:8];
+            xd_bar[j*16+:16] <= old_frame_delayed[j*8+:8] * (~del_gauss[j*8+:8]);
+            yd[j*16+:16] <= new_frame_delayed[j*8+:8] * del_gauss[j*8+:8];
         end
     end
 end
@@ -89,7 +87,7 @@ always@(posedge clk) begin
         old_frame_delayed_dly1 <= old_frame_delayed;
         old_frame_delayed_dly2 <= old_frame_delayed_dly1;
 
-        del_out_dly1 <= del_out;
+        del_out_dly1 <= del_gauss;
         del_out_dly2 <= del_out_dly1;
     end
 end

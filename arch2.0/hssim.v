@@ -10,7 +10,7 @@ module HSSIM #(
     input [DATA_WIDTH-1:0] avg_map,
     input [DATA_WIDTH-1:0] new_map,
 
-    output reg [8*PIXELS_PER_BEAT-1:0] del_out
+    output reg [8*PIXELS_PER_BEAT-1:0] del
 );
 
 /*
@@ -189,20 +189,7 @@ endgenerate
 compare p1 and p2 to get the selected value (0 or 255)
     del = 255 when p2 > p1 (given both denr have same sign) else 0
 */
-reg [8*PIXELS_PER_BEAT-1:0] del;
 reg [PIXELS_PER_BEAT-1:0] comp_val;
-
-reg [3:0] del_start_cnt;
-always@(posedge clk) begin
-    if(~aresetn) begin
-        del_start_cnt <= 7;
-    end
-
-    else if(del_start_cnt != 0 && ~stall) begin
-        del_start_cnt <= del_start_cnt - 1;
-    end
-end
-
 
 generate
 for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
@@ -212,34 +199,15 @@ for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
 
     always@(posedge clk) begin
         if(~stall) begin
-            if(del_start_cnt > 0) begin
-                del[j*8+:8] <= 0;
+            if(denr_x[(j+1)*36-1] ^ denr_z[(j+1)*36-1]) begin
+                del[j*8+:8] = ~comp_val[j] ? 8'd255 : 8'd0;
             end
 
             else begin
-                if(denr_x[(j+1)*36-1] ^ denr_z[(j+1)*36-1]) begin
-                    del[j*8+:8] = ~comp_val[j] ? 8'd255 : 8'd0;
-                end
-
-                else begin
-                    del[j*8+:8] = comp_val[j] ? 8'd255 : 8'd0;
-                end
+                del[j*8+:8] = comp_val[j] ? 8'd255 : 8'd0;
             end
         end
     end
-end
-endgenerate
-
-
-// gaussian blur of the del
-wire [8*PIXELS_PER_BEAT-1:0] del_gauss;
-CONV_GAUSS #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) del_gauss1 (clk, aresetn, stall, del, del_gauss);
-
-generate
-for (j = 0; j < PIXELS_PER_BEAT; j = j + 1) begin
-always@(*) begin
-    del_out[j*8+:8] <= del_gauss[j*8+:8];
-end
 end
 endgenerate
 
