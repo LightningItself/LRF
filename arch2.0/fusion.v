@@ -15,7 +15,8 @@ module FUSION #(
     output reg [DATA_WIDTH-1:0] fused_frame
 );
 
-localparam FRAME_DELAY_VAL = 10;  // hssim module takes 10 cycles to produce del_out
+localparam SOBEL_DELAY = 10;   
+localparam FRAME_DELAY_VAL = SOBEL_DELAY+10;  // hssim module takes 10 cycles to produce del_out
 
 // old,new frame delay block
 reg [DATA_WIDTH-1:0] old_frame_sr [FRAME_DELAY_VAL-1:0];
