@@ -6,6 +6,7 @@ module FUSION #(
 )(
     input clk,
     input aresetn,
+    input stall,
     input [DATA_WIDTH-1:0] old_frame,
     input [DATA_WIDTH-1:0] new_frame,
     input [DATA_WIDTH-1:0] old_map,
@@ -44,7 +45,7 @@ end
 // HSSIM
 wire [DATA_WIDTH-1:0] del_out;
 
-HSSIM #(PIXELS_PER_BEAT, INPUT_WIDTH,IMAGE_DIM) hssim_mod (clk, aresetn, stall, old_map, avg_map, new_map, del_out);
+HSSIM #(PIXELS_PER_BEAT,IMAGE_DIM) hssim_mod (clk, aresetn, stall, old_map, avg_map, new_map, del_out);
 
 /*
  z= y*d + x*~d

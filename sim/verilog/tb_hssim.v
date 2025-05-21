@@ -37,10 +37,14 @@ module tb_HSSIM();
     );
 
     initial clk = 0;
-    always #5 clk = ~clk;
+    always #1 clk = ~clk;
 
     integer beat_count = 0;
     integer i,y,z = 0;
+
+    always@(posedge clk) begin
+        stall <= $random;
+    end
 
     initial begin
         aresetn = 0;
@@ -50,7 +54,7 @@ module tb_HSSIM();
         new_map = 0;
 
         // repeat (4) @(posedge clk);
-        #40.1 aresetn = 1;
+        #8.1 aresetn = 1;
 
         for (beat_count = 0; beat_count < 400; beat_count = beat_count + 1) begin
             for (i = 0; i < PIXELS_PER_BEAT; i = i + 1) begin

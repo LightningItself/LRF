@@ -1,13 +1,7 @@
 module HSSIM #(
     parameter PIXELS_PER_BEAT = 16,
-    parameter INPUT_WIDTH = 8,
     parameter IMAGE_DIM = 512,
-    parameter DATA_WIDTH = INPUT_WIDTH*PIXELS_PER_BEAT,
-
-    parameter NUMR_BIT_WIDTH = 36,
-    parameter DENR_BIT_WIDTH = 36,
-    parameter NUMR_WIDTH = NUMR_BIT_WIDTH*PIXELS_PER_BEAT,
-    parameter DENR_WIDTH = DENR_BIT_WIDTH*PIXELS_PER_BEAT
+    parameter DATA_WIDTH = 8*PIXELS_PER_BEAT
 )(
     input clk,
     input aresetn,
@@ -201,10 +195,10 @@ reg [PIXELS_PER_BEAT-1:0] comp_val;
 reg [3:0] del_start_cnt;
 always@(posedge clk) begin
     if(~aresetn) begin
-        del_start_cnt <= 6;
+        del_start_cnt <= 7;
     end
 
-    else if(del_start_cnt != 0) begin
+    else if(del_start_cnt != 0 && ~stall) begin
         del_start_cnt <= del_start_cnt - 1;
     end
 end
