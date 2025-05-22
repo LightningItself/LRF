@@ -1,7 +1,9 @@
 module LSU #(
     parameter PIXELS_PER_BEAT = 16,
     parameter IMAGE_DIM  = 512,
-    parameter DATA_WIDTH = PIXELS_PER_BEAT*8
+    parameter BIT_WIDTH = 8,
+    parameter WRITE_DELAY = 1,
+    parameter DATA_WIDTH = PIXELS_PER_BEAT*BIT_WIDTH
 ) (
     input wire clk,
     input wire aresetn,
@@ -33,8 +35,8 @@ end
 
 always @(posedge clk) begin
     if(~aresetn) begin
-        read_ptr <= 0;
-        write_ptr <= 0;
+        read_ptr <= 1-WRITE_DELAY;
+        write_ptr <= -WRITE_DELAY;
     end
     else begin
         read_ptr <= read_ptr+1;

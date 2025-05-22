@@ -2,8 +2,8 @@ module LRF #(
     parameter PIXELS_PER_BEAT = 16,
     parameter IMAGE_DIM = 512,
     parameter N_FUSE_COUNT = 4,
-    parameter DATA_WIDTH = 8*PIXELS_PER_BEAT,
-    parameter OUT_DELAY = 10 //not correct
+    parameter PIPELINE_DELAY = 3,
+    parameter DATA_WIDTH = 8*PIXELS_PER_BEAT
 ) (
     input wire s_axis_aclk,
     input wire s_axis_aresetn,
@@ -18,103 +18,140 @@ module LRF #(
     input wire m_axis_tready,
     output reg m_axis_tlast
 );
+localparam SOBEL_DELAY = 10;
+localparam FUSION_DELAY = 11;
 
 localparam FUSE_COUNT = 1<<N_FUSE_COUNT;
 localparam N_IMAGE_DIM  = $clog2(IMAGE_DIM);
+localparam BEATS_PER_IMAGE = IMAGE_DIM*IMAGE_DIM/PIXELS_PER_BEAT;
+localparam N_BEATS_PER_IMAGE = $clog2(BEATS_PER_IMAGE);
+localparam N_PIPELINE_DELAY = $clog2(PIPELINE_DELAY);
 
-localparam STATE_START = 0; //add the incoming frame * 16 to average frame
-localparam STATE_NEWFRAME = 1; //calculate new fused frame
-localparam STATE_OLDFRAME = 2; //calculate new average frame
-reg [1:0] state;
+wire [DATA_WIDTH-1:0] s1_new_frame_emap;
+reg step; //check if the  pipeline can move forward
 
+
+//FUSION CONTROL STATES
+reg load_avg;
+reg [N_FUSE_COUNT-1:0] frame_counter;
+wire new_frame = ~frame_counter[0];
+wire old_frame = frame_counter[0];
+
+//FRAME_BUFFER STATES
+localparam BUF_COUNTER_WIDTH = $clog2(IMAGE_DIM/PIXELS_PER_BEAT);
+reg avg_read_en, avg_write_en;
+reg fused_read_en, fused_write_en;
+reg [DATA_WIDTH+N_FUSE_COUNT*PIXELS_PER_BEAT-1:0] avg_buff_in;
+wire [DATA_WIDTH+N_FUSE_COUNT*PIXELS_PER_BEAT-1:0] avg_frame_emap;
+
+reg [DATA_WIDTH-1:0] fused_buff_in, fused_frame;
+wire [DATA_WIDTH-1:0] fused_buff_out;
+
+//DATAPATH STATES
+wire [DATA_WIDTH-1:0] curr_frame_emap;
+reg [DATA_WIDTH-1:0] fused_frame_emap;
+wire [DATA_WIDTH-1:0] out_frame;
+
+//FUSION STATE LOGIC
 always @(posedge s_axis_aclk) begin
     if(~s_axis_aresetn) begin
-        state <= STATE_START;
+        load_avg <= 1;
+        frame_counter <= 0;
     end
-    else begin
-        
+    else if(step) begin
+        if(s_axis_tlast) begin
+            load_avg <= 0;
+            if(frame_counter == 2*FUSE_COUNT-1) 
+                frame_counter <= 0;
+            else 
+                frame_counter <= frame_counter+1;
+        end
     end
 end
 
-reg [N_FUSE_COUNT-1:0] fuse_counter;
-reg [N_IMAGE_DIM+1:0] out_delay_counter;
-
-wire step = s_axis_tvalid & s_axis_tready;
-
-//START LOGIC
-/***
-
-we send f(n-16) and f(n) every cycle.
-for first 15 frames we will send f(0) and f(n).
-
-for first frame, we shall use f(0) as fused and add 16*f(0) to average.
-for every next frames, we sub f(0) and add f(n) to average sum.
-
--> RECEIVE FIRST IMAGE -> store as curr fused image and average image
--> RECEIVE FIRST 16 IMAAGES -> keep updating 
-***/
 
 
-//HANDLE AVERAGE FRAME CALCULATION
-reg avg_read_enable, avg_write_enable;
-wire [DATA_WIDTH-1:0] avg_frame, avg_write;
-
+//AXI IO INTERFACE LOGIC
+// reg [N_PIPELINE_DELAY-1:0] last_counter;
+// reg [N_PIPELINE_DELAY-1:0] valid_counter;
+// //m_axis_tlast logic
 // always @(posedge s_axis_aclk) begin
-//     if(~stall) begin
-//         avg_add <= (avg_frame<<N_FUSE_COUNT) + s_axis_tdata;
-//         avg_write <= avg_add - 
+//     if(~s_axis_aresetn) begin
+//         last_counter <= 0;
+//     end
+//     else if(step) begin
+//         if(last_counter!=0) begin
+//             if(last_counter == PIPELINE_DELAY) 
+//                 last_counter <= 0;
+//             else 
+//                 last_counter <= last_counter+1; 
+//         end
+//         else if(s_axis_tlast)
+//             last_counter <= 1;
 //     end
 // end
-
-// always @(*) begin
-//     if(state == STATE_START)
-//         avg_read_enable = s_axis_tlast & step;
-//     else 
-//         avg_read_enable = step;
-//     avg_write_enable = step;
-//     if(state == STATE_START) 
-//         avg_write = s_axis_tdata;
-//     else if(state == STATE_OLDFRAME)
-//         avg_write = (avg_frame<<N_FUSE_COUNT)-
+// //m_axis_tvalid logic
+// always @(posedge s_axis_aclk) begin
+//     if(~s_axis_aresetn) begin
+//         valid_counter <= 0;
+//     end
+//     else if(step) begin
+//         if(valid_counter==0)
+//             valid_counter <= 1;
+//         else if(valid_counter < PIPELINE_DELAY)
+//             valid_counter <= valid_counter+1; 
+//     end
 // end
-// //LSU for current average frame and curr fused frame
-// LSU #(PIXELS_PER_BEAT,IMAGE_DIM) avg_frame (clk,aresetn,avg_read_enable,avg_frame,avg_write_enable,avg_write);
+// always @(*) begin
+//     m_axis_tvalid = s_axis_tvalid & (valid_counter==PIPELINE_DELAY);
+//     m_axis_tdata  = s1_new_frame_emap;
+//     m_axis_tlast  = (last_counter==PIPELINE_DELAY); 
+//     s_axis_tready = m_axis_tready;
+//     step = (s_axis_tvalid & s_axis_tready);
+// end
 
+genvar i;
 
-
-//FUSE COUNTER LOGIC
-always @(posedge s_axis_aclk) begin
-    if(~s_axis_aresetn) begin
-        fuse_counter <= 0;
+//AVERAGE FRAME LOGIC
+LSU #(PIXELS_PER_BEAT,IMAGE_DIM,8+N_FUSE_COUNT,SOBEL_DELAY) avg_frame_buff (s_axis_aclk,s_axis_aresetn,avg_read_en&step,avg_frame_emap,avg_write_en,avg_buff_in);
+wire [DATA_WIDTH+N_FUSE_COUNT*PIXELS_PER_BEAT-1:0] iframex16, iframe;
+generate 
+    for(i=0;i<PIXELS_PER_BEAT;i=i+1) begin
+        assign iframex16[(8+N_FUSE_COUNT)*i+:(8+N_FUSE_COUNT)] = curr_frame_emap[8*i+:8]<<N_FUSE_COUNT; 
+        assign iframe[(8+N_FUSE_COUNT)*i+:8] = curr_frame_emap[8*i+:8]; 
+        assign iframe[((8+N_FUSE_COUNT)*i+8)+:N_FUSE_COUNT] = 0; 
+    end    
+endgenerate
+always @(*) begin
+    avg_write_en = step & s_axis_aresetn;
+    avg_read_en = step & s_axis_aresetn;
+    if(load_avg) begin
+        avg_buff_in = iframex16;
     end
-    else begin
-        //increment fuse_counter;
+    else if(old_frame) begin
+        avg_buff_in = avg_frame_emap - iframe;
+    end
+    else begin //new_frame
+        avg_buff_in = avg_frame_emap + iframe;
     end
 end
 
-//OUT_DELAY LOGIC
-always @(posedge s_axis_aclk) begin
-    if(s_axis_aresetn) begin
-        out_delay_counter <= 0;
-    end
-    else begin
-        if(out_delay_counter < OUT_DELAY-1)
-            out_delay_counter <= out_delay_counter+1;
-    end
-end
-
-//DATAPATH
-
-//HSSIM(new, ref) -> D1
-//HSSIM(curr, ref) -> D2
-
-//FUSION(D1,D2, new)
-
+//FUSED FRAME LOGIC
+LSU #(PIXELS_PER_BEAT,IMAGE_DIM,8+N_FUSE_COUNT,SOBEL_DELAY) fused_frame_buff (s_axis_aclk,s_axis_aresetn,avg_read_en&step,avg_frame_emap,avg_write_en,avg_buff_in);
 
 
 always @(*) begin
-    s_axis_tready = (fuse_counter==FUSE_COUNT-1) ? m_axis_tready : 1;
-    m_axis_tvalid = (fuse_counter==FUSE_COUNT-1);
+    s_axis_tready = m_axis_tready;
+    step = (s_axis_tvalid & s_axis_tready);
 end
+
+//PIPELINED DATAPATH
+CONV_SOBEL #(PIXELS_PER_BEAT,IMAGE_DIM) sobel_curr_frame (s_axis_aclk,s_axis_aresetn,~step,s_axis_tdata,curr_frame_emap);
+FUSION #(PIXELS_PER_BEAT,IMAGE_DIM) m_fusion (s_axis_aclk,s_axis_aresetn,~step,fused_frame,s_axis_tdata,fused_frame_emap,curr_frame_emap,avg_frame_emap,out_frame);
+
+always @(*) begin
+    fused_frame_emap = (frame_counter == 0) ? curr_frame_emap : 0; //TODO: incomplete
+end
+
 
 endmodule

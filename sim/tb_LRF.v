@@ -1,9 +1,9 @@
-`timescale 1ns/1ps
+`timescale 1ns/10ps
 
 module tb_LRF ();
 
 // Parameters
-parameter N_IMAGES = 50;  // Number of images (Door_1.hex to Door_N.hex)
+parameter N_IMAGES = 5;  // Number of images (Door_1.hex to Door_N.hex)
 parameter IMAGE_DIM = 512;
 parameter N_FUSE_COUNT = 4; //FUSECOUNT 16
 parameter PIXEL_COUNT = IMAGE_DIM*IMAGE_DIM;  // 262144
@@ -18,6 +18,7 @@ parameter MAX_BEAT_PTR = WORDS_PER_IMAGE;
 
 //CONTROL PARAMETERS
 parameter RANDOMIZE = 0;
+parameter PIPELINE_DELAY = 10;
 
 reg                         s_axis_aclk     = 0;
 reg                         s_axis_aresetn  = 0;
@@ -35,7 +36,7 @@ wire                        m_axis_tlast;
 reg                         m_axis_tready;
 
 //DDR MEM
-reg [WORD_WIDTH-1:0]        mem [0:MEM_DEPTH-1];
+reg [WORD_WIDTH-1:0]        mem [0:MEM_DEPTH+PIPELINE_DELAY-1];
 reg [PIXEL_WIDTH-1:0]       pixel_array [0:PIXEL_COUNT-1];
 reg [256*8:0]               hex_filename;
 
@@ -74,41 +75,61 @@ reg rand_valid;
 reg rand_ready;
 reg done;
 
+reg [63:0] flush_counter;
+
 always @(posedge s_axis_aclk) begin
     rand_valid <= RANDOMIZE ? $random : 1;
     rand_ready <= RANDOMIZE ? $random : 1;
 end
 
 always @(posedge s_axis_aclk) begin
-    if(~s_axis_aresetn) begin
+    if (~s_axis_aresetn) begin
         state          <= STATE_NEW;
         new_frame_ptr  <= 0;
         beat_counter   <= 0;
+        flush_counter  <= 0;
     end
-    else if(s_axis_tready & s_axis_tvalid) begin
-        if(beat_counter == WORDS_PER_IMAGE-1) begin
-            beat_counter <= 0;
-            new_frame_ptr <= new_frame_ptr+1;
-        end
-        else begin
-            beat_counter <= beat_counter+1;
+    else if (s_axis_tready & s_axis_tvalid) begin
+        if (new_frame_ptr < 2*N_IMAGES) begin
+            if (beat_counter == WORDS_PER_IMAGE - 1) begin
+                beat_counter  <= 0;
+                new_frame_ptr <= new_frame_ptr + 1;
+                state <= ~state;
+            end else begin
+                beat_counter <= beat_counter + 1;
+            end
+        end else if (flush_counter < PIPELINE_DELAY) begin
+            flush_counter <= flush_counter + 1;
         end
     end
 end
-always @(*) begin
-    old_frame_ptr = new_frame_ptr>16 ? new_frame_ptr-16 : 0;
-    mem_ptr = (state==STATE_NEW) ? (new_frame_ptr*WORDS_PER_IMAGE+beat_counter): 
-                                   (old_frame_ptr*WORDS_PER_IMAGE+beat_counter);
 
-    if(~s_axis_aresetn) begin
+
+always @(*) begin
+    old_frame_ptr = new_frame_ptr > 2*(1<<N_FUSE_COUNT) ? new_frame_ptr/2 - (1<<N_FUSE_COUNT) : 0;
+    mem_ptr = (state == STATE_NEW) ? (new_frame_ptr/2 * WORDS_PER_IMAGE + beat_counter) : 
+                                     (old_frame_ptr * WORDS_PER_IMAGE + beat_counter);
+
+    if (~s_axis_aresetn) begin
         s_axis_tvalid = 0;
         s_axis_tlast = 0;
         s_axis_tdata = 0;
-    end
-    else begin
-        s_axis_tdata = mem[mem_ptr];
-        s_axis_tvalid = rand_valid & new_frame_ptr < N_IMAGES;
-        s_axis_tlast = beat_counter==WORDS_PER_IMAGE-1;
+        flush_counter = 0;
+    end else if (new_frame_ptr < 2*N_IMAGES) begin
+        // Regular image data transmission
+        s_axis_tdata  = mem[mem_ptr];
+        s_axis_tvalid = rand_valid;
+        s_axis_tlast  = (beat_counter == WORDS_PER_IMAGE - 1);
+    end else if (flush_counter < PIPELINE_DELAY) begin
+        // Flush pipeline with zeros
+        s_axis_tdata  = 128'b0;
+        s_axis_tvalid = rand_valid;
+        s_axis_tlast  = 0;
+    end else begin
+        // Stop transmission
+        s_axis_tdata  = 0;
+        s_axis_tvalid = 0;
+        s_axis_tlast  = 0;
     end
 end
 
@@ -145,7 +166,7 @@ always @(posedge s_axis_aclk) begin
             $display("Frame %0d capture complete.", frame_counter);
             $fclose(outfile);
             frame_counter = frame_counter + 1;
-            if(frame_counter == N_IMAGES) 
+            if(frame_counter == 2*N_IMAGES) 
                 $finish;
         end
     end
@@ -155,10 +176,11 @@ always @(*)
     m_axis_tready = rand_ready;
 
 //DUT LRF MODULE
-LRF_dummy #(
+LRF #(
     PIXELS_PER_BEAT,
     IMAGE_DIM,
-    N_FUSE_COUNT
+    N_FUSE_COUNT,
+    PIPELINE_DELAY
 ) dut(
     s_axis_aclk,
     s_axis_aresetn,
@@ -176,7 +198,7 @@ LRF_dummy #(
 
 //INITIAL SIM
 initial begin
-    #3.01 s_axis_aresetn = 1;
+    #3.1 s_axis_aresetn = 1;
 end
 
 // initial begin
@@ -186,3 +208,5 @@ end
 // end
 
 endmodule
+
+

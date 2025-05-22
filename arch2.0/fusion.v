@@ -1,8 +1,7 @@
 module FUSION #(
     parameter PIXELS_PER_BEAT = 16,
-    parameter INPUT_WIDTH = 8,
     parameter IMAGE_DIM = 512,
-    parameter DATA_WIDTH = INPUT_WIDTH*PIXELS_PER_BEAT
+    parameter DATA_WIDTH = 8*PIXELS_PER_BEAT
 )(
     input clk,
     input aresetn,

@@ -145,7 +145,7 @@ endgenerate
 //calculate squared values of X and Y
 generate
 for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
-    cordic_0 sqrt(clk,~stall,conv_sum[j]>>1,,sobel_out[j]);
+    cordic_0 sqrt(clk,~stall,1,conv_sum[j]>>1,,sobel_out[j]);
     always @(posedge clk) begin
         if(~stall) begin
             conv_sum_x2[j] <= conv_sum_x[j]*conv_sum_x[j];
@@ -155,9 +155,6 @@ for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
     end      
 end
 endgenerate
-
-
-
 
 //send final output
 generate

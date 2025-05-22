@@ -41,8 +41,8 @@ video_writer = cv2.VideoWriter(output_file, fourcc, fps, (frame_width, frame_hei
 
 # === Frame generation loop ===
 for idx, (f1, f2) in enumerate(zip(files1, files2)):
-    img1 = load_hex_image(f1, image_width, image_height) if f1 else pad_image
-    img2 = load_hex_image(f2, image_width, image_height) if f2 else pad_image
+    img1 = load_hex_image(f1, image_width, image_height) 
+    img2 = load_hex_image(f2, image_width, image_height)
     combined = np.hstack((img1, img2))
     video_writer.write(combined)
     print(f"Processed frame {idx+1}/{num_frames}")
