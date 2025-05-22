@@ -161,7 +161,7 @@ generate
 for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
     always @(posedge clk) begin
         if(~stall) begin
-            out_frame[(DATA_WIDTH-8*(j+1))+:8] = (sobel_out[j] > 8'hff) ? 8'hff : sobel_out[j][7:0];
+            out_frame[(DATA_WIDTH-8*(j+1))+:8] <= (sobel_out[j] > 8'hff) ? 8'hff : sobel_out[j][7:0];
         end
     end
 end

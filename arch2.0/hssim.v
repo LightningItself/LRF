@@ -19,6 +19,7 @@ Old Edge Map (inp_edge) -> X
 Average Edge Map (avg_edge) -> Y
 New Edge Map -> Z
 
+
 variance(signed)  -> 4 cycle dly
 mean calc -> 1 cycle dly => delay the result by 3 cycles to sync with co-var output
     (2*muX*muY + c1), (muX^2 + muY^2 + c1) calculation <- divided into 3 stages
@@ -41,15 +42,15 @@ wire [16*PIXELS_PER_BEAT-1:0] out_sig_sq_z;
 wire [16*PIXELS_PER_BEAT-1:0] out_sig_xy;
 wire [16*PIXELS_PER_BEAT-1:0] out_sig_zy;
 
+
 CONV_GAUSS #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) mu_x (clk, aresetn, stall, old_map, out_mu_x);
 CONV_GAUSS #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) mu_y (clk, aresetn, stall, avg_map, out_mu_y);
 CONV_GAUSS #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) mu_z (clk, aresetn, stall, new_map, out_mu_z);
 
-// SIG_XY #(PIXELS_PER_BEAT, IMAGE_DIM) sig_sq_x (clk, aresetn, stall, old_map, old_map, out_sig_sq_x);    // each co-variance unit is 4 stage pipelned
-SIG_XY #(PIXELS_PER_BEAT, IMAGE_DIM) sig_sq_x (clk, aresetn, stall, new_map, avg_map, out_sig_sq_x);    // to debug
+
+SIG_XY #(PIXELS_PER_BEAT, IMAGE_DIM) sig_sq_x (clk, aresetn, stall, old_map, old_map, out_sig_sq_x);    // each co-variance unit is 4 stage pipelned
 SIG_XY #(PIXELS_PER_BEAT, IMAGE_DIM) siq_sq_y (clk, aresetn, stall, avg_map, avg_map, out_sig_sq_y);
 SIG_XY #(PIXELS_PER_BEAT, IMAGE_DIM) siq_sq_z (clk, aresetn, stall, new_map, new_map, out_sig_sq_z);
-// SIG_XY #(PIXELS_PER_BEAT, IMAGE_DIM) siq_sq_z (clk, aresetn, stall, old_map, old_map, out_siq_sq_z); // to debug
 
 SIG_XY #(PIXELS_PER_BEAT, IMAGE_DIM) siq_xy (clk, aresetn, stall, old_map, avg_map, out_sig_xy);
 SIG_XY #(PIXELS_PER_BEAT, IMAGE_DIM) siq_zy (clk, aresetn, stall, new_map, avg_map, out_sig_zy);
@@ -114,7 +115,7 @@ for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
             numr_part_1_x <= muX_muY_times2_dly1_plus_c1;
             // numr_part_1_x <= numr_part_1_x_temp;
 
-            muZ_muY_times2_dly1_plus_c1[j*18+:18] <= muX_muY_times2_dly1[j*17+:17] + c1;
+            muZ_muY_times2_dly1_plus_c1[j*18+:18] <= muZ_muY_times2_dly1[j*17+:17] + c1;
             numr_part_1_z <= muZ_muY_times2_dly1_plus_c1;
             // numr_part_1_z <= numr_part_1_z_temp;
 
@@ -194,17 +195,17 @@ reg [PIXELS_PER_BEAT-1:0] comp_val;
 generate
 for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
     always@(*) begin
-        comp_val[j] <= p2[j*36+:36] > p1[j*36+:36];
+        comp_val[j] = p2[j*36+:36] > p1[j*36+:36];
     end
 
     always@(posedge clk) begin
         if(~stall) begin
             if(denr_x[(j+1)*36-1] ^ denr_z[(j+1)*36-1]) begin
-                del[j*8+:8] = ~comp_val[j] ? 8'd255 : 8'd0;
+                del[j*8+:8] <= ~comp_val[j] ? 8'd255 : 8'd0;
             end
 
             else begin
-                del[j*8+:8] = comp_val[j] ? 8'd255 : 8'd0;
+                del[j*8+:8] <= comp_val[j] ? 8'd255 : 8'd0;
             end
         end
     end
