@@ -171,15 +171,15 @@ get products, P1=Nx*Dz and P2=Nz*Dx
 HSSIM1 (old) = Nx/Dx
 HSSIM2 (new) = Nz/Dz
 */
-reg [(36*PIXELS_PER_BEAT)-1:0] p1;
-reg [(36*PIXELS_PER_BEAT)-1:0] p2;
+reg [(72*PIXELS_PER_BEAT)-1:0] p1;
+reg [(72*PIXELS_PER_BEAT)-1:0] p2;
 
 generate
 for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
     always@(posedge clk) begin
         if(~stall) begin
-            p1[j*36+:36] <= numr_x[j*18+:18] * denr_z[j*18+:18];
-            p2[j*36+:36] <= numr_z[j*18+:18] * denr_x[j*18+:18];
+            p1[j*72+:72] <= numr_x[j*36+:36] * denr_z[j*36+:36];
+            p2[j*72+:72] <= numr_z[j*36+:36] * denr_x[j*36+:36];
         end
     end
 end
@@ -195,7 +195,7 @@ reg [PIXELS_PER_BEAT-1:0] comp_val;
 generate
 for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
     always@(*) begin
-        comp_val[j] = p2[j*36+:36] > p1[j*36+:36];
+        comp_val[j] = p2[j*72+:72] > p1[j*72+:72];
     end
 
     always@(posedge clk) begin

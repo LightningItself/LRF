@@ -20,7 +20,7 @@ module LRF #(
 );
 localparam MAX_DELAY = 30;
 localparam SOBEL_DELAY = 10;
-localparam FUSION_DELAY = 11;
+localparam TOTAL_DELAY = 21;
 
 localparam FUSE_COUNT = 1<<N_FUSE_COUNT;
 localparam N_IMAGE_DIM  = $clog2(IMAGE_DIM);
@@ -156,7 +156,7 @@ always @(*) begin
 end
 
 //FUSED FRAME BUFFER
-LSU #(PIXELS_PER_BEAT,IMAGE_DIM,8,FUSION_DELAY) fused_frame_buff (s_axis_aclk,s_axis_aresetn,avg_read_en&step,fused_frame_buff_out,avg_write_en,fused_frame_buff_in);
+LSU #(PIXELS_PER_BEAT,IMAGE_DIM,8,TOTAL_DELAY) fused_frame_buff (s_axis_aclk,s_axis_aresetn,avg_read_en&step,fused_frame_buff_out,avg_write_en,fused_frame_buff_in);
 always @(*) begin
     fused_frame = (frame_counter == 0) ? s_axis_tdata : fused_frame_buff_out; //TODO: incomplete
 end
@@ -180,10 +180,27 @@ localparam HSSIM_DELAY = 10;
 HSSIM #(PIXELS_PER_BEAT,IMAGE_DIM) m_hssim (s_axis_aclk,aresetn_d[HSSIM_DELAY-1],~step,fused_frame_emap,avg_frame_emap,curr_frame_emap, out_hssim);
 
 //CALCULATE DMAP
-CONV_GAUSS #(PIXELS_PER_BEAT,8,IMAGE_DIM) m_gauss (s_axis_aclk,s_axis_aresetn,~step,out_hssim,out_dmap);
+localparam DOUT_GAUSS_DELAY = 19;
+CONV_GAUSS #(PIXELS_PER_BEAT,8,IMAGE_DIM) m_gauss (s_axis_aclk,aresetn_d[DOUT_GAUSS_DELAY-1],~step,out_hssim,out_dmap);
 
 //CREATE NEW FUSED IMAGE
-FUSION #(PIXELS_PER_BEAT,IMAGE_DIM) m_fusion (s_axis_aclk,s_axis_aresetn,~step,fused_frame,s_axis_tdata,out_dmap,out_fused_frame);
+localparam FUSION_DELAY = 21;
+reg [DATA_WIDTH-1:0] fused_frame_d [MAX_DELAY-1:0], curr_frame_d [FUSION_DELAY-1:0];
+always @(posedge s_axis_aclk) begin
+    if(step) begin
+        fused_frame_d[FUSION_DELAY-1] <= fused_frame;
+        curr_frame_d[FUSION_DELAY-1] <= s_axis_tdata;
+    end
+end
+generate
+for(i=0; i<FUSION_DELAY-1; i=i+1) begin
+    always @(posedge s_axis_aclk) begin
+        fused_frame_d[i] <= fused_frame_d[i+1];
+        curr_frame_d[i] <= curr_frame_d[i+1];
+    end
+end
+endgenerate
+FUSION #(PIXELS_PER_BEAT,IMAGE_DIM) m_fusion (s_axis_aclk,~step,fused_frame_d[0],curr_frame_d[0],out_dmap,out_fused_frame);
 
 always @(*) begin
     s_axis_tready = m_axis_tready;
