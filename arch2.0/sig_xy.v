@@ -43,7 +43,7 @@ generate
 for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
     always @(posedge clk) begin
         if(~stall) begin
-            out[j*16 +:16] <= out_gauss_xy[j*8 +:8] - mult_xy_dly2[j*8 +:8];
+            out[j*16 +:16] <= out_gauss_xy[j*16 +:16] - mult_xy_dly2[j*16 +:16];
         end
     end      
 end

@@ -27,8 +27,8 @@ mean calc -> 1 cycle dly => delay the result by 3 cycles to sync with co-var out
 localparam CONV_GAUSS_INPUT_WIDTH = 8;  // mean calc
 localparam CONV_GAUSS_OUTPUT_WIDTH = 8; // mean calc
 localparam MEAN_DATA_WIDTH = 8*PIXELS_PER_BEAT;
-localparam signed c1 = 17'd6;
-localparam signed c2 = 17'd58;
+localparam c1 = 17'd6;
+localparam c2 = 17'd58;
 localparam DLY_VAL_MEAN = 2;
 
 // mean and variance calculation
@@ -133,15 +133,15 @@ endgenerate
 
 
 // add the constant c2 with variance values and multiply the result with above partial parts calculated (2 cycles)
-reg signed [((2*8+1+1)*PIXELS_PER_BEAT)-1:0] numr_part_2_x;
-reg signed [((2*8+1+1)*PIXELS_PER_BEAT)-1:0] numr_part_2_z;
-reg signed [((2*8+1+1)*PIXELS_PER_BEAT)-1:0] denr_part_2_x;
-reg signed [((2*8+1+1)*PIXELS_PER_BEAT)-1:0] denr_part_2_z;
+reg [((2*8+1+1)*PIXELS_PER_BEAT)-1:0] numr_part_2_x;
+reg [((2*8+1+1)*PIXELS_PER_BEAT)-1:0] numr_part_2_z;
+reg [((2*8+1+1)*PIXELS_PER_BEAT)-1:0] denr_part_2_x;
+reg [((2*8+1+1)*PIXELS_PER_BEAT)-1:0] denr_part_2_z;
 
-reg signed [(2*(2*8+1+1)*PIXELS_PER_BEAT)-1:0] numr_x;
-reg signed [(2*(2*8+1+1)*PIXELS_PER_BEAT)-1:0] denr_x;
-reg signed [(2*(2*8+1+1)*PIXELS_PER_BEAT)-1:0] numr_z;
-reg signed [(2*(2*8+1+1)*PIXELS_PER_BEAT)-1:0] denr_z;
+reg [(2*(2*8+1+1)*PIXELS_PER_BEAT)-1:0] numr_x;
+reg [(2*(2*8+1+1)*PIXELS_PER_BEAT)-1:0] denr_x;
+reg [(2*(2*8+1+1)*PIXELS_PER_BEAT)-1:0] numr_z;
+reg [(2*(2*8+1+1)*PIXELS_PER_BEAT)-1:0] denr_z;
 
 
 generate
@@ -171,8 +171,8 @@ get products, P1=Nx*Dz and P2=Nz*Dx
 HSSIM1 (old) = Nx/Dx
 HSSIM2 (new) = Nz/Dz
 */
-reg signed [(36*PIXELS_PER_BEAT)-1:0] p1;
-reg signed [(36*PIXELS_PER_BEAT)-1:0] p2;
+reg [(36*PIXELS_PER_BEAT)-1:0] p1;
+reg [(36*PIXELS_PER_BEAT)-1:0] p2;
 
 generate
 for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
@@ -200,13 +200,7 @@ for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
 
     always@(posedge clk) begin
         if(~stall) begin
-            if(denr_x[(j+1)*36-1] ^ denr_z[(j+1)*36-1]) begin
-                del[j*8+:8] <= ~comp_val[j] ? 8'd255 : 8'd0;
-            end
-
-            else begin
-                del[j*8+:8] <= comp_val[j] ? 8'd255 : 8'd0;
-            end
+            del[j*8+:8] <= comp_val[j] ? 8'd255 : 8'd0;
         end
     end
 end
