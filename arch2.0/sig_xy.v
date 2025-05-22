@@ -13,17 +13,24 @@ module SIG_XY #(
     output reg signed [2*DATA_WIDTH-1:0] out
 );
 
-reg [2*DATA_WIDTH-1:0] mult_xy, mult_xy_dly1, mult_xy_dly2;
+
+// mean-x and mean-y calculation
+wire [DATA_WIDTH-1:0] mu_x, mu_y;
+
+CONV_GAUSS #(PIXELS_PER_BEAT, 8, IMAGE_DIM) mean_x (clk, aresetn, stall, in_x, mu_x);
+CONV_GAUSS #(PIXELS_PER_BEAT, 8, IMAGE_DIM) mean_y (clk, aresetn, stall, in_y, mu_y);
+
 
 // multiply x and y
+reg [2*DATA_WIDTH-1:0] mult_xy, mu_x_mu_y;
+
 genvar j;
 generate
 for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
     always @(posedge clk) begin
         if(~stall) begin
             mult_xy[j*16 +:16] <= in_x[j*8 +:8] * in_y[j*8 +:8];
-            mult_xy_dly1 <= mult_xy;
-            mult_xy_dly2 <= mult_xy_dly1;   // multiplied value de;ayed by 2 cyc;es before comparision with gaussian output
+            mu_x_mu_y[j*16 +:16] <= mu_x[j*8 +:8] * mu_y[j*8 +:8];
         end
     end      
 end
@@ -43,7 +50,7 @@ generate
 for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
     always @(posedge clk) begin
         if(~stall) begin
-            out[j*16 +:16] <= out_gauss_xy[j*8 +:8] - mult_xy_dly2[j*8 +:8];
+            out[j*16 +:16] <= out_gauss_xy[j*16 +:16] - mu_x_mu_y[j*16 +:16];
         end
     end      
 end
