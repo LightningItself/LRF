@@ -41,7 +41,8 @@ localparam CONV_GAUSS_INPUT_WIDTH = 16;  // XY bit width is 16
 wire [CONV_GAUSS_INPUT_WIDTH*PIXELS_PER_BEAT-1:0] out_gauss_xy;
 reg aresetn_d1;
 always @(posedge clk) begin
-    aresetn_d1 <= aresetn;
+    if(~stall)
+        aresetn_d1 <= aresetn;
 end
 CONV_GAUSS #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) gauss_xy (clk, aresetn_d1, stall, mult_xy, out_gauss_xy);
 
