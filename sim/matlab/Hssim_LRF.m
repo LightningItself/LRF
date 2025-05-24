@@ -28,25 +28,29 @@ for j = hcombine : T-hcombine      % Clearly no of output frames = T - 2*hcombin
                                    % End at T-hcombine since we use n upto hcombine+j, which shud be <= T
     
     hfuse = frames(:,:,j); % first image in the set of 'hcombine' no of images is chosen as 
-                           % the starting fused image 
+                           % the starting fused image                                       
     
     for n = j+1 : hcombine+j % create an output image from 'hcombine' number of images starting from jth image 
         
         
-        avg_now=double(hfuse-hfuse); % creating a ZERO 2d matrix of size hfuse
-     
-        
-        for r = n-hcombine : 1 : n-1 % Calculating avg of last hcombine images (Last corresponding to nth index)
-                                     % Present image corresponding to nth index also included in avg calculation
-                                     % This avg calculation occurs everytime n changes
-                                  
+%         avg_now=double(hfuse-hfuse); % creating a ZERO 2d matrix of size hfuse
+%         for r = n-hcombine : 1 : n-1 % Calculating avg of last hcombine images (Last corresponding to nth index)
+%                                       % Present image corresponding to nth index also included in avg calculation
+%                                       % This avg calculation occurs everytime n changes
+%                                   
+%              w = frames(:,:,r);
+%              avg_now = double(w) + avg_now; % first sum
+%          
+%          end
+
+        avg_now = double(hfuse-hfuse);
+        for r = j : 1 : n-1
             w = frames(:,:,r);
-            avg_now = double(w) + avg_now; % first sum
-         
+            avg_now = double(w) + avg_now;
         end
         
         
-        avg_now = (avg_now)/hcombine;  % sum then divide
+        avg_now = (avg_now)/(n-j);  % sum then divide
     
         newim = frames(:,:,n);
     
@@ -92,8 +96,6 @@ for j = hcombine : T-hcombine      % Clearly no of output frames = T - 2*hcombin
   
         
         hfuse = (ones(size(newim))-hdelta).*double(hfuse)+hdelta.*double(newim);
-        max(hdelta,[],"all")
-        min(hdelta,[],"all")
         hfuse = uint8(hfuse);
         %hfuse = uint8((hfuse>255)*255 + (hfuse<=255)*hfuse);
 

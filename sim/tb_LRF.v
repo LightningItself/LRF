@@ -3,7 +3,7 @@
 module tb_LRF ();
 
 // Parameters
-parameter N_IMAGES = 2;  // Number of images (Door_1.hex to Door_N.hex)
+parameter N_IMAGES = 25;  // Number of images (Door_1.hex to Door_N.hex)
 parameter IMAGE_DIM = 512;
 parameter N_FUSE_COUNT = 4; //FUSECOUNT 16
 parameter PIXEL_COUNT = IMAGE_DIM*IMAGE_DIM;  // 262144
@@ -23,7 +23,7 @@ parameter PIPELINE_DELAY = 10;
 reg                         s_axis_aclk     = 0;
 reg                         s_axis_aresetn  = 0;
 
-//S_AXIS_INTERFACE SIGNALS
+//S_AXIS_INTERFACE SIGNALS                                                                                                                                               
 reg [WORD_WIDTH-1:0]        s_axis_tdata;
 reg                         s_axis_tvalid;
 reg                         s_axis_tlast;
