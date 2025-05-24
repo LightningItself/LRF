@@ -1,0 +1,460 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_LRF_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="tb_LRF" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="70.701 ns"></ZoomEndTime>
+      <Cursor1Time time="10.200 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="153"></NameColumnWidth>
+      <ValueColumnWidth column_width="269"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="32" />
+   <wave_markers>
+      <marker time="5000" label="" />
+   </wave_markers>
+   <wvobject type="divider" fp_name="divider298">
+      <obj_property name="label">CLOCK</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/s_axis_aclk" type="logic">
+      <obj_property name="ElementShortName">s_axis_aclk</obj_property>
+      <obj_property name="ObjectShortName">s_axis_aclk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/s_axis_aresetn" type="logic">
+      <obj_property name="ElementShortName">s_axis_aresetn</obj_property>
+      <obj_property name="ObjectShortName">s_axis_aresetn</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/step" type="logic">
+      <obj_property name="ElementShortName">step</obj_property>
+      <obj_property name="ObjectShortName">step</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/mem_ptr" type="array">
+      <obj_property name="ElementShortName">mem_ptr[63:0]</obj_property>
+      <obj_property name="ObjectShortName">mem_ptr[63:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/new_frame_ptr" type="array">
+      <obj_property name="ElementShortName">new_frame_ptr[63:0]</obj_property>
+      <obj_property name="ObjectShortName">new_frame_ptr[63:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/old_frame_ptr" type="array">
+      <obj_property name="ElementShortName">old_frame_ptr[63:0]</obj_property>
+      <obj_property name="ObjectShortName">old_frame_ptr[63:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider193">
+      <obj_property name="label">IO INTERFACES</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="group202" type="group">
+      <obj_property name="label">S_AXIS INPUT</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_LRF/s_axis_tdata" type="array">
+         <obj_property name="ElementShortName">s_axis_tdata[127:0]</obj_property>
+         <obj_property name="ObjectShortName">s_axis_tdata[127:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/s_axis_tvalid" type="logic">
+         <obj_property name="ElementShortName">s_axis_tvalid</obj_property>
+         <obj_property name="ObjectShortName">s_axis_tvalid</obj_property>
+         <obj_property name="CustomSignalColor">#FFA500</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/s_axis_tlast" type="logic">
+         <obj_property name="ElementShortName">s_axis_tlast</obj_property>
+         <obj_property name="ObjectShortName">s_axis_tlast</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/s_axis_tready" type="logic">
+         <obj_property name="ElementShortName">s_axis_tready</obj_property>
+         <obj_property name="ObjectShortName">s_axis_tready</obj_property>
+         <obj_property name="CustomSignalColor">#00FF7F</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group203" type="group">
+      <obj_property name="label">M_AXIS OUTPUT</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/tb_LRF/m_axis_tdata" type="array">
+         <obj_property name="ElementShortName">m_axis_tdata[127:0]</obj_property>
+         <obj_property name="ObjectShortName">m_axis_tdata[127:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/m_axis_tvalid" type="logic">
+         <obj_property name="ElementShortName">m_axis_tvalid</obj_property>
+         <obj_property name="ObjectShortName">m_axis_tvalid</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/m_axis_tlast" type="logic">
+         <obj_property name="ElementShortName">m_axis_tlast</obj_property>
+         <obj_property name="ObjectShortName">m_axis_tlast</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/m_axis_tready" type="logic">
+         <obj_property name="ElementShortName">m_axis_tready</obj_property>
+         <obj_property name="ObjectShortName">m_axis_tready</obj_property>
+         <obj_property name="CustomSignalColor">#FFA500</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider300">
+      <obj_property name="label">TEST BENCH CONTROL</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/state" type="logic">
+      <obj_property name="ElementShortName">state</obj_property>
+      <obj_property name="ObjectShortName">state</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/beat_counter" type="array">
+      <obj_property name="ElementShortName">beat_counter[63:0]</obj_property>
+      <obj_property name="ObjectShortName">beat_counter[63:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider299">
+      <obj_property name="label">DUT INTERNALS</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="BkColor">#FFFF00</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/load_avg" type="logic">
+      <obj_property name="ElementShortName">load_avg</obj_property>
+      <obj_property name="ObjectShortName">load_avg</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/frame_counter" type="array">
+      <obj_property name="ElementShortName">frame_counter[3:0]</obj_property>
+      <obj_property name="ObjectShortName">frame_counter[3:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/beat_counter" type="array">
+      <obj_property name="ElementShortName">beat_counter[13:0]</obj_property>
+      <obj_property name="ObjectShortName">beat_counter[13:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/is_new_frame" type="logic">
+      <obj_property name="ElementShortName">is_new_frame</obj_property>
+      <obj_property name="ObjectShortName">is_new_frame</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/avg_frame_buff/write_ptr" type="array">
+      <obj_property name="ElementShortName">write_ptr[13:0]</obj_property>
+      <obj_property name="ObjectShortName">write_ptr[13:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/sobel_curr_frame/out_frame" type="array">
+      <obj_property name="ElementShortName">out_frame[127:0]</obj_property>
+      <obj_property name="ObjectShortName">out_frame[127:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/avg_buff_in" type="array">
+      <obj_property name="ElementShortName">avg_buff_in[191:0]</obj_property>
+      <obj_property name="ObjectShortName">avg_buff_in[191:0]</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider818">
+      <obj_property name="label">AVG FRAME BUFFER</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/avg_frame_buff/read_enable" type="logic">
+      <obj_property name="ElementShortName">read_enable</obj_property>
+      <obj_property name="ObjectShortName">read_enable</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/avg_frame_buff/write_enable" type="logic">
+      <obj_property name="ElementShortName">write_enable</obj_property>
+      <obj_property name="ObjectShortName">write_enable</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider1141">
+      <obj_property name="label">DATAPATH</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="group128" type="group">
+      <obj_property name="label">INP_FRAME_SOBEL</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_LRF/dut/sobel_curr_frame/inp_frame" type="array">
+         <obj_property name="ElementShortName">inp_frame[127:0]</obj_property>
+         <obj_property name="ObjectShortName">inp_frame[127:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/sobel_curr_frame/out_frame" type="array">
+         <obj_property name="ElementShortName">out_frame[127:0]</obj_property>
+         <obj_property name="ObjectShortName">out_frame[127:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/sobel_curr_frame/col_counter" type="array">
+         <obj_property name="ElementShortName">col_counter[4:0]</obj_property>
+         <obj_property name="ObjectShortName">col_counter[4:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group129" type="group">
+      <obj_property name="label">FUSED_FRAME_SOBEL</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_LRF/dut/sobel_fused_frame/inp_frame" type="array">
+         <obj_property name="ElementShortName">inp_frame[127:0]</obj_property>
+         <obj_property name="ObjectShortName">inp_frame[127:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/sobel_fused_frame/out_frame" type="array">
+         <obj_property name="ElementShortName">out_frame[127:0]</obj_property>
+         <obj_property name="ObjectShortName">out_frame[127:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/sobel_fused_frame/col_counter" type="array">
+         <obj_property name="ElementShortName">col_counter[4:0]</obj_property>
+         <obj_property name="ObjectShortName">col_counter[4:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group142" type="group">
+      <obj_property name="label">AVG_IAMGE_BUFF</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_LRF/dut/avg_frame_buff/write_data" type="array">
+         <obj_property name="ElementShortName">write_data[191:0]</obj_property>
+         <obj_property name="ObjectShortName">write_data[191:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/avg_frame_buff/write_ptr" type="array">
+         <obj_property name="ElementShortName">write_ptr[13:0]</obj_property>
+         <obj_property name="ObjectShortName">write_ptr[13:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/avg_frame_buff/read_data" type="array">
+         <obj_property name="ElementShortName">read_data[191:0]</obj_property>
+         <obj_property name="ObjectShortName">read_data[191:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/avg_frame_buff/read_ptr" type="array">
+         <obj_property name="ElementShortName">read_ptr[13:0]</obj_property>
+         <obj_property name="ObjectShortName">read_ptr[13:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/avg_frame_emap" type="array">
+         <obj_property name="ElementShortName">avg_frame_emap[127:0]</obj_property>
+         <obj_property name="ObjectShortName">avg_frame_emap[127:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group336" type="group">
+      <obj_property name="label">HSSIM</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_LRF/dut/m_hssim/old_map" type="array">
+         <obj_property name="ElementShortName">old_map[127:0]</obj_property>
+         <obj_property name="ObjectShortName">old_map[127:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/m_hssim/avg_map" type="array">
+         <obj_property name="ElementShortName">avg_map[127:0]</obj_property>
+         <obj_property name="ObjectShortName">avg_map[127:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/m_hssim/new_map" type="array">
+         <obj_property name="ElementShortName">new_map[127:0]</obj_property>
+         <obj_property name="ObjectShortName">new_map[127:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="group340" type="group">
+         <obj_property name="label">MU_CALC</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/tb_LRF/dut/m_hssim/mu_x/inp_frame" type="array">
+            <obj_property name="ElementShortName">inp_frame[127:0]</obj_property>
+            <obj_property name="ObjectShortName">inp_frame[127:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_LRF/dut/m_hssim/mu_y/inp_frame" type="array">
+            <obj_property name="ElementShortName">inp_frame[127:0]</obj_property>
+            <obj_property name="ObjectShortName">inp_frame[127:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_LRF/dut/m_hssim/mu_z/inp_frame" type="array">
+            <obj_property name="ElementShortName">inp_frame[127:0]</obj_property>
+            <obj_property name="ObjectShortName">inp_frame[127:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_LRF/dut/m_hssim/mu_x/out_frame" type="array">
+            <obj_property name="ElementShortName">out_frame[127:0]</obj_property>
+            <obj_property name="ObjectShortName">out_frame[127:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_LRF/dut/m_hssim/mu_y/out_frame" type="array">
+            <obj_property name="ElementShortName">out_frame[127:0]</obj_property>
+            <obj_property name="ObjectShortName">out_frame[127:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_LRF/dut/m_hssim/mu_z/out_frame" type="array">
+            <obj_property name="ElementShortName">out_frame[127:0]</obj_property>
+            <obj_property name="ObjectShortName">out_frame[127:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_LRF/dut/m_hssim/mu_x/col_counter" type="array">
+            <obj_property name="ElementShortName">col_counter[4:0]</obj_property>
+            <obj_property name="ObjectShortName">col_counter[4:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_LRF/dut/m_hssim/mu_y/col_counter" type="array">
+            <obj_property name="ElementShortName">col_counter[4:0]</obj_property>
+            <obj_property name="ObjectShortName">col_counter[4:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_LRF/dut/m_hssim/mu_z/col_counter" type="array">
+            <obj_property name="ElementShortName">col_counter[4:0]</obj_property>
+            <obj_property name="ObjectShortName">col_counter[4:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_LRF/dut/m_hssim/muX_sq" type="array">
+            <obj_property name="ElementShortName">muX_sq[255:0]</obj_property>
+            <obj_property name="ObjectShortName">muX_sq[255:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_LRF/dut/m_hssim/muY_sq" type="array">
+            <obj_property name="ElementShortName">muY_sq[255:0]</obj_property>
+            <obj_property name="ObjectShortName">muY_sq[255:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_LRF/dut/m_hssim/muZ_sq" type="array">
+            <obj_property name="ElementShortName">muZ_sq[255:0]</obj_property>
+            <obj_property name="ObjectShortName">muZ_sq[255:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_LRF/dut/m_hssim/muX_sq_plus_muY_sq" type="array">
+            <obj_property name="ElementShortName">muX_sq_plus_muY_sq[271:0]</obj_property>
+            <obj_property name="ObjectShortName">muX_sq_plus_muY_sq[271:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_LRF/dut/m_hssim/muZ_sq_plus_muY_sq" type="array">
+            <obj_property name="ElementShortName">muZ_sq_plus_muY_sq[271:0]</obj_property>
+            <obj_property name="ObjectShortName">muZ_sq_plus_muY_sq[271:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_LRF/dut/m_hssim/muZ_muY_times2_dly1_plus_c1" type="array">
+            <obj_property name="ElementShortName">muZ_muY_times2_dly1_plus_c1[287:0]</obj_property>
+            <obj_property name="ObjectShortName">muZ_muY_times2_dly1_plus_c1[287:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_LRF/dut/m_hssim/muX_muY_times2_dly1_plus_c1" type="array">
+            <obj_property name="ElementShortName">muX_muY_times2_dly1_plus_c1[287:0]</obj_property>
+            <obj_property name="ObjectShortName">muX_muY_times2_dly1_plus_c1[287:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_LRF/dut/m_hssim/numr_x" type="array">
+            <obj_property name="ElementShortName">numr_x[575:0]</obj_property>
+            <obj_property name="ObjectShortName">numr_x[575:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_LRF/dut/m_hssim/denr_x" type="array">
+            <obj_property name="ElementShortName">denr_x[575:0]</obj_property>
+            <obj_property name="ObjectShortName">denr_x[575:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_LRF/dut/m_hssim/numr_z" type="array">
+            <obj_property name="ElementShortName">numr_z[575:0]</obj_property>
+            <obj_property name="ObjectShortName">numr_z[575:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_LRF/dut/m_hssim/denr_z" type="array">
+            <obj_property name="ElementShortName">denr_z[575:0]</obj_property>
+            <obj_property name="ObjectShortName">denr_z[575:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_LRF/dut/m_hssim/p1" type="array">
+            <obj_property name="ElementShortName">p1[1151:0]</obj_property>
+            <obj_property name="ObjectShortName">p1[1151:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_LRF/dut/m_hssim/p2" type="array">
+            <obj_property name="ElementShortName">p2[1151:0]</obj_property>
+            <obj_property name="ObjectShortName">p2[1151:0]</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="group351" type="group">
+         <obj_property name="label">SIG_CALC</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="group144" type="group">
+            <obj_property name="label">sig_x</obj_property>
+            <obj_property name="DisplayName">label</obj_property>
+            <obj_property name="isExpanded"></obj_property>
+            <wvobject fp_name="/tb_LRF/dut/m_hssim/sig_sq_x/mean_x/aresetn" type="logic">
+               <obj_property name="ElementShortName">aresetn</obj_property>
+               <obj_property name="ObjectShortName">aresetn</obj_property>
+            </wvobject>
+            <wvobject fp_name="group157" type="group">
+               <obj_property name="label">mean_multiply</obj_property>
+               <obj_property name="DisplayName">label</obj_property>
+               <obj_property name="isExpanded"></obj_property>
+               <wvobject fp_name="/tb_LRF/dut/m_hssim/sig_sq_x/in_x" type="array">
+                  <obj_property name="ElementShortName">in_x[127:0]</obj_property>
+                  <obj_property name="ObjectShortName">in_x[127:0]</obj_property>
+               </wvobject>
+               <wvobject fp_name="/tb_LRF/dut/m_hssim/sig_sq_x/mu_x" type="array">
+                  <obj_property name="ElementShortName">mu_x[127:0]</obj_property>
+                  <obj_property name="ObjectShortName">mu_x[127:0]</obj_property>
+               </wvobject>
+               <wvobject fp_name="/tb_LRF/dut/m_hssim/sig_sq_x/mu_x_mu_y" type="array">
+                  <obj_property name="ElementShortName">mu_x_mu_y[255:0]</obj_property>
+                  <obj_property name="ObjectShortName">mu_x_mu_y[255:0]</obj_property>
+               </wvobject>
+            </wvobject>
+            <wvobject fp_name="group158" type="group">
+               <obj_property name="label">multiply_mean</obj_property>
+               <obj_property name="DisplayName">label</obj_property>
+               <obj_property name="isExpanded"></obj_property>
+               <wvobject fp_name="/tb_LRF/dut/m_hssim/sig_sq_x/in_x" type="array">
+                  <obj_property name="ElementShortName">in_x[127:0]</obj_property>
+                  <obj_property name="ObjectShortName">in_x[127:0]</obj_property>
+               </wvobject>
+               <wvobject fp_name="/tb_LRF/dut/m_hssim/sig_sq_x/mult_xy" type="array">
+                  <obj_property name="ElementShortName">mult_xy[255:0]</obj_property>
+                  <obj_property name="ObjectShortName">mult_xy[255:0]</obj_property>
+               </wvobject>
+               <wvobject fp_name="/tb_LRF/dut/m_hssim/sig_sq_x/out_gauss_xy" type="array">
+                  <obj_property name="ElementShortName">out_gauss_xy[255:0]</obj_property>
+                  <obj_property name="ObjectShortName">out_gauss_xy[255:0]</obj_property>
+               </wvobject>
+            </wvobject>
+            <wvobject fp_name="/tb_LRF/dut/m_hssim/sig_sq_x/out" type="array">
+               <obj_property name="ElementShortName">out[255:0]</obj_property>
+               <obj_property name="ObjectShortName">out[255:0]</obj_property>
+            </wvobject>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/m_hssim/del" type="array">
+         <obj_property name="ElementShortName">del[127:0]</obj_property>
+         <obj_property name="ObjectShortName">del[127:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group180" type="group">
+      <obj_property name="label">DMAP_GAUSS</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_LRF/dut/m_gauss/inp_frame" type="array">
+         <obj_property name="ElementShortName">inp_frame[127:0]</obj_property>
+         <obj_property name="ObjectShortName">inp_frame[127:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/m_gauss/out_frame" type="array">
+         <obj_property name="ElementShortName">out_frame[127:0]</obj_property>
+         <obj_property name="ObjectShortName">out_frame[127:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/m_gauss/aresetn" type="logic">
+         <obj_property name="ElementShortName">aresetn</obj_property>
+         <obj_property name="ObjectShortName">aresetn</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group185" type="group">
+      <obj_property name="label">FUSION</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_LRF/dut/m_fusion/old_frame" type="array">
+         <obj_property name="ElementShortName">old_frame[127:0]</obj_property>
+         <obj_property name="ObjectShortName">old_frame[127:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/m_fusion/new_frame" type="array">
+         <obj_property name="ElementShortName">new_frame[127:0]</obj_property>
+         <obj_property name="ObjectShortName">new_frame[127:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/m_fusion/del_gauss" type="array">
+         <obj_property name="ElementShortName">del_gauss[127:0]</obj_property>
+         <obj_property name="ObjectShortName">del_gauss[127:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/m_fusion/dbar" type="array">
+         <obj_property name="ElementShortName">dbar[143:0]</obj_property>
+         <obj_property name="ObjectShortName">dbar[143:0]</obj_property>
+         <obj_property name="Radix">BINARYRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/m_fusion/fused_frame" type="array">
+         <obj_property name="ElementShortName">fused_frame[127:0]</obj_property>
+         <obj_property name="ObjectShortName">fused_frame[127:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group194" type="group">
+      <obj_property name="label">UPDATE FUSED_FRAME</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_LRF/dut/fused_frame_buff/write_ptr" type="array">
+         <obj_property name="ElementShortName">write_ptr[13:0]</obj_property>
+         <obj_property name="ObjectShortName">write_ptr[13:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/fused_frame_buff/read_ptr" type="array">
+         <obj_property name="ElementShortName">read_ptr[13:0]</obj_property>
+         <obj_property name="ObjectShortName">read_ptr[13:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/fused_frame_buff/write_data" type="array">
+         <obj_property name="ElementShortName">write_data[127:0]</obj_property>
+         <obj_property name="ObjectShortName">write_data[127:0]</obj_property>
+      </wvobject>
+   </wvobject>
+</wave_config>
