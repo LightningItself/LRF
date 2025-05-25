@@ -90,31 +90,12 @@ endgenerate
 
 
 //---------------------AVG BUFFER------------------------------
-reg avg_state;
-reg avg_curr_read_en, avg_curr_write_en, avg_next_read_en, avg_next_write_en;
-reg avg_read_en_a, avg_read_en_b, avg_write_en_a, avg_write_en_b;
+reg avg_curr_en, avg_next_en;
+reg avg_en_a, avg_en_b;
 reg avg_first, avg_add;
 
-reg [DATA_WIDTH+N_FUSE_COUNT*PIXELS_PER_BEAT-1:0] avg_buff_in, avg_frame_buff_out;
-wire [DATA_WIDTH+N_FUSE_COUNT*PIXELS_PER_BEAT-1:0] avg_frame_buff_out_a, avg_frame_buff_out_b;
-
-always @(*) begin
-    avg_read_en_a =  avg_state ? avg_curr_read_en : avg_next_read_en;
-    avg_read_en_b = ~avg_state ? avg_curr_read_en : avg_next_read_en;
-    avg_write_en_a =  avg_state ? avg_curr_write_en : avg_next_write_en;
-    avg_write_en_b = ~avg_state ? avg_curr_write_en : avg_next_write_en;
-    avg_frame_buff_out = avg_state ? avg_frame_buff_out_a : avg_frame_buff_out_b;
-end
-
-always @(posedge s_axis_aclk) begin
-    if(~s_axis_aresetn) begin
-        avg_state <= 0;
-    end
-    else if(step) begin
-        if(frame_counter == 0 & beat_counter == SOBEL_DELAY-1)
-            avg_state <= ~avg_state;
-    end
-end
+reg [DATA_WIDTH+(N_FUSE_COUNT+1)*PIXELS_PER_BEAT-1:0] avg_buff_in, avg_frame_buff_out;
+wire [DATA_WIDTH+(N_FUSE_COUNT+1)*PIXELS_PER_BEAT-1:0] avg_frame_buff_out_a, avg_frame_buff_out_b;
 
 always @(posedge s_axis_aclk) begin
     if(~s_axis_aresetn) begin
@@ -128,28 +109,52 @@ always @(posedge s_axis_aclk) begin
         end
     end
 end
+
+//********** avg_out_state decides which buffer output to use for average
+reg avg_out_state, avg_next_state;
+always @(posedge s_axis_aclk) begin
+    if(~s_axis_aresetn) begin
+        avg_out_state <= 0;
+        avg_next_state <= 1;
+    end
+    else begin
+        if(frame_counter == 0 & beat_counter == SOBEL_DELAY-1) 
+            avg_out_state <= ~avg_out_state;
+        if(beat_counter == SOBEL_DELAY-1 & frame_counter == 0)
+            avg_next_state <= 1;
+        else if(beat_counter == SOBEL_DELAY-1 && frame_counter == 2)
+            avg_next_state <= 0;
+    end
+end
+
+always @(*) begin
+    avg_curr_en =  step & aresetn_d[SOBEL_DELAY-1];
+    avg_next_en =  avg_next_state & step & aresetn_d[SOBEL_DELAY-1];
+    avg_en_a = (avg_out_state) ? avg_curr_en : avg_next_en;
+    avg_en_b = (~avg_out_state) ? avg_curr_en : avg_next_en;
+    avg_frame_buff_out = avg_out_state ? avg_frame_buff_out_a : avg_frame_buff_out_b;    
+end
+
 genvar i;
 
-LSU #(PIXELS_PER_BEAT,IMAGE_DIM,9+N_FUSE_COUNT,SOBEL_DELAY) avg_frame_buff_a (s_axis_aclk,s_axis_aresetn,avg_read_en_a&step,avg_frame_buff_out_a,avg_write_en_a,avg_buff_in);
-LSU #(PIXELS_PER_BEAT,IMAGE_DIM,9+N_FUSE_COUNT,SOBEL_DELAY) avg_frame_buff_b (s_axis_aclk,s_axis_aresetn,avg_read_en_b&step,avg_frame_buff_out_b,avg_write_en_b,avg_buff_in);
+LSU #(PIXELS_PER_BEAT,IMAGE_DIM,9+N_FUSE_COUNT,0) avg_frame_buff_a (s_axis_aclk,s_axis_aresetn,avg_en_a,avg_frame_buff_out_a,avg_en_a,avg_buff_in);
+LSU #(PIXELS_PER_BEAT,IMAGE_DIM,9+N_FUSE_COUNT,0) avg_frame_buff_b (s_axis_aclk,s_axis_aresetn,avg_en_b,avg_frame_buff_out_b,avg_en_b,avg_buff_in);
 
-wire [DATA_WIDTH+N_FUSE_COUNT*PIXELS_PER_BEAT-1:0] iframex16, iframe;
+wire [DATA_WIDTH+(N_FUSE_COUNT+1)*PIXELS_PER_BEAT-1:0] iframex17, iframe;
+
 generate 
     for(i=0;i<PIXELS_PER_BEAT;i=i+1) begin
-        assign iframex16[(8+N_FUSE_COUNT)*i+:(8+N_FUSE_COUNT)] = curr_frame_emap[8*i+:8]<<N_FUSE_COUNT; 
-        assign iframe[(8+N_FUSE_COUNT)*i+:8] = curr_frame_emap[8*i+:8]; 
-        assign iframe[((8+N_FUSE_COUNT)*i+8)+:N_FUSE_COUNT] = 0; 
+        assign iframex17[(9+N_FUSE_COUNT)*i+:(9+N_FUSE_COUNT)] = (curr_frame_emap[8*i+:8]<<N_FUSE_COUNT) + curr_frame_emap[8*i+:8]; 
+        assign iframe[(9+N_FUSE_COUNT)*i+:8] = curr_frame_emap[8*i+:8]; 
+        assign iframe[((9+N_FUSE_COUNT)*i+8)+:(N_FUSE_COUNT+1)] = 0; 
 
-        assign avg_frame_emap[(8*i)+:8] = (avg_first) ? curr_frame_emap[(8*i)+:8] : avg_frame_buff_out[((8+N_FUSE_COUNT)*i+N_FUSE_COUNT)+:8];
+        assign avg_frame_emap[(8*i)+:8] = (avg_first) ? curr_frame_emap[(8*i)+:8] : avg_frame_buff_out[((9+N_FUSE_COUNT)*i+N_FUSE_COUNT)+:8];
     end    
 endgenerate
+
 always @(*) begin
-    avg_curr_write_en = step & s_axis_aresetn;
-    avg_curr_read_en = step & s_axis_aresetn;
-    avg_next_write_en = (frame_counter==1&beat_counter>SOBEL_DELAY)|(frame_counter==2&beat_counter<SOBEL_DELAY); //refactor??
-    avg_next_read_en = step & s_axis_aresetn;
     if(avg_first) begin
-        avg_buff_in = iframex16;
+        avg_buff_in = iframex17;
     end
     else if(~avg_add) begin
         avg_buff_in = avg_frame_buff_out - iframe;

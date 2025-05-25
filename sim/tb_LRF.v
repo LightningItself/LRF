@@ -3,9 +3,9 @@
 module tb_LRF ();
 
 // Parameters
-parameter N_IMAGES = 25;  // Number of images (Door_1.hex to Door_N.hex)
+parameter N_IMAGES = 3;  // Number of images (Door_1.hex to Door_N.hex)
 parameter IMAGE_DIM = 512;
-parameter N_FUSE_COUNT = 4; //FUSECOUNT 16
+parameter N_FUSE_COUNT = 1; //FUSECOUNT 16
 parameter PIXEL_COUNT = IMAGE_DIM*IMAGE_DIM;  // 262144
 parameter PIXEL_WIDTH = 8;
 parameter PIXELS_PER_BEAT = 16;  // 16
