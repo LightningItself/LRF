@@ -38,15 +38,14 @@ reg [DATA_WIDTH-1:0] fused_frame_d [TOTAL_DELAY-1:0], curr_frame_d [TOTAL_DELAY-
 
 
 //FUSION CONTROL STATES
-reg [N_FUSE_COUNT-1:0] frame_counter;
+reg [2*N_FUSE_COUNT-1:0] frame_counter;
 reg [N_BEATS_PER_IMAGE-1:0] beat_counter; 
 
 //FRAME_BUFFER STATES
 localparam BUF_COUNTER_WIDTH = $clog2(IMAGE_DIM/PIXELS_PER_BEAT);
-reg avg_read_en, avg_write_en;
+
 reg fused_read_en, fused_write_en;
-reg [DATA_WIDTH+N_FUSE_COUNT*PIXELS_PER_BEAT-1:0] avg_buff_in;
-wire [DATA_WIDTH+N_FUSE_COUNT*PIXELS_PER_BEAT-1:0] avg_frame_buff_out;
+
 reg [DATA_WIDTH-1:0] fused_frame_buff_in, fused_frame;
 wire [DATA_WIDTH-1:0] fused_frame_buff_out;
  
@@ -91,7 +90,32 @@ endgenerate
 
 
 //---------------------AVG BUFFER------------------------------
+reg avg_state;
+reg avg_curr_read_en, avg_curr_write_en, avg_next_read_en, avg_next_write_en;
+reg avg_read_en_a, avg_read_en_b, avg_write_en_a, avg_write_en_b;
 reg avg_first, avg_add;
+
+reg [DATA_WIDTH+N_FUSE_COUNT*PIXELS_PER_BEAT-1:0] avg_buff_in, avg_frame_buff_out;
+wire [DATA_WIDTH+N_FUSE_COUNT*PIXELS_PER_BEAT-1:0] avg_frame_buff_out_a, avg_frame_buff_out_b;
+
+always @(*) begin
+    avg_read_en_a =  avg_state ? avg_curr_read_en : avg_next_read_en;
+    avg_read_en_b = ~avg_state ? avg_curr_read_en : avg_next_read_en;
+    avg_write_en_a =  avg_state ? avg_curr_write_en : avg_next_write_en;
+    avg_write_en_b = ~avg_state ? avg_curr_write_en : avg_next_write_en;
+    avg_frame_buff_out = avg_state ? avg_frame_buff_out_a : avg_frame_buff_out_b;
+end
+
+always @(posedge s_axis_aclk) begin
+    if(~s_axis_aresetn) begin
+        avg_state <= 0;
+    end
+    else if(step) begin
+        if(beat_counter == SOBEL_DELAY-1)
+            avg_state <= ~avg_state;
+    end
+end
+
 always @(posedge s_axis_aclk) begin
     if(~s_axis_aresetn) begin
         avg_first <= 1;
@@ -106,8 +130,10 @@ always @(posedge s_axis_aclk) begin
 end
 genvar i;
 
+LSU #(PIXELS_PER_BEAT,IMAGE_DIM,9+N_FUSE_COUNT,SOBEL_DELAY) avg_frame_buff_a (s_axis_aclk,s_axis_aresetn,avg_read_en_a&step,avg_frame_buff_out_a,avg_write_en_a,avg_buff_in);
+LSU #(PIXELS_PER_BEAT,IMAGE_DIM,9+N_FUSE_COUNT,SOBEL_DELAY) avg_frame_buff_b (s_axis_aclk,s_axis_aresetn,avg_read_en_b&step,avg_frame_buff_out_b,avg_write_en_b,avg_buff_in);
+
 wire [DATA_WIDTH+N_FUSE_COUNT*PIXELS_PER_BEAT-1:0] iframex16, iframe;
-LSU #(PIXELS_PER_BEAT,IMAGE_DIM,8+N_FUSE_COUNT,SOBEL_DELAY) avg_frame_buff (s_axis_aclk,s_axis_aresetn,avg_read_en&step,avg_frame_buff_out,avg_write_en,avg_buff_in);
 generate 
     for(i=0;i<PIXELS_PER_BEAT;i=i+1) begin
         assign iframex16[(8+N_FUSE_COUNT)*i+:(8+N_FUSE_COUNT)] = curr_frame_emap[8*i+:8]<<N_FUSE_COUNT; 
@@ -118,8 +144,10 @@ generate
     end    
 endgenerate
 always @(*) begin
-    avg_write_en = step & s_axis_aresetn;
-    avg_read_en = step & s_axis_aresetn;
+    avg_curr_write_en = step & s_axis_aresetn;
+    avg_curr_read_en = step & s_axis_aresetn;
+    avg_next_write_en = (frame_counter==1&beat_counter>SOBEL_DELAY)|(frame_counter==2&beat_counter<SOBEL_DELAY); //refactor??
+    avg_next_read_en = step & s_axis_aresetn;
     if(avg_first) begin
         avg_buff_in = iframex16;
     end
@@ -151,11 +179,16 @@ always @(posedge s_axis_aclk) begin
     if(~s_axis_aresetn) begin
         fused_write_en <= 0;
         fused_read_en <= 0;
+        m_axis_tvalid <= 0;
     end
     else if(step) begin
         if(beat_counter == FUSED_DELAY-1) begin
             fused_write_en <= ~fused_write_en;
             fused_read_en <= 1;
+            if(frame_counter == 2*FUSE_COUNT-2)
+                m_axis_tvalid <= 1;
+            else 
+                m_axis_tvalid <= 0;
         end
     end
 end
@@ -202,47 +235,34 @@ FUSION #(PIXELS_PER_BEAT,IMAGE_DIM) m_fusion (s_axis_aclk,~step,fused_frame_d[FU
 
 always @(*) begin
     s_axis_tready = m_axis_tready;
-    step = (s_axis_tvalid & s_axis_tready);
+    step = (s_axis_tvalid & s_axis_tready) & (!m_axis_tvalid | m_axis_tready);
+end
+
+//OUTPUT AXI_MASTER INTERFACE
+reg [TOTAL_DELAY-1:0] out_last_d;
+always @(posedge s_axis_aclk) begin
+    if(~s_axis_aresetn) begin
+        out_last_d[TOTAL_DELAY-1] <= 0;
+    end
+    else if(step) out_last_d[TOTAL_DELAY-1] <= s_axis_tlast;
+end
+genvar v;
+generate
+for(v=0;v<TOTAL_DELAY-1;v=v+1) begin
+    always @(posedge s_axis_aclk) begin
+        if(~s_axis_aresetn) begin
+            out_last_d[v] <= 0;
+        end 
+        else if(step) out_last_d[v] <= out_last_d[v+1];
+    end
+end 
+endgenerate
+
+always @(*) begin
+    m_axis_tdata = out_fused_frame;
+    m_axis_tlast = out_last_d[0];
 end
 
 
 
-//AXI IO INTERFACE LOGIC
-// reg [N_PIPELINE_DELAY-1:0] last_counter;
-// reg [N_PIPELINE_DELAY-1:0] valid_counter;
-// //m_axis_tlast logic
-// always @(posedge s_axis_aclk) begin
-//     if(~s_axis_aresetn) begin
-//         last_counter <= 0;
-//     end
-//     else if(step) begin
-//         if(last_counter!=0) begin
-//             if(last_counter == PIPELINE_DELAY) 
-//                 last_counter <= 0;
-//             else 
-//                 last_counter <= last_counter+1; 
-//         end
-//         else if(s_axis_tlast)
-//             last_counter <= 1;
-//     end
-// end
-// //m_axis_tvalid logic
-// always @(posedge s_axis_aclk) begin
-//     if(~s_axis_aresetn) begin
-//         valid_counter <= 0;
-//     end
-//     else if(step) begin
-//         if(valid_counter==0)
-//             valid_counter <= 1;
-//         else if(valid_counter < PIPELINE_DELAY)
-//             valid_counter <= valid_counter+1; 
-//     end
-// end
-// always @(*) begin
-//     m_axis_tvalid = s_axis_tvalid & (valid_counter==PIPELINE_DELAY);
-//     m_axis_tdata  = s1_new_frame_emap;
-//     m_axis_tlast  = (last_counter==PIPELINE_DELAY); 
-//     s_axis_tready = m_axis_tready;
-//     step = (s_axis_tvalid & s_axis_tready);
-// end
 endmodule
