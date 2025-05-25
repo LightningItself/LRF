@@ -111,7 +111,7 @@ always @(posedge s_axis_aclk) begin
         avg_state <= 0;
     end
     else if(step) begin
-        if(beat_counter == SOBEL_DELAY-1)
+        if(frame_counter == 0 & beat_counter == SOBEL_DELAY-1)
             avg_state <= ~avg_state;
     end
 end
