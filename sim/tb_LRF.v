@@ -5,7 +5,7 @@ module tb_LRF ();
 // Parameters
 parameter N_IMAGES = 3;  // Number of images (Door_1.hex to Door_N.hex)
 parameter IMAGE_DIM = 512;
-parameter N_FUSE_COUNT = 1; //FUSECOUNT 16
+parameter N_FUSE_COUNT = 2; //FUSECOUNT 16
 parameter PIXEL_COUNT = IMAGE_DIM*IMAGE_DIM;  // 262144
 parameter PIXEL_WIDTH = 8;
 parameter PIXELS_PER_BEAT = 16;  // 16
@@ -51,8 +51,8 @@ always #1
 //LOAD IMAGE DATA FROM FILE
 initial begin
     for (img = 1; img <= N_IMAGES; img = img + 1) begin
-       $sformat(hex_filename, "C:/Users/Indrayudh/Research/LRF/sim/data/hex_data/Door_%0d.hex", img);
-        // $sformat(hex_filename, "/home/rahul/Documents/LRF/sim/hex_data/Door_%0d.hex", img);
+//       $sformat(hex_filename, "C:/Users/Indrayudh/Research/LRF/sim/data/hex_data/Door_%0d.hex", img);
+         $sformat(hex_filename, "/home/rahul/Documents/LRF/sim/data/hex_data/Door_%0d.hex", img);
         $display("Loading image: %s", hex_filename);
         // Read .hex file into temporary pixel array
         $readmemh(hex_filename, pixel_array);
@@ -152,7 +152,8 @@ end
 always @(posedge s_axis_aclk) begin
     if (m_axis_tvalid && m_axis_tready) begin
         if (output_counter == 0) begin
-            $sformat(output_filename, "C:/Users/Indrayudh/Research/LRF/sim/data/output_hex_data/conv_output_%0d.hex", frame_counter);
+//            $sformat(output_filename, "C:/Users/Indrayudh/Research/LRF/sim/data/output_hex_data/conv_output_%0d.hex", frame_counter);
+            $sformat(output_filename, "/home/rahul/Documents/LRF/sim/data/output_hex_data/conv_output_%0d.hex", frame_counter);
             outfile = $fopen(output_filename, "w");
         end
 
