@@ -11,17 +11,21 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
-      <ZoomEndTime time="70.701 ns"></ZoomEndTime>
-      <Cursor1Time time="10.200 ns"></Cursor1Time>
+      <ZoomStartTime time="32,767.900 ns"></ZoomStartTime>
+      <ZoomEndTime time="32,861.051 ns"></ZoomEndTime>
+      <Cursor1Time time="32,801.450 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="153"></NameColumnWidth>
-      <ValueColumnWidth column_width="269"></ValueColumnWidth>
+      <NameColumnWidth column_width="382"></NameColumnWidth>
+      <ValueColumnWidth column_width="272"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="32" />
+   <WVObjectSize size="41" />
    <wave_markers>
-      <marker time="5000" label="" />
+      <marker time="22447000" label="" />
+      <marker time="65608261" label="" />
+      <marker time="131075000" label="" />
+      <marker time="993000" label="" />
+      <marker time="32839000" label="" />
    </wave_markers>
    <wvobject type="divider" fp_name="divider298">
       <obj_property name="label">CLOCK</obj_property>
@@ -123,13 +127,9 @@
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="BkColor">#FFFF00</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_LRF/dut/load_avg" type="logic">
-      <obj_property name="ElementShortName">load_avg</obj_property>
-      <obj_property name="ObjectShortName">load_avg</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_LRF/dut/frame_counter" type="array">
-      <obj_property name="ElementShortName">frame_counter[3:0]</obj_property>
-      <obj_property name="ObjectShortName">frame_counter[3:0]</obj_property>
+      <obj_property name="ElementShortName">frame_counter[1:0]</obj_property>
+      <obj_property name="ObjectShortName">frame_counter[1:0]</obj_property>
       <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_LRF/dut/beat_counter" type="array">
@@ -137,34 +137,17 @@
       <obj_property name="ObjectShortName">beat_counter[13:0]</obj_property>
       <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_LRF/dut/is_new_frame" type="logic">
-      <obj_property name="ElementShortName">is_new_frame</obj_property>
-      <obj_property name="ObjectShortName">is_new_frame</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_LRF/dut/avg_frame_buff/write_ptr" type="array">
-      <obj_property name="ElementShortName">write_ptr[13:0]</obj_property>
-      <obj_property name="ObjectShortName">write_ptr[13:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_LRF/dut/sobel_curr_frame/out_frame" type="array">
       <obj_property name="ElementShortName">out_frame[127:0]</obj_property>
       <obj_property name="ObjectShortName">out_frame[127:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_LRF/dut/avg_buff_in" type="array">
-      <obj_property name="ElementShortName">avg_buff_in[191:0]</obj_property>
-      <obj_property name="ObjectShortName">avg_buff_in[191:0]</obj_property>
+      <obj_property name="ElementShortName">avg_buff_in[159:0]</obj_property>
+      <obj_property name="ObjectShortName">avg_buff_in[159:0]</obj_property>
    </wvobject>
    <wvobject type="divider" fp_name="divider818">
       <obj_property name="label">AVG FRAME BUFFER</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_LRF/dut/avg_frame_buff/read_enable" type="logic">
-      <obj_property name="ElementShortName">read_enable</obj_property>
-      <obj_property name="ObjectShortName">read_enable</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_LRF/dut/avg_frame_buff/write_enable" type="logic">
-      <obj_property name="ElementShortName">write_enable</obj_property>
-      <obj_property name="ObjectShortName">write_enable</obj_property>
    </wvobject>
    <wvobject type="divider" fp_name="divider1141">
       <obj_property name="label">DATAPATH</obj_property>
@@ -208,24 +191,6 @@
       <obj_property name="label">AVG_IAMGE_BUFF</obj_property>
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="isExpanded"></obj_property>
-      <wvobject fp_name="/tb_LRF/dut/avg_frame_buff/write_data" type="array">
-         <obj_property name="ElementShortName">write_data[191:0]</obj_property>
-         <obj_property name="ObjectShortName">write_data[191:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_LRF/dut/avg_frame_buff/write_ptr" type="array">
-         <obj_property name="ElementShortName">write_ptr[13:0]</obj_property>
-         <obj_property name="ObjectShortName">write_ptr[13:0]</obj_property>
-         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_LRF/dut/avg_frame_buff/read_data" type="array">
-         <obj_property name="ElementShortName">read_data[191:0]</obj_property>
-         <obj_property name="ObjectShortName">read_data[191:0]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_LRF/dut/avg_frame_buff/read_ptr" type="array">
-         <obj_property name="ElementShortName">read_ptr[13:0]</obj_property>
-         <obj_property name="ObjectShortName">read_ptr[13:0]</obj_property>
-         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-      </wvobject>
       <wvobject fp_name="/tb_LRF/dut/avg_frame_emap" type="array">
          <obj_property name="ElementShortName">avg_frame_emap[127:0]</obj_property>
          <obj_property name="ObjectShortName">avg_frame_emap[127:0]</obj_property>
@@ -431,9 +396,9 @@
          <obj_property name="ObjectShortName">del_gauss[127:0]</obj_property>
       </wvobject>
       <wvobject fp_name="/tb_LRF/dut/m_fusion/dbar" type="array">
-         <obj_property name="ElementShortName">dbar[143:0]</obj_property>
-         <obj_property name="ObjectShortName">dbar[143:0]</obj_property>
-         <obj_property name="Radix">BINARYRADIX</obj_property>
+         <obj_property name="ElementShortName">dbar[127:0]</obj_property>
+         <obj_property name="ObjectShortName">dbar[127:0]</obj_property>
+         <obj_property name="Radix">HEXRADIX</obj_property>
       </wvobject>
       <wvobject fp_name="/tb_LRF/dut/m_fusion/fused_frame" type="array">
          <obj_property name="ElementShortName">fused_frame[127:0]</obj_property>
@@ -456,5 +421,100 @@
          <obj_property name="ElementShortName">write_data[127:0]</obj_property>
          <obj_property name="ObjectShortName">write_data[127:0]</obj_property>
       </wvobject>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider228">
+      <obj_property name="label">AVERAGE LOGIC</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="group229" type="group">
+      <obj_property name="label">AVG_BUFF_A</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_LRF/dut/avg_frame_buff_a/read_data" type="array">
+         <obj_property name="ElementShortName">read_data[159:0]</obj_property>
+         <obj_property name="ObjectShortName">read_data[159:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/avg_frame_buff_a/write_data" type="array">
+         <obj_property name="ElementShortName">write_data[159:0]</obj_property>
+         <obj_property name="ObjectShortName">write_data[159:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/avg_frame_buff_a/write_ptr" type="array">
+         <obj_property name="ElementShortName">write_ptr[13:0]</obj_property>
+         <obj_property name="ObjectShortName">write_ptr[13:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/avg_frame_buff_a/read_ptr" type="array">
+         <obj_property name="ElementShortName">read_ptr[13:0]</obj_property>
+         <obj_property name="ObjectShortName">read_ptr[13:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group230" type="group">
+      <obj_property name="label">AVG_BUFF_B</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_LRF/dut/avg_frame_buff_b/read_data" type="array">
+         <obj_property name="ElementShortName">read_data[159:0]</obj_property>
+         <obj_property name="ObjectShortName">read_data[159:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/avg_frame_buff_b/write_data" type="array">
+         <obj_property name="ElementShortName">write_data[159:0]</obj_property>
+         <obj_property name="ObjectShortName">write_data[159:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/avg_frame_buff_b/write_ptr" type="array">
+         <obj_property name="ElementShortName">write_ptr[13:0]</obj_property>
+         <obj_property name="ObjectShortName">write_ptr[13:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/avg_frame_buff_b/read_ptr" type="array">
+         <obj_property name="ElementShortName">read_ptr[13:0]</obj_property>
+         <obj_property name="ObjectShortName">read_ptr[13:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/avg_first" type="logic">
+      <obj_property name="ElementShortName">avg_first</obj_property>
+      <obj_property name="ObjectShortName">avg_first</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/avg_out_state" type="logic">
+      <obj_property name="ElementShortName">avg_out_state</obj_property>
+      <obj_property name="ObjectShortName">avg_out_state</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/avg_buff_in" type="array">
+      <obj_property name="ElementShortName">avg_buff_in[159:0]</obj_property>
+      <obj_property name="ObjectShortName">avg_buff_in[159:0]</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/avg_frame_buff_out" type="array">
+      <obj_property name="ElementShortName">avg_frame_buff_out[159:0]</obj_property>
+      <obj_property name="ObjectShortName">avg_frame_buff_out[159:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/iframe" type="array">
+      <obj_property name="ElementShortName">iframe[159:0]</obj_property>
+      <obj_property name="ObjectShortName">iframe[159:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/iframex17" type="array">
+      <obj_property name="ElementShortName">iframex17[159:0]</obj_property>
+      <obj_property name="ObjectShortName">iframex17[159:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/avg_curr_en" type="logic">
+      <obj_property name="ElementShortName">avg_curr_en</obj_property>
+      <obj_property name="ObjectShortName">avg_curr_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/avg_next_en" type="logic">
+      <obj_property name="ElementShortName">avg_next_en</obj_property>
+      <obj_property name="ObjectShortName">avg_next_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/avg_en_a" type="logic">
+      <obj_property name="ElementShortName">avg_en_a</obj_property>
+      <obj_property name="ObjectShortName">avg_en_a</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/avg_en_b" type="logic">
+      <obj_property name="ElementShortName">avg_en_b</obj_property>
+      <obj_property name="ObjectShortName">avg_en_b</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/avg_next_state" type="logic">
+      <obj_property name="ElementShortName">avg_next_state</obj_property>
+      <obj_property name="ObjectShortName">avg_next_state</obj_property>
    </wvobject>
 </wave_config>

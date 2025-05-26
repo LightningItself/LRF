@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_LRF_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="tb_LRF" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="131,878.260 ns"></ZoomStartTime>
+      <ZoomEndTime time="132,024.348 ns"></ZoomEndTime>
+      <Cursor1Time time="132,000.000 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="254"></NameColumnWidth>
+      <ValueColumnWidth column_width="152"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="17" />
+   <wvobject fp_name="/tb_LRF/dut/s_axis_aclk" type="logic">
+      <obj_property name="ElementShortName">s_axis_aclk</obj_property>
+      <obj_property name="ObjectShortName">s_axis_aclk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/s_axis_aresetn" type="logic">
+      <obj_property name="ElementShortName">s_axis_aresetn</obj_property>
+      <obj_property name="ObjectShortName">s_axis_aresetn</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/s_axis_tlast" type="logic">
+      <obj_property name="ElementShortName">s_axis_tlast</obj_property>
+      <obj_property name="ObjectShortName">s_axis_tlast</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/s_axis_tvalid" type="logic">
+      <obj_property name="ElementShortName">s_axis_tvalid</obj_property>
+      <obj_property name="ObjectShortName">s_axis_tvalid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/s_axis_tdata" type="array">
+      <obj_property name="ElementShortName">s_axis_tdata[127:0]</obj_property>
+      <obj_property name="ObjectShortName">s_axis_tdata[127:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/beat_counter" type="array">
+      <obj_property name="ElementShortName">beat_counter[13:0]</obj_property>
+      <obj_property name="ObjectShortName">beat_counter[13:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/frame_counter" type="array">
+      <obj_property name="ElementShortName">frame_counter[1:0]</obj_property>
+      <obj_property name="ObjectShortName">frame_counter[1:0]</obj_property>
+   </wvobject>
+   <wvobject type="divider" fp_name="divider186">
+      <obj_property name="label">AVG_BUFFER_LOGIC</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+   </wvobject>
+   <wvobject fp_name="group197" type="group">
+      <obj_property name="label">AVG_BUFFER</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_LRF/dut/avg_buff_in" type="array">
+         <obj_property name="ElementShortName">avg_buff_in[159:0]</obj_property>
+         <obj_property name="ObjectShortName">avg_buff_in[159:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/avg_frame_buff_out" type="array">
+         <obj_property name="ElementShortName">avg_frame_buff_out[159:0]</obj_property>
+         <obj_property name="ObjectShortName">avg_frame_buff_out[159:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/avg_first" type="logic">
+         <obj_property name="ElementShortName">avg_first</obj_property>
+         <obj_property name="ObjectShortName">avg_first</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/avg_add" type="logic">
+         <obj_property name="ElementShortName">avg_add</obj_property>
+         <obj_property name="ObjectShortName">avg_add</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/avg_frame_emap" type="array">
+         <obj_property name="ElementShortName">avg_frame_emap[127:0]</obj_property>
+         <obj_property name="ObjectShortName">avg_frame_emap[127:0]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group305" type="group">
+      <obj_property name="label">FUSED_BUFFER</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_LRF/dut/fused_frame_buff_in" type="array">
+         <obj_property name="ElementShortName">fused_frame_buff_in[127:0]</obj_property>
+         <obj_property name="ObjectShortName">fused_frame_buff_in[127:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/fused_frame_buff_out" type="array">
+         <obj_property name="ElementShortName">fused_frame_buff_out[127:0]</obj_property>
+         <obj_property name="ObjectShortName">fused_frame_buff_out[127:0]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/fused_frame_buff/write_ptr" type="array">
+         <obj_property name="ElementShortName">write_ptr[13:0]</obj_property>
+         <obj_property name="ObjectShortName">write_ptr[13:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/fused_frame_buff/read_ptr" type="array">
+         <obj_property name="ElementShortName">read_ptr[13:0]</obj_property>
+         <obj_property name="ObjectShortName">read_ptr[13:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_LRF/dut/fused_frame_buff/write_enable" type="logic">
+         <obj_property name="ElementShortName">write_enable</obj_property>
+         <obj_property name="ObjectShortName">write_enable</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group299" type="group">
+      <obj_property name="label">DATAPATH</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="group300" type="group">
+         <obj_property name="label">HSSIM</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/tb_LRF/dut/m_hssim/stall" type="logic">
+            <obj_property name="ElementShortName">stall</obj_property>
+            <obj_property name="ObjectShortName">stall</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_LRF/dut/m_hssim/old_map" type="array">
+            <obj_property name="ElementShortName">old_map[127:0]</obj_property>
+            <obj_property name="ObjectShortName">old_map[127:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_LRF/dut/m_hssim/avg_map" type="array">
+            <obj_property name="ElementShortName">avg_map[127:0]</obj_property>
+            <obj_property name="ObjectShortName">avg_map[127:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_LRF/dut/m_hssim/new_map" type="array">
+            <obj_property name="ElementShortName">new_map[127:0]</obj_property>
+            <obj_property name="ObjectShortName">new_map[127:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_LRF/dut/m_hssim/del" type="array">
+            <obj_property name="ElementShortName">del[127:0]</obj_property>
+            <obj_property name="ObjectShortName">del[127:0]</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="group312" type="group">
+         <obj_property name="label">GAUSS+FUSION</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/tb_LRF/dut/m_gauss/out_frame" type="array">
+            <obj_property name="ElementShortName">out_frame[127:0]</obj_property>
+            <obj_property name="ObjectShortName">out_frame[127:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_LRF/dut/m_fusion/fused_frame" type="array">
+            <obj_property name="ElementShortName">fused_frame[127:0]</obj_property>
+            <obj_property name="ObjectShortName">fused_frame[127:0]</obj_property>
+         </wvobject>
+      </wvobject>
+      <wvobject fp_name="group796" type="group">
+         <obj_property name="label">FUSION</obj_property>
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="isExpanded"></obj_property>
+         <wvobject fp_name="/tb_LRF/dut/m_fusion/old_frame" type="array">
+            <obj_property name="ElementShortName">old_frame[127:0]</obj_property>
+            <obj_property name="ObjectShortName">old_frame[127:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_LRF/dut/m_fusion/new_frame" type="array">
+            <obj_property name="ElementShortName">new_frame[127:0]</obj_property>
+            <obj_property name="ObjectShortName">new_frame[127:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_LRF/dut/m_fusion/del_gauss" type="array">
+            <obj_property name="ElementShortName">del_gauss[127:0]</obj_property>
+            <obj_property name="ObjectShortName">del_gauss[127:0]</obj_property>
+         </wvobject>
+         <wvobject fp_name="/tb_LRF/dut/m_fusion/fused_frame" type="array">
+            <obj_property name="ElementShortName">fused_frame[127:0]</obj_property>
+            <obj_property name="ObjectShortName">fused_frame[127:0]</obj_property>
+         </wvobject>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/out_fused_frame" type="array">
+      <obj_property name="ElementShortName">out_fused_frame[127:0]</obj_property>
+      <obj_property name="ObjectShortName">out_fused_frame[127:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/fused_write_en" type="logic">
+      <obj_property name="ElementShortName">fused_write_en</obj_property>
+      <obj_property name="ObjectShortName">fused_write_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/fused_read_en" type="logic">
+      <obj_property name="ElementShortName">fused_read_en</obj_property>
+      <obj_property name="ObjectShortName">fused_read_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/fused_frame_buff/write_ptr" type="array">
+      <obj_property name="ElementShortName">write_ptr[13:0]</obj_property>
+      <obj_property name="ObjectShortName">write_ptr[13:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/fused_frame_buff/read_ptr" type="array">
+      <obj_property name="ElementShortName">read_ptr[13:0]</obj_property>
+      <obj_property name="ObjectShortName">read_ptr[13:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_LRF/dut/avg_frame_emap" type="array">
+      <obj_property name="ElementShortName">avg_frame_emap[127:0]</obj_property>
+      <obj_property name="ObjectShortName">avg_frame_emap[127:0]</obj_property>
+   </wvobject>
+</wave_config>
