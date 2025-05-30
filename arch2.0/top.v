@@ -244,6 +244,9 @@ always @(*) begin
 end
 
 //OUTPUT AXI_MASTER INTERFACE
+
+// recheck axi_master interface
+
 reg [TOTAL_DELAY-1:0] out_last_d;
 always @(posedge s_axis_aclk) begin
     if(~s_axis_aresetn) begin
