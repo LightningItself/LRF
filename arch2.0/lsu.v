@@ -22,6 +22,8 @@ localparam ADDR_WIDTH = $clog2(MEM_DEPTH);
 reg [DATA_WIDTH-1:0] ram [MEM_DEPTH-1:0];
 reg [ADDR_WIDTH-1:0] read_ptr, write_ptr;
 
+// reduce read and write enables into single transition.
+
 always @(posedge clk) begin
     if(~aresetn)
         write_ptr <= -WRITE_DELAY;
