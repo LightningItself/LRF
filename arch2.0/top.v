@@ -38,7 +38,7 @@ reg [DATA_WIDTH-1:0] fused_frame_d [TOTAL_DELAY-1:0], curr_frame_d [TOTAL_DELAY-
 
 
 //FUSION CONTROL STATES
-reg [2*N_FUSE_COUNT-1:0] frame_counter;
+reg [N_FUSE_COUNT:0] frame_counter;
 reg [N_BEATS_PER_IMAGE-1:0] beat_counter; 
 
 //FRAME_BUFFER STATES

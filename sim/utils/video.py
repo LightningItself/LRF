@@ -1,10 +1,12 @@
 import cv2
 import os
 
-image_folder = "C:/Users/Indrayudh/Downloads/LRF-20231103T121935Z-001/LRF/Abhishek/OTIS_PNG_Gray/Fixed Backgrounds/Door"  # Change this
+# image_folder = "C:/Users/Indrayudh/Downloads/LRF-20231103T121935Z-001/LRF/Abhishek/OTIS_PNG_Gray/Fixed Backgrounds/Door"  # Change this
+image_folder = "C:/Users/Indrayudh/Research/LRF/sim/data/output_hex_data"  # Change this
+
 output_video = 'output.avi'
 fps = 10
-frame_size = (520, 520)
+frame_size = (64, 64)
 
 # Get sorted list of .png files
 image_files = sorted([

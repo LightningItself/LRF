@@ -1,3 +1,5 @@
+`timescale 1ns/10ps
+
 module ROW_BUFF #(
     parameter PIXELS_PER_BEAT = 16,
     parameter PIXEL_WIDTH = 8,

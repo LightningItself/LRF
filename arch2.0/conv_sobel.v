@@ -1,3 +1,5 @@
+`timescale 1ns/10ps
+
 module CONV_SOBEL #(
     parameter PIXELS_PER_BEAT = 16,
     parameter IMAGE_DIM = 512,

@@ -1,3 +1,5 @@
+`timescale 1ns/10ps
+
 module CONV_GAUSS #(
     parameter PIXELS_PER_BEAT = 16,
     parameter INPUT_WIDTH = 8,

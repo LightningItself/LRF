@@ -1,4 +1,4 @@
-// 4 stage pipelined
+`timescale 1ns/10ps
 
 module SIG_XY #(
     parameter PIXELS_PER_BEAT = 16,

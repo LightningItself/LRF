@@ -1,3 +1,5 @@
+`timescale 1ns/10ps
+
 module LSU #(
     parameter PIXELS_PER_BEAT = 16,
     parameter IMAGE_DIM  = 512,

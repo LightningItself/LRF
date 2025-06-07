@@ -56,7 +56,10 @@ def display_image(images, titles=None):
 if __name__ == "__main__":
     # fused_image_path = "../runs/fused_output.hex"
     input_image_path = "../data/hex_data/Door_1.hex"
-    fused_image_path = "../data/output_hex_data/conv_output_0.hex"
-    fused_image = read_hex_image(fused_image_path)
-    input_image = read_hex_image(input_image_path)
+    fused_image_path = "../data/output_hex_data/conv_output_2.hex"
+    image_dim = 512
+    fused_image = read_hex_image(fused_image_path, image_dim, image_dim)
+    input_image = read_hex_image(input_image_path, image_dim, image_dim)
+
+    images = read_hex_image(input_image_path, image_dim, image_dim) 
     display_image([fused_image, input_image], ["fused image", "input_image"])
