@@ -3,7 +3,8 @@ import os
 
 # Parameters
 original_size = (520, 520)  # (height, width)
-crop_size = (512, 512)
+# crop_size = (512, 512)
+crop_size = (64, 64)
 
 start_y = (original_size[0] - crop_size[0]) // 2
 start_x = (original_size[1] - crop_size[1]) // 2
