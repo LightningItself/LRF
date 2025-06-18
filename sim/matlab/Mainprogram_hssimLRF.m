@@ -3,7 +3,7 @@ close all;
 
 %himfold='E:\MATLAB2017trial\bin\OTIS_PNG_Gray\Fixed Backgrounds\Door'; %% Folder containing turbluence affected images
 % himfold='C:\Users\Indrayudh\Downloads\LRF-20231103T121935Z-001\LRF\Abhishek\OTIS_PNG_Gray\Fixed Backgrounds\Door';
-himfold = '/home/rahul/Documents/LRF/sim/data/OTIS_PNG_Gray/Fixed Backgrounds/';
+himfold = '/home/rahul/Documents/LRF/sim/data/OTIS_PNG_Gray/Fixed Patterns/Pattern16';
 hfile=dir(fullfile(himfold,'*.png'));
 htotim=numel(hfile); % Total no of images in folder
 
@@ -27,7 +27,7 @@ hcombine = 16;  % No of images combined to produce a single output image
 
  [out1] = Hssim_LRF (frames , hcombine); %Calling the required function
 
-writerObj = VideoWriter('/home/rahul/Documents/LRF/sim/runs/output/door_output.avi'); % Craeting video object, Saved in bin of MATLAB folder
+writerObj = VideoWriter('/home/rahul/Documents/LRF/sim/runs/output_orig/output_pattern16.avi'); % Craeting video object, Saved in bin of MATLAB folder
 writerObj.FrameRate = 10; % setting frame rate
 open(writerObj);
 
