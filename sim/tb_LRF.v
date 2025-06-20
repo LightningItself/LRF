@@ -1,12 +1,12 @@
-`timescale 10ns/10ps
+`timescale 1ns/10ps
 
 module tb_LRF (); // Sliding window frame-based LRF testbench
 
 // Parameters
-parameter N_IMAGES = 100;  // Total number of frames
+parameter N_IMAGES = 300;  // Total number of frames
 parameter IMAGE_DIM = 64;
-parameter N_FUSE_COUNT = 16;
-parameter WINDOW_SIZE = 1 << N_FUSE_COUNT;
+parameter N_FUSE_COUNT = 4;
+parameter WINDOW_SIZE = 1<<N_FUSE_COUNT;
 parameter PIXEL_COUNT = IMAGE_DIM*IMAGE_DIM;
 parameter PIXEL_WIDTH = 8;
 parameter PIXELS_PER_BEAT = 16;
@@ -70,7 +70,7 @@ reg [31:0] mem_ptr;
 reg [31:0] total_frames = N_IMAGES;
 
 // Randomization
-parameter RANDOMIZE = 0;
+parameter RANDOMIZE = 1;
 reg rand_valid;
 reg rand_ready;
 always @(posedge s_axis_aclk) begin

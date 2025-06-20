@@ -56,7 +56,7 @@ reg step; //check if the  pipeline can move forward
 
 reg [DATA_WIDTH-1:0] fused_frame_d [TOTAL_DELAY-1:0], curr_frame_d [TOTAL_DELAY-1:0];
 
-localparam FRAME_COUNTER_BITS = $clog2(2*N_FUSE_COUNT-1);
+localparam FRAME_COUNTER_BITS = $clog2(2*FUSE_COUNT-1);
 //FUSION CONTROL STATES
 reg [FRAME_COUNTER_BITS-1:0] frame_counter;
 reg [N_BEATS_PER_IMAGE-1:0] beat_counter; 
@@ -215,10 +215,10 @@ always @(posedge s_axis_aclk) begin
         if(beat_counter == FUSED_DELAY-1) begin
             fused_write_en <= ~fused_write_en;
             fused_read_en <= 1;
-            if(frame_counter == 2*N_FUSE_COUNT-2)
+            if(frame_counter == 2*FUSE_COUNT-2)
                 m_axis_tvalid_temp <= 1;
 				
-			else if(frame_counter == 2*N_FUSE_COUNT-1) begin
+			else if(frame_counter == 2*FUSE_COUNT-1) begin
 				m_axis_tvalid_temp <= m_axis_tvalid_temp & ~out_last_d[0];
 			end
 			

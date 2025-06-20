@@ -55,9 +55,9 @@ def display_image(images, titles=None):
 # -------- Main Execution --------
 if __name__ == "__main__":
     # fused_image_path = "../runs/fused_output.hex"
-    input_image_path = "../data/hex_data/Door_1.hex"
-    fused_image_path = "../data/output_hex_data/conv_output_2.hex"
-    image_dim = 512
+    input_image_path = "../data/cropped_hex/Door_1.hex"
+    fused_image_path = "../data/output_hex_data/conv_output_1.hex"
+    image_dim = 64
     fused_image = read_hex_image(fused_image_path, image_dim, image_dim)
     input_image = read_hex_image(input_image_path, image_dim, image_dim)
 

@@ -6,8 +6,8 @@ from pathlib import Path
 # === CONFIGURATION ===
 folder1 = "data/hex_data"
 folder2 = "data/output_hex_data"
-image_width = 512
-image_height = 512
+image_width = 64
+image_height = 64
 fps = 30
 output_file = "output_video.avi"
 
