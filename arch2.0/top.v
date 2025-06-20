@@ -1,8 +1,28 @@
-`timescale 1ns/10ps
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 06/10/2025 10:34:44 AM
+// Design Name: 
+// Module Name: LRF
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
 
 module LRF #(
     parameter PIXELS_PER_BEAT = 16,
-    parameter IMAGE_DIM = 512,
+    parameter IMAGE_DIM = 64,
     parameter N_FUSE_COUNT = 4,
     parameter PIPELINE_DELAY = 3,
     parameter DATA_WIDTH = 8*PIXELS_PER_BEAT
@@ -36,9 +56,9 @@ reg step; //check if the  pipeline can move forward
 
 reg [DATA_WIDTH-1:0] fused_frame_d [TOTAL_DELAY-1:0], curr_frame_d [TOTAL_DELAY-1:0];
 
-
+localparam FRAME_COUNTER_BITS = $clog2(2*N_FUSE_COUNT-1);
 //FUSION CONTROL STATES
-reg [N_FUSE_COUNT:0] frame_counter;
+reg [FRAME_COUNTER_BITS-1:0] frame_counter;
 reg [N_BEATS_PER_IMAGE-1:0] beat_counter; 
 
 //FRAME_BUFFER STATES
@@ -180,20 +200,30 @@ always @(posedge s_axis_aclk) begin
 end
 
 LSU #(PIXELS_PER_BEAT,IMAGE_DIM,8,0,24) fused_frame_buff (s_axis_aclk,s_axis_aresetn,fused_read_en&step,fused_frame_buff_out,fused_write_en&step,fused_frame_buff_in);
+
+reg m_axis_tvalid_temp;
+reg out_temp;
+reg [TOTAL_DELAY-1:0] out_last_d;
+
 always @(posedge s_axis_aclk) begin
     if(~s_axis_aresetn) begin
         fused_write_en <= 0;
         fused_read_en <= 0;
-        m_axis_tvalid <= 0;
+        m_axis_tvalid_temp <= 0;
     end
     else if(step) begin
         if(beat_counter == FUSED_DELAY-1) begin
             fused_write_en <= ~fused_write_en;
             fused_read_en <= 1;
-            if(frame_counter == 2*FUSE_COUNT-2)
-                m_axis_tvalid <= 1;
+            if(frame_counter == 2*N_FUSE_COUNT-2)
+                m_axis_tvalid_temp <= 1;
+				
+			else if(frame_counter == 2*N_FUSE_COUNT-1) begin
+				m_axis_tvalid_temp <= m_axis_tvalid_temp & ~out_last_d[0];
+			end
+			
             else 
-                m_axis_tvalid <= 0;
+                m_axis_tvalid_temp <= 0;
         end
     end
 end
@@ -240,14 +270,14 @@ FUSION #(PIXELS_PER_BEAT,IMAGE_DIM) m_fusion (s_axis_aclk,~step,fused_frame_d[FU
 
 always @(*) begin
     s_axis_tready = m_axis_tready;
-    step = (s_axis_tvalid & s_axis_tready) & (!m_axis_tvalid | m_axis_tready);
+    step = (s_axis_tvalid & s_axis_tready) & (!m_axis_tvalid_temp | m_axis_tready);
+	m_axis_tvalid = step & m_axis_tvalid_temp;
 end
 
 //OUTPUT AXI_MASTER INTERFACE
 
 // recheck axi_master interface
 
-reg [TOTAL_DELAY-1:0] out_last_d;
 always @(posedge s_axis_aclk) begin
     if(~s_axis_aresetn) begin
         out_last_d[TOTAL_DELAY-1] <= 0;
@@ -265,6 +295,13 @@ for(v=0;v<TOTAL_DELAY-1;v=v+1) begin
     end
 end 
 endgenerate
+
+always@(posedge s_axis_aclk) begin
+		if(~s_axis_aresetn) begin
+            out_temp <= 0;
+        end 
+        else if(step) out_temp <= out_last_d[0];
+end
 
 always @(*) begin
     m_axis_tdata = out_fused_frame;

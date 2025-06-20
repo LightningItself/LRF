@@ -1,11 +1,11 @@
-`timescale 1ns/10ps
+`timescale 10ns/10ps
 
 module tb_LRF (); // Sliding window frame-based LRF testbench
 
 // Parameters
-parameter N_IMAGES = 30;  // Total number of frames
-parameter IMAGE_DIM = 512;
-parameter N_FUSE_COUNT = 4;
+parameter N_IMAGES = 100;  // Total number of frames
+parameter IMAGE_DIM = 64;
+parameter N_FUSE_COUNT = 16;
 parameter WINDOW_SIZE = 1 << N_FUSE_COUNT;
 parameter PIXEL_COUNT = IMAGE_DIM*IMAGE_DIM;
 parameter PIXEL_WIDTH = 8;
@@ -15,8 +15,10 @@ parameter WORDS_PER_IMAGE = PIXEL_COUNT / PIXELS_PER_BEAT;
 parameter MEM_DEPTH = N_IMAGES * WORDS_PER_IMAGE;
 parameter MEM_BITS = $clog2(MEM_DEPTH);
 parameter PIPELINE_DELAY = 10;
-parameter INPUT_IMAGE_PATH = "C:/Users/Indrayudh/Research/LRF/sim/data/cropped_hex/";
-parameter OUTPUT_IMAGE_PATH = "C:/Users/Indrayudh/Research/LRF/sim/data/output_hex_data/";
+// parameter INPUT_IMAGE_PATH = "C:/Users/Indrayudh/Research/LRF/sim/data/cropped_hex/";
+// parameter OUTPUT_IMAGE_PATH = "C:/Users/Indrayudh/Research/LRF/sim/data/output_hex_data/";
+parameter INPUT_IMAGE_PATH = "/home/rahul/Documents/LRF/sim/data/cropped_hex/";
+parameter OUTPUT_IMAGE_PATH = "/home/rahul/Documents/LRF/sim/data/output_hex_data/";
 
 // Clock and Reset
 reg s_axis_aclk = 0;
@@ -44,7 +46,7 @@ integer i, j, img, mem_index = 0;
 initial begin
     for (img = 1; img <= N_IMAGES; img = img + 1) begin
 //       $sformat(hex_filename, "C:/Users/Indrayudh/Research/LRF/sim/data/hex_data/Door_%0d.hex", img);
-         $sformat(hex_filename, "C:/Users/Indrayudh/Research/LRF/sim/data/hex_data/Door_%0d.hex", img);
+         $sformat(hex_filename, "/home/rahul/Documents/LRF/sim/data/hex_data/Door_%0d.hex", img);
         $display("Loading image: %s", hex_filename);
         $readmemh(hex_filename, pixel_array);
         for (i = 0; i < WORDS_PER_IMAGE; i = i + 1) begin
@@ -86,7 +88,7 @@ always @(posedge s_axis_aclk) begin
     end else begin
         case (transfer_state)
             IDLE: begin
-                if (win_start + WINDOW_SIZE - 1 < total_frames) begin
+                if (win_start + WINDOW_SIZE - 1 < N_IMAGES) begin
                     current_frame <= win_start;
                     beat_counter <= 0;
                     transfer_state <= SEND_NEW;
@@ -152,7 +154,7 @@ always @(posedge s_axis_aclk) begin
     if (m_axis_tvalid && m_axis_tready) begin
         if (output_counter == 0) begin
 //            $sformat(output_filename, "C:/Users/Indrayudh/Research/LRF/sim/data/output_hex_data/conv_output_%0d.hex", frame_counter);
-            $sformat(output_filename, "C:/Users/Indrayudh/Research/LRF/sim/data/output_hex_data/conv_output_%0d.hex", frame_counter);
+            $sformat(output_filename, "/home/rahul/Documents/LRF/sim/data/output_hex_data/conv_output_%0d.hex", frame_counter);
             outfile = $fopen(output_filename, "w");
         end
         for (i = 15; i >= 0; i = i - 1)
