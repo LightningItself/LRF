@@ -1,29 +1,26 @@
-# Vivado log files
+# Vivado
 *.jou
 *.log
 *.str
-
-# Simulation files
 *.wdb
 *.wcfg
 
-# Vivado generated folders
 .cache/
 .hw/
 .ip_user_files/
 .sim/
 .runs/
 
-# Temporary / backup
-*.backup
-*.tmp
-
-# OS files
-.DS_Store
-Thumbs.db
+# Python
+__pycache__/
+*.pyc
 
 # VS Code
 .vscode/
 
-# Optional workspace
+# Workspace
 workspace/*
+
+# OS
+.DS_Store
+Thumbs.db

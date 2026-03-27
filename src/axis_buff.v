@@ -16,6 +16,9 @@ module axis_buff #(
     output reg m_axis_tlast
 );
 
+// AXI handshake (either at input or output interface)
+// Data transfer happens ONLY when: tvalid == 1 AND tready == 1
+
 always @(posedge aclk) begin
     if(~aresetn) begin
         m_axis_tvalid <= 0;
@@ -36,6 +39,6 @@ always @(posedge aclk) begin
     end
 end
 
-assign s_axis_tready = ~m_axis_tvalid || m_axis_tready;
+assign s_axis_tready = ~m_axis_tvalid || m_axis_tready; // this allows simultaneous read and write when m_axis_tready = 1
 
 endmodule

@@ -21,12 +21,16 @@ module tb_top;
         .m_axis_tdata(m_if.tdata), .m_axis_tvalid(m_if.tvalid), .m_axis_tready(m_if.tready), .m_axis_tlast(m_if.tlast)
     );
 
+    // Driver → s_if → DUT → m_if → Monitor
+
     // AXI-Stream simulation pipeline
-    axis_sim #(`S_AXIS_DATA_WIDTH, `M_AXIS_DATA_WIDTH, `S_AXIS_TOTAL_BEATS, `M_AXIS_TOTAL_BEATS) sim;
+    axis_sim #(`S_AXIS_DATA_WIDTH, `M_AXIS_DATA_WIDTH, `S_AXIS_TOTAL_BEATS, `M_AXIS_TOTAL_BEATS) sim; // Simulation class
 
     initial begin
-        sim = new(s_if, m_if);
-        
+        sim = new(s_if, m_if); // constructor of axis_sim class, passing interfaces to connect to hardware signals
+        // object → uses interface → interface connects to hardware, classes/Objects don’t become hardware — they just control hardware via interfaces
+        // When you pass an interface, you are giving the class access to real hardware signals, It is NOT creating hardware connection
+        // Interface is a bridge: software uses it like an object, hardware uses it like wires
         rst_n = 0;
         repeat(10) @(posedge clk);
         rst_n = 1;

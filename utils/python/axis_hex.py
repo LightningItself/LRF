@@ -1,3 +1,16 @@
+# This function converts a NumPy data array into AXI-stream compatible hex format.
+# Steps:
+# 1. Flatten the input array into a 1D sequence.
+# 2. Calculate how many elements fit into one AXI data beat.
+# 3. Pad with zeros if data does not align to full beats.
+# 4. Split data into chunks (each chunk = one AXI beat).
+# 5. Reverse element order inside each chunk (LSB-first packing).
+# 6. Convert each element to hexadecimal and concatenate into one string.
+# 7. Write one AXI beat per line into the output file.
+# 8. Return total number of AXI beats generated.
+#
+# Purpose: Generate AXI-stream formatted hex files for simulation/testing.
+
 import numpy as np
 
 def write_axi_stream_hex(filename, data_array, data_width_bits):

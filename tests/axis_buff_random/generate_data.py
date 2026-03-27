@@ -1,3 +1,20 @@
+# This script generates test data and configuration files for AXI-stream simulation.
+#
+# Steps:
+# 1. Parses command-line arguments for input and output file paths.
+# 2. Generates random 8-bit input data of length LENGTH.
+# 3. Creates expected output by casting input data to 16-bit.
+# 4. Uses write_axi_stream_hex() to:
+#    - Convert input data into AXI-stream hex format and write to input file.
+#    - Convert expected output into AXI-stream hex format and write to output file.
+# 5. Receives total number of AXI beats for both input and output.
+# 6. Creates a configuration file (tb_config.svh) in the output directory.
+# 7. Writes AXI parameters (data widths and total beats) as Verilog macros.
+#
+# Purpose:
+# Automates generation of stimulus, expected results, and configuration
+# for AXI-based testbench simulation.
+
 import argparse
 import os
 import sys

@@ -1,3 +1,35 @@
+# This script generates image-based test data and expected outputs
+# for AXI-stream simulation of a convolution (Gaussian-like) module.
+#
+# Steps:
+# 1. Parses command-line arguments for input and output HEX file paths.
+# 2. Generates a random grayscale image (512x512, 8-bit pixels).
+#
+# 3. Pads the image with zeros (2 rows/columns) to handle boundary conditions.
+# 4. Converts image to 16-bit for intermediate computation (to prevent overflow).
+#
+# 5. Applies a 3x3 weighted convolution (Gaussian-like filter):
+#       [1 2 1
+#        2 4 2   ] / 16
+#       [1 2 1]
+#    - Uses bit shifts for efficient multiplication.
+#    - Final result is normalized by shifting right by 4.
+#
+# 6. Stores the filtered result into expected_output:
+#    - Output is aligned with a 2-pixel offset (due to padding and pipeline behavior).
+#
+# 7. Converts both input image and expected output into AXI-stream HEX format:
+#    - Packs pixels into beats based on DATA_WIDTH.
+#    - Writes them into input and output HEX files.
+#
+# 8. Generates a configuration file (tb_config.svh) containing:
+#    - AXI data widths
+#    - Total number of beats for input and output
+#
+# Purpose:
+# Automates creation of image stimulus and expected results for verifying
+# a Gaussian convolution hardware design using AXI-stream interface.
+
 import argparse
 import os
 import sys
