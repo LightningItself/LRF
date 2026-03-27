@@ -1,2 +1,29 @@
-workspace/*
+# Vivado log files
+*.jou
+*.log
+*.str
+
+# Simulation files
+*.wdb
+*.wcfg
+
+# Vivado generated folders
+.cache/
+.hw/
+.ip_user_files/
+.sim/
+.runs/
+
+# Temporary / backup
+*.backup
+*.tmp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# VS Code
 .vscode/
+
+# Optional workspace
+workspace/*
