@@ -10,6 +10,7 @@
 .ip_user_files/
 .sim/
 .runs/
+project_1.gen/
 
 # Python
 __pycache__/
