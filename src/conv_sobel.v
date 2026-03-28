@@ -1,216 +1,233 @@
-`timescale 1ns/10ps
+    `timescale 1ns/10ps
 
-module CONV_SOBEL #(
-    parameter PIXELS_PER_BEAT = 16,
-    parameter IMAGE_DIM = 512,
-    parameter DATA_WIDTH = 8*PIXELS_PER_BEAT
-)(
-    input wire clk,
-    input wire aresetn,
-    input wire stall,
-    input wire [DATA_WIDTH-1:0] inp_frame,
-    output reg [DATA_WIDTH-1:0] out_frame
-);
+    module CONV_SOBEL #(
+        parameter PIXELS_PER_BEAT = 16,
+        parameter PIXEL_SIZE = 8,
+        parameter IMAGE_WIDTH = 512,
+        parameter DATA_WIDTH = 8*PIXELS_PER_BEAT
+    )(
+        input aclk,
+        input aresetn,
 
-localparam COUNTER_MAX = IMAGE_DIM/PIXELS_PER_BEAT;
-localparam COUNTER_WIDTH = $clog2(COUNTER_MAX);
-localparam ROW_COUNTER_WIDTH = $clog2(IMAGE_DIM);
+        // AXIS input interface
+        input [DATA_WIDTH-1:0] s_axis_tdata,
+        input                  s_axis_tvalid,
+        output                 s_axis_tready,
+        input                  s_axis_tlast,
 
-reg [1:0] buff_counter;
+        // AXIS output interface
+        output reg [DATA_WIDTH-1:0] m_axis_tdata,
+        output reg                  m_axis_tvalid,
+        input                       m_axis_tready,
+        output reg                  m_axis_tlast
+    );
 
-//use column and row counters a write pointers
-reg [COUNTER_WIDTH-1:0] col_counter;
-reg [ROW_COUNTER_WIDTH-1:0] row_counter;
- 
-reg buff_a_write_en, buff_b_write_en, buff_c_write_en;
-reg buff_a_read_en, buff_b_read_en, buff_c_read_en;
+    localparam BUFF_DEPTH = IMAGE_WIDTH / PIXELS_PER_BEAT;
 
-//BUFFER WRITE LOGIC
-always @(*) begin
-    buff_a_write_en = (buff_counter == 0) & ~stall;
-    buff_b_write_en = (buff_counter == 1) & ~stall;
-    buff_c_write_en = (buff_counter == 2) & ~stall;
-end
+    localparam COL_PTR_WIDTH = $clog2(BUFF_DEPTH);
 
-//BUFFER READ LOGIC
-always @(posedge clk) begin
-    if(~aresetn) begin
-        buff_a_read_en <= 0;
-        buff_b_read_en <= 0;
-        buff_c_read_en <= 0;
-    end
-    else if(~stall) begin
-        if(col_counter==COUNTER_MAX-2) begin
-            buff_a_read_en <= ~(buff_counter==2);
-            buff_b_read_en <= ~(buff_counter==0);
-            buff_c_read_en <= ~(buff_counter==1);    
+    reg [15:0] row_ptr;
+    reg [COL_PTR_WIDTH-1:0] col_ptr;
+    wire [COL_PTR_WIDTH-1:0] col_ptr_next = col_ptr + 1;
+
+    reg [DATA_WIDTH-1:0] buff_top [BUFF_DEPTH-1:0];
+    reg [DATA_WIDTH-1:0] buff_mid [BUFF_DEPTH-1:0];
+
+    reg [2*PIXEL_SIZE-1:0] last_top;
+    reg [2*PIXEL_SIZE-1:0] last_mid;
+    reg [2*PIXEL_SIZE-1:0] last_bot;
+
+    reg [DATA_WIDTH-1:0] buff_top_out;
+    reg [DATA_WIDTH-1:0] buff_mid_out;
+
+    reg signed [10:0] conv_sum_x[PIXELS_PER_BEAT-1:0];
+    reg signed [10:0] conv_sum_y[PIXELS_PER_BEAT-1:0];
+
+    reg signed [21:0] conv_sum_x2[PIXELS_PER_BEAT-1:0];
+    reg signed [21:0] conv_sum_y2[PIXELS_PER_BEAT-1:0];
+
+    wire advance;
+
+    assign advance = (m_axis_tready || !m_axis_tvalid);
+
+    integer i;
+
+always @(posedge aclk) begin
+    if (!aresetn) begin
+        for(i = 0; i < BUFF_DEPTH; i = i + 1) begin
+            buff_top[i] <= 0;
+            buff_mid[i] <= 0;
         end
     end
 end
 
-wire [DATA_WIDTH-1:0] buff_a_out_frame, buff_b_out_frame, buff_c_out_frame;
+    // stage 1 : compute conv_x and conv_y for each pixel in the beat
 
-ROW_BUFF #(PIXELS_PER_BEAT,8,IMAGE_DIM) buff_a (clk,aresetn,buff_a_read_en&~stall,buff_a_write_en,inp_frame,buff_a_out_frame);
-ROW_BUFF #(PIXELS_PER_BEAT,8,IMAGE_DIM) buff_b (clk,aresetn,buff_b_read_en&~stall,buff_b_write_en,inp_frame,buff_b_out_frame);
-ROW_BUFF #(PIXELS_PER_BEAT,8,IMAGE_DIM) buff_c (clk,aresetn,buff_c_read_en&~stall,buff_c_write_en,inp_frame,buff_c_out_frame);
+    always @(posedge aclk) begin
+        if (~aresetn) begin
+            m_axis_tdata <= 0;
+            m_axis_tvalid <= 0;
+            m_axis_tlast <= 0;
 
-//DATAPATH
-reg [DATA_WIDTH-1:0] d_top, d_mid, d_bot;
+            row_ptr <= 0;
+            col_ptr <= 0;
 
-always @(*) begin
-    case(buff_counter)
-        0: begin
-            d_top = (row_counter < 2) ? 0 : buff_b_out_frame;
-            d_mid = (row_counter < 2) ? 0 : buff_c_out_frame;
-        end
-        1: begin
-            d_top = (row_counter < 2) ? 0 : buff_c_out_frame;
-            d_mid = (row_counter < 2) ? 0 : buff_a_out_frame;
-        end
-        2: begin
-            d_top = (row_counter < 2) ? 0 : buff_a_out_frame;
-            d_mid = (row_counter < 2) ? 0 : buff_b_out_frame;
-        end
-        default: begin
-            d_top = (row_counter < 2) ? 0 : buff_b_out_frame;
-            d_mid = (row_counter < 2) ? 0 : buff_c_out_frame;
-        end
-    endcase
-    d_bot = (row_counter < 2) ? 0 : inp_frame;
-end
+            buff_top_out <= 0;
+            buff_mid_out <= 0;
 
-reg signed [10:0] conv_sum_x[PIXELS_PER_BEAT-1:0]; // 10 bits because max sum can be 255*4=1020 which is 10 bits, signed because of negative values in sobel kernel
-reg signed [10:0] conv_sum_y[PIXELS_PER_BEAT-1:0];
-
-reg signed [21:0] conv_sum_x2[PIXELS_PER_BEAT-1:0]; // squared value of conv_sum_x, 22 bits because max value can be 1020^2 which is 21 bits plus sign bit
-reg signed [21:0] conv_sum_y2[PIXELS_PER_BEAT-1:0];
-
-reg signed [20:0] conv_sum[PIXELS_PER_BEAT-1:0]; // final conv sum for each pixel in beat, 21 bits as max value can be 1020^2+1020^2 which is 22 bits minus 1 because of sign bit
-
-
-wire [10:0] sobel_out[PIXELS_PER_BEAT-1:0]; 
-
-reg signed [10:0] conv_sum_part1_x, conv_sum_part2_x; //part1 -> sum of 1 row, part2 -> sum of 2 rows
-reg signed [10:0] conv_sum_part1_y, conv_sum_part2_y; //part1 -> sum of 1 row, part2 -> sum of 2 rows
-
-// -1  0  1      1  2  1 
-// -2  0  2      0  0  0
-// -1  0  1     -1 -2 -1
-//   Gx             Gy
-// see these and follow the logic accordingly 
-
-//calculate 2 pairs of partial outputs and 2 complete outputs using previous partial sums
-always @(posedge clk) begin
-    if(~aresetn) begin
-        conv_sum_part1_x <= 0;
-        conv_sum_part2_x <= 0;
-        conv_sum_part1_y <= 0;
-        conv_sum_part2_y <= 0;
-    end
-    else if(~stall) begin
-
-        //FOR SOBEL_X
-        // if col_counter is 0 then it means the window is not full and output should be 0
-        conv_sum_x[0] <= (col_counter==0) ? 0 : conv_sum_part2_x + d_top[(DATA_WIDTH-8)+:8]   + (d_mid[(DATA_WIDTH-8)+:8]<<1)  + d_bot[(DATA_WIDTH-8)+:8]; 
-        // computes conv sum of previous beat's p15 pixel using conv_sum_part2_x (appropriately weighted p14 and p15 of last beat) and current beat's p0 pixel
-        conv_sum_x[1] <= (col_counter==0) ? 0 : conv_sum_part1_x + d_top[(DATA_WIDTH-16)+:8]  + (d_mid[(DATA_WIDTH-16)+:8]<<1) + d_bot[(DATA_WIDTH-16)+:8];
-        // computes conv sum of this beat's p0 pixel using conv_sum_part1_x (appropriately weighted p15 of last beat) and current beat's p0 and p1 pixels
-        conv_sum_part1_x <= -d_top[0+:8] - (d_mid[0+:8]<<1) - d_bot[0+:8]; 
-        // partial sum for p0 pixel of next beat, uses current beat's p15 pixel
-        conv_sum_part2_x <= -d_top[8+:8] - (d_mid[8+:8]<<1) - d_bot[8+:8]; 
-        // partial sum for current beat's p15 pixel uses curent beat's p14 and (p15 is multiplied with 0) and gets used in next beat's cycle
-
-        //FOR SOBEL_Y
-        // if col_counter is 0 then it means the window is not full and output should be 0
-        conv_sum_y[0] <= (col_counter==0) ? 0 : conv_sum_part2_y - d_top[(DATA_WIDTH-8)+:8]       + d_bot[(DATA_WIDTH-8)+:8];
-        conv_sum_y[1] <= (col_counter==0) ? 0 : conv_sum_part1_y - d_top[(DATA_WIDTH-16)+:8]      + d_bot[(DATA_WIDTH-16)+:8]
-                                                                - (d_top[(DATA_WIDTH-8)+:8]<<1)  + (d_bot[(DATA_WIDTH-8)+:8]<<1);
-                                          
-        conv_sum_part1_y <= -d_top[0+:8] + d_bot[0+:8];
-        conv_sum_part2_y <= -d_top[8+:8] + d_bot[8+:8]
-                            -(d_top[0+:8]<<1) + (d_bot[0+:8]<<1);
-    
-    end
-end
-
-//calculate N-2 pairs of complete outputs
-genvar j;
-generate
-for(j=0; j<PIXELS_PER_BEAT-2; j=j+1) begin
-    always @(posedge clk) begin
-        if(~stall) begin
-            //next N-2 outputs are directly generated
-
-            //FOR SOBEL_X
-            conv_sum_x[PIXELS_PER_BEAT-1-j] <=   d_top[(8*j)+:8]      -  d_top[(8*j+16)+:8]     + 
-                                                (d_mid[(8*j)+:8]<<1)  - (d_mid[(8*j+16)+:8]<<1) + 
-                                                 d_bot[(8*j)+:8]      -  d_bot[(8*j+16)+:8]; 
-
-            //FOR SOBEL_Y
-            conv_sum_y[PIXELS_PER_BEAT-1-j] <=  -d_top[(8*j)+:8]     - (d_top[(8*j+8)+:8]<<1) -  d_top[(8*j+16)+:8] + 
-                                                 d_bot[(8*j)+:8]     + (d_bot[(8*j+8)+:8]<<1) +  d_bot[(8*j+16)+:8]; 
-        end
-    end      
-end
-endgenerate
-
-//calculate squared values of X and Y
-generate
-for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
-    // CORDIC calculates square root iteratively using shift-add operations, not multipliers.
-    cordic_0 sqrt(clk,~stall,1,conv_sum[j]>>1,,sobel_out[j]);
-    // right shift by 1 to divide by 2 because max value of conv_sum can be 1020^2+1020^2 which is 22 bits and our cordic can handle max 21 bits plus sign bit,
-    // also dividing by 2 does not affect the output as we will be doing thresholding later and threshold value can be adjusted accordingly
-    always @(posedge clk) begin
-        if(~stall) begin
-            conv_sum_x2[j] <= conv_sum_x[j]*conv_sum_x[j];
-            conv_sum_y2[j] <= conv_sum_y[j]*conv_sum_y[j];
-            conv_sum[j] <= conv_sum_x2[j]+conv_sum_y2[j];
-        end
-    end      
-end
-endgenerate
-
-// total 16 pixels will come as output from one beat, one conv output where window is centered at p15 of previous beat,
-// one using partial sum which is centered at p0 of this beat and 14 only from this beat without any partials and partials sent to next beat.
-
-//send final output
-generate
-for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
-    always @(posedge clk) begin
-        if(~stall) begin
-            out_frame[(DATA_WIDTH-8*(j+1))+:8] <= (sobel_out[j] > 8'hff) ? 8'hff : sobel_out[j][7:0]; // cutting off values above 255 to 255
-        end
-    end
-end
-endgenerate
-
-//CONTROL LOGIC
-always @(posedge clk) begin
-    if(~aresetn) begin
-        buff_counter <= 0;
-        col_counter  <= 0;
-        row_counter  <= 0;
-    end
-    else if(~stall) begin
-        //update counters at end of line
-        if(col_counter==COUNTER_MAX-1) begin
-            col_counter <= 0;
-            row_counter <= row_counter+1;
-            if(buff_counter == 2) 
-                buff_counter <= 0;
-            else 
-                buff_counter <= buff_counter+1;
+            last_top <= 0;
+            last_mid <= 0;
+            last_bot <= 0;
         end
         else begin
-            col_counter <= col_counter+1;
+            if (s_axis_tvalid && advance) begin
+            buff_top[col_ptr] <= buff_mid[col_ptr];
+            buff_mid[col_ptr] <= s_axis_tdata;
+
+            buff_top_out <= buff_top[col_ptr_next];
+            buff_mid_out <= buff_mid[col_ptr_next];
+
+            col_ptr <= col_ptr_next;
+            
+            if (col_ptr == BUFF_DEPTH - 1) begin
+                row_ptr <= (s_axis_tlast) ? 0 : row_ptr + 1;
+            end
+
+            // -1  0  1      1  2  1 
+            // -2  0  2      0  0  0
+            // -1  0  1     -1 -2 -1
+            //   Gx             Gy
+            
+            // centered around 15th pixel of previous beat
+            conv_sum_x[0] <= ((row_ptr <2 || col_ptr ==0) ) ? 0 : (-last_top[0+:PIXEL_SIZE] + buff_top_out[0+:PIXEL_SIZE] 
+                                                                -(last_mid[0+:PIXEL_SIZE]<<1) + (buff_mid_out[0+:PIXEL_SIZE]<<1)
+                                                                -last_bot[0+:PIXEL_SIZE] + s_axis_tdata[0+:PIXEL_SIZE]);
+            conv_sum_y[0] <= (row_ptr <2 || col_ptr ==0) ? 0 : (last_top[0+:PIXEL_SIZE] + (last_top[PIXEL_SIZE+:PIXEL_SIZE]<<1) + buff_top_out[0+:PIXEL_SIZE]
+                                                                -last_bot[0+:PIXEL_SIZE] - (last_bot[PIXEL_SIZE+:PIXEL_SIZE]<<1) - s_axis_tdata[0+:PIXEL_SIZE]);
+            
+            conv_sum_x[1] <= (row_ptr <2) ? 0 : (-last_top[PIXEL_SIZE+:PIXEL_SIZE] + buff_top_out[PIXEL_SIZE+:PIXEL_SIZE] 
+                                                                -(last_mid[PIXEL_SIZE+:PIXEL_SIZE]<<1) + (buff_mid_out[PIXEL_SIZE+:PIXEL_SIZE]<<1)
+                                                                -last_bot[PIXEL_SIZE+:PIXEL_SIZE] + s_axis_tdata[PIXEL_SIZE+:PIXEL_SIZE]);
+            conv_sum_y[1] <= (row_ptr <2) ? 0 : (last_top[PIXEL_SIZE+:PIXEL_SIZE] + (buff_top_out[0+:PIXEL_SIZE]<<1) + buff_top_out[PIXEL_SIZE+:PIXEL_SIZE]
+                                                                -last_bot[PIXEL_SIZE+:PIXEL_SIZE] - (s_axis_tdata[0+:PIXEL_SIZE]<<1) - s_axis_tdata[PIXEL_SIZE+:PIXEL_SIZE]);
+            for(i=2; i<PIXELS_PER_BEAT; i=i+1) begin
+                conv_sum_x[i] <= (row_ptr <2) ? 0 : (-buff_top_out[(i-2)*PIXEL_SIZE+:PIXEL_SIZE] + buff_top_out[i*PIXEL_SIZE+:PIXEL_SIZE] 
+                                                    -(buff_mid_out[(i-2)*PIXEL_SIZE+:PIXEL_SIZE]<<1) + (buff_mid_out[i*PIXEL_SIZE+:PIXEL_SIZE]<<1)
+                                                    - s_axis_tdata[(i-2)*PIXEL_SIZE+:PIXEL_SIZE] + s_axis_tdata[i*PIXEL_SIZE+:PIXEL_SIZE]);
+                conv_sum_y[i] <= (row_ptr <2) ? 0 : (buff_top_out[(i-2)*PIXEL_SIZE+:PIXEL_SIZE] + (buff_top_out[(i-1)*PIXEL_SIZE+:PIXEL_SIZE]<<1) + buff_top_out[i*PIXEL_SIZE+:PIXEL_SIZE]
+                                                    - s_axis_tdata[(i-2)*PIXEL_SIZE+:PIXEL_SIZE] - (s_axis_tdata[(i-1)*PIXEL_SIZE+:PIXEL_SIZE]<<1) - s_axis_tdata[i*PIXEL_SIZE+:PIXEL_SIZE]);
+            end
+            last_top <= buff_top_out[DATA_WIDTH-2*PIXEL_SIZE+:2*PIXEL_SIZE];
+            last_mid <= buff_mid_out[DATA_WIDTH-2*PIXEL_SIZE+:2*PIXEL_SIZE];
+            last_bot <= s_axis_tdata[DATA_WIDTH-2*PIXEL_SIZE+:2*PIXEL_SIZE];
+            end
         end
+    end
+
+    // stage 2: compute conv_sum_x^2, conv_sum_y^2
+
+    genvar j;
+    generate
+    for (j=0; j<PIXELS_PER_BEAT; j=j+1) begin
+        always @(posedge aclk) begin
+            if(advance) begin
+            conv_sum_x2[j] <= conv_sum_x[j] * conv_sum_x[j];
+            conv_sum_y2[j] <= conv_sum_y[j] * conv_sum_y[j];
+            end
+        end
+    end
+    endgenerate
+
+reg valid_s1, valid_s2, valid_s3;
+
+always @(posedge aclk) begin
+    if (!aresetn) begin
+        valid_s1 <= 0;
+        valid_s2 <= 0;
+        valid_s3 <= 0;
+    end else if(advance) begin
+        valid_s1 <= s_axis_tvalid && s_axis_tready;
+        valid_s2 <= valid_s1;
+        valid_s3 <= valid_s2;
     end
 end
 
 
-endmodule
 
-// 0 1 2
-// 40 41 42
-//80 81 82
+// stage 3: compute conv_sum and feed to CORDIC
+
+reg [21:0] conv_sum_reg[PIXELS_PER_BEAT-1:0];
+
+wire [10:0] sobel_out_wire[PIXELS_PER_BEAT-1:0];
+wire [PIXELS_PER_BEAT-1:0] cordic_valid_out;
+
+genvar k;
+generate
+for (k=0; k<PIXELS_PER_BEAT; k=k+1) begin : STAGE3
+
+    always @(posedge aclk) begin
+        if (advance) begin
+        conv_sum_reg[k] <= conv_sum_x2[k] + conv_sum_y2[k];
+        end
+    end
+
+    // CORDIC instance (FIXED)
+    cordic_0 sqrt_inst (
+        .aclk(aclk),
+        .aclken(advance),
+        .s_axis_cartesian_tvalid(valid_s3),
+        .s_axis_cartesian_tdata(conv_sum_reg[k] >> 1),
+
+        .m_axis_dout_tvalid(cordic_valid_out[k]),
+        .m_axis_dout_tdata(sobel_out_wire[k])
+    );
+
+end
+endgenerate
+
+    // stage 4: assign output data, saturate to 255 if value is greater than 255
+
+    generate
+    for (j=0; j<PIXELS_PER_BEAT; j=j+1) begin
+        always @(posedge aclk) begin
+            if(advance) begin
+            m_axis_tdata[j*PIXEL_SIZE+:PIXEL_SIZE] <= (sobel_out_wire[j] > 255) ? 255 : sobel_out_wire[j][7:0];
+            end
+        end
+    end
+    endgenerate
+
+
+always @(posedge aclk) begin
+    if (!aresetn) begin
+        m_axis_tvalid <= 0;
+    end 
+    else if (advance) begin
+        m_axis_tvalid <= cordic_valid_out[0];
+    end
+end
+localparam TOTAL_LATENCY = 16; // actually 17
+
+reg [TOTAL_LATENCY-1:0] tlast_pipe;
+
+wire safe_tlast;
+assign safe_tlast = (s_axis_tvalid && s_axis_tready && (s_axis_tlast === 1'b1));
+
+always @(posedge aclk) begin
+    if (!aresetn)
+        tlast_pipe <= {TOTAL_LATENCY{1'b0}};
+    else if (advance)
+        tlast_pipe <= {tlast_pipe[TOTAL_LATENCY-2:0],safe_tlast
+        };
+end
+
+always @(posedge aclk) begin
+    if (!aresetn)
+        m_axis_tlast <= 1'b0;
+    else if (advance)
+        m_axis_tlast <= tlast_pipe[TOTAL_LATENCY-1];
+end
+
+assign s_axis_tready = advance;
+
+    endmodule

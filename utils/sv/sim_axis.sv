@@ -43,7 +43,7 @@ class axis_driver #(parameter DATA_WIDTH = 128);
         forever begin
             @(posedge vif.clk);
             if(!vif.tvalid || vif.tready) begin // if interface is ready
-                if ($urandom_range(0, 9) < 7) begin // 70% chance to send data
+                if ($urandom_range(0, 9) <7) begin // 70% chance to send data
                     if(gen2drv.try_get(transaction)) begin
                         vif.tvalid <= 1;
                         vif.tdata <= transaction.tdata;
