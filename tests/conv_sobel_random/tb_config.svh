@@ -5,4 +5,4 @@
 `define M_AXIS_DATA_WIDTH  128
 
 `define S_AXIS_TOTAL_BEATS 16384
-`define M_AXIS_TOTAL_BEATS 16408   // includes latency padding
+`define M_AXIS_TOTAL_BEATS 16384
