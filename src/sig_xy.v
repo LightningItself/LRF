@@ -1,0 +1,73 @@
+`timescale 1ns/10ps
+
+module SIG_XY #(
+    parameter PIXELS_PER_BEAT = 16,
+    parameter IMAGE_DIM = 512,
+    parameter DATA_WIDTH = 8*PIXELS_PER_BEAT
+)(
+    input clk,
+    input aresetn,
+    input stall,
+    input [DATA_WIDTH-1:0] in_x,
+    input [DATA_WIDTH-1:0] in_y,
+    output reg signed [2*DATA_WIDTH-1:0] out
+);
+
+
+// mean-x and mean-y calculation
+wire [DATA_WIDTH-1:0] mu_x, mu_y;
+
+CONV_GAUSS #(PIXELS_PER_BEAT, 8, IMAGE_DIM) mean_x (clk, aresetn, stall, in_x, mu_x);
+CONV_GAUSS #(PIXELS_PER_BEAT, 8, IMAGE_DIM) mean_y (clk, aresetn, stall, in_y, mu_y);
+
+
+// multiply x and y
+reg [2*DATA_WIDTH-1:0] mult_xy, mu_x_mu_y;
+
+genvar j;
+generate
+for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
+    always @(posedge clk) begin
+        if(~stall) begin
+            mult_xy[j*16 +:16] <= in_x[j*8 +:8] * in_y[j*8 +:8];
+            mu_x_mu_y[j*16 +:16] <= mu_x[j*8 +:8] * mu_y[j*8 +:8];
+        end
+    end      
+end
+endgenerate
+
+localparam CONV_GAUSS_INPUT_WIDTH = 16;  // XY bit width is 16
+
+wire [CONV_GAUSS_INPUT_WIDTH*PIXELS_PER_BEAT-1:0] out_gauss_xy;
+
+// mult_xy have 1 clock cycle latency, so if we didnot delay the reset for gauss_xy, then for the first cycle it takes junk beat 
+// in first line buffer as mult_xy is not valid for the first cycle, which will inturn currupt the sliding window conv outputs. 
+// So we delay the reset until the mult_xy is valid that is delaying for 1 cycle
+
+reg aresetn_d1;
+always @(posedge clk) begin
+    if(~stall)
+        aresetn_d1 <= aresetn;
+end
+CONV_GAUSS #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) gauss_xy (clk, aresetn_d1, stall, mult_xy, out_gauss_xy);
+
+// difference
+generate
+for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
+    always @(posedge clk) begin
+        if(~stall) begin
+            out[j*16 +:16] <= out_gauss_xy[j*16 +:16] - mu_x_mu_y[j*16 +:16];
+        end
+    end      
+end
+endgenerate
+
+endmodule
+
+// Mean path (μxμy)
+// Total μxμy latency = 2 + 1 = 3 cycles
+// E[XY] path
+// Total latency = 1 + 2 = 3 cycles
+// Subtraction stage: we have 1 cycle
+// Total pipeline delay: Input → Output delay = 4 clock cycles latency in steady state (4 stage pipelined)
+// The delayed reset does NOT change the steady-state output latency, it is just used to make sure no garbage mult_xy enters the gauss_xy

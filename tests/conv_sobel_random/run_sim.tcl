@@ -38,7 +38,7 @@ if {$has_pythonpath} { set env(PYTHONPATH) $saved_pythonpath }
 # PROJECT (Note: Replace with your actual part number if different)
 # -----------------------------
 puts "Generating Vivado project..."
-create_project -force sim_project ${WORKSPACE_DIR}/sim_project -part xc7a100tcsg324-1
+create_project -force sim_project ${WORKSPACE_DIR}/sim_project -part xc7z010clg225-1
 
 # -----------------------------
 # ADD CORDIC IP (Using IMPORT to keep .gen in Workspace)
