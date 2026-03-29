@@ -26,7 +26,9 @@ module CONV_SOBEL #(
 
     localparam COL_PTR_WIDTH = $clog2(BUFF_DEPTH);
 
-    reg [15:0] row_ptr;
+    localparam ROW_PTR_WIDTH = $clog2(IMAGE_WIDTH);
+    reg [ROW_PTR_WIDTH-1:0] row_ptr;
+    
     reg [COL_PTR_WIDTH-1:0] col_ptr;
     wire [COL_PTR_WIDTH-1:0] col_ptr_next = col_ptr + 1;
 
@@ -40,11 +42,15 @@ module CONV_SOBEL #(
     reg [DATA_WIDTH-1:0] buff_top_out;
     reg [DATA_WIDTH-1:0] buff_mid_out;
 
-    reg signed [10:0] conv_sum_x[PIXELS_PER_BEAT-1:0];
-    reg signed [10:0] conv_sum_y[PIXELS_PER_BEAT-1:0];
+    localparam CONV_SUM_WIDTH = PIXEL_SIZE + 3; // including sign bit
 
-    reg signed [21:0] conv_sum_x2[PIXELS_PER_BEAT-1:0];
-    reg signed [21:0] conv_sum_y2[PIXELS_PER_BEAT-1:0];
+    reg signed [CONV_SUM_WIDTH-1:0] conv_sum_x[PIXELS_PER_BEAT-1:0];
+    reg signed [CONV_SUM_WIDTH-1:0] conv_sum_y[PIXELS_PER_BEAT-1:0];
+
+    localparam SQ_WIDTH = 2*(PIXEL_SIZE + 2); 
+
+    reg [SQ_WIDTH-1:0] conv_sum_x2[PIXELS_PER_BEAT-1:0];
+    reg [SQ_WIDTH-1:0] conv_sum_y2[PIXELS_PER_BEAT-1:0];
 
     wire advance;
 
@@ -101,22 +107,22 @@ module CONV_SOBEL #(
                 
                 // centered around 15th pixel of previous beat
                 conv_sum_x[0] <= ((row_ptr <2 || col_ptr ==0) ) ? 0 : (-last_top[0+:PIXEL_SIZE] + buff_top_out[0+:PIXEL_SIZE] 
-                                 -(last_mid[0+:PIXEL_SIZE]<<1) + (buff_mid_out[0+:PIXEL_SIZE]<<1)
-                                 -last_bot[0+:PIXEL_SIZE] + s_axis_tdata[0+:PIXEL_SIZE]);
+                                                                        -(last_mid[0+:PIXEL_SIZE]<<1) + (buff_mid_out[0+:PIXEL_SIZE]<<1)
+                                                                        -last_bot[0+:PIXEL_SIZE] + s_axis_tdata[0+:PIXEL_SIZE]);
                 conv_sum_y[0] <= (row_ptr <2 || col_ptr ==0) ? 0 : (last_top[0+:PIXEL_SIZE] + (last_top[PIXEL_SIZE+:PIXEL_SIZE]<<1) + buff_top_out[0+:PIXEL_SIZE]
-                                 -last_bot[0+:PIXEL_SIZE] - (last_bot[PIXEL_SIZE+:PIXEL_SIZE]<<1) - s_axis_tdata[0+:PIXEL_SIZE]);
+                                                                    -last_bot[0+:PIXEL_SIZE] - (last_bot[PIXEL_SIZE+:PIXEL_SIZE]<<1) - s_axis_tdata[0+:PIXEL_SIZE]);
                 
-                conv_sum_x[1] <= (row_ptr <2) ? 0 : (-last_top[PIXEL_SIZE+:PIXEL_SIZE] + buff_top_out[PIXEL_SIZE+:PIXEL_SIZE] 
-                                 -(last_mid[PIXEL_SIZE+:PIXEL_SIZE]<<1) + (buff_mid_out[PIXEL_SIZE+:PIXEL_SIZE]<<1)
-                                 -last_bot[PIXEL_SIZE+:PIXEL_SIZE] + s_axis_tdata[PIXEL_SIZE+:PIXEL_SIZE]);
-                conv_sum_y[1] <= (row_ptr <2) ? 0 : (last_top[PIXEL_SIZE+:PIXEL_SIZE] + (buff_top_out[0+:PIXEL_SIZE]<<1) + buff_top_out[PIXEL_SIZE+:PIXEL_SIZE]
-                                 -last_bot[PIXEL_SIZE+:PIXEL_SIZE] - (s_axis_tdata[0+:PIXEL_SIZE]<<1) - s_axis_tdata[PIXEL_SIZE+:PIXEL_SIZE]);
+                conv_sum_x[1] <= (row_ptr <2 || col_ptr ==0) ? 0 : (-last_top[PIXEL_SIZE+:PIXEL_SIZE] + buff_top_out[PIXEL_SIZE+:PIXEL_SIZE] 
+                                                                    -(last_mid[PIXEL_SIZE+:PIXEL_SIZE]<<1) + (buff_mid_out[PIXEL_SIZE+:PIXEL_SIZE]<<1)
+                                                                    -last_bot[PIXEL_SIZE+:PIXEL_SIZE] + s_axis_tdata[PIXEL_SIZE+:PIXEL_SIZE]);
+                conv_sum_y[1] <= (row_ptr <2 || col_ptr ==0) ? 0 : (last_top[PIXEL_SIZE+:PIXEL_SIZE] + (buff_top_out[0+:PIXEL_SIZE]<<1) + buff_top_out[PIXEL_SIZE+:PIXEL_SIZE]
+                                                                    -last_bot[PIXEL_SIZE+:PIXEL_SIZE] - (s_axis_tdata[0+:PIXEL_SIZE]<<1) - s_axis_tdata[PIXEL_SIZE+:PIXEL_SIZE]);
                 for(i=2; i<PIXELS_PER_BEAT; i=i+1) begin
                     conv_sum_x[i] <= (row_ptr <2) ? 0 : (-buff_top_out[(i-2)*PIXEL_SIZE+:PIXEL_SIZE] + buff_top_out[i*PIXEL_SIZE+:PIXEL_SIZE] 
-                                     -(buff_mid_out[(i-2)*PIXEL_SIZE+:PIXEL_SIZE]<<1) + (buff_mid_out[i*PIXEL_SIZE+:PIXEL_SIZE]<<1)
-                                     - s_axis_tdata[(i-2)*PIXEL_SIZE+:PIXEL_SIZE] + s_axis_tdata[i*PIXEL_SIZE+:PIXEL_SIZE]);
+                                                            -(buff_mid_out[(i-2)*PIXEL_SIZE+:PIXEL_SIZE]<<1) + (buff_mid_out[i*PIXEL_SIZE+:PIXEL_SIZE]<<1)
+                                                            - s_axis_tdata[(i-2)*PIXEL_SIZE+:PIXEL_SIZE] + s_axis_tdata[i*PIXEL_SIZE+:PIXEL_SIZE]);
                     conv_sum_y[i] <= (row_ptr <2) ? 0 : (buff_top_out[(i-2)*PIXEL_SIZE+:PIXEL_SIZE] + (buff_top_out[(i-1)*PIXEL_SIZE+:PIXEL_SIZE]<<1) + buff_top_out[i*PIXEL_SIZE+:PIXEL_SIZE]
-                                     - s_axis_tdata[(i-2)*PIXEL_SIZE+:PIXEL_SIZE] - (s_axis_tdata[(i-1)*PIXEL_SIZE+:PIXEL_SIZE]<<1) - s_axis_tdata[i*PIXEL_SIZE+:PIXEL_SIZE]);
+                                                        - s_axis_tdata[(i-2)*PIXEL_SIZE+:PIXEL_SIZE] - (s_axis_tdata[(i-1)*PIXEL_SIZE+:PIXEL_SIZE]<<1) - s_axis_tdata[i*PIXEL_SIZE+:PIXEL_SIZE]);
                 end
                 last_top <= buff_top_out[DATA_WIDTH-2*PIXEL_SIZE+:2*PIXEL_SIZE];
                 last_mid <= buff_mid_out[DATA_WIDTH-2*PIXEL_SIZE+:2*PIXEL_SIZE];
@@ -157,7 +163,8 @@ module CONV_SOBEL #(
 
     // stage 3: compute conv_sum and feed to CORDIC
 
-    reg [21:0] conv_sum_reg[PIXELS_PER_BEAT-1:0];
+    localparam SUM_WIDTH = SQ_WIDTH + 1;
+    reg [SUM_WIDTH-1:0] conv_sum_reg[PIXELS_PER_BEAT-1:0];
 
     wire [10:0] sobel_out_wire[PIXELS_PER_BEAT-1:0];
     wire [PIXELS_PER_BEAT-1:0] cordic_valid_out;
@@ -177,22 +184,22 @@ module CONV_SOBEL #(
                 .aclk(aclk),
                 .aclken(advance),
                 .s_axis_cartesian_tvalid(valid_s3),
-                .s_axis_cartesian_tdata(conv_sum_reg[k] >> 1),
+                .s_axis_cartesian_tdata(conv_sum_reg[k]),
 
                 .m_axis_dout_tvalid(cordic_valid_out[k]),
                 .m_axis_dout_tdata(sobel_out_wire[k])
-            );
+            ); // cordic will have a latency of 11 cycles
 
         end
     endgenerate
 
-    // stage 4: assign output data, saturate to 255 if value is greater than 255
+    // stage 4: assign output data, saturate
 
     generate
         for (j=0; j<PIXELS_PER_BEAT; j=j+1) begin
             always @(posedge aclk) begin
                 if(advance) begin
-                    m_axis_tdata[j*PIXEL_SIZE+:PIXEL_SIZE] <= (sobel_out_wire[j] > 255) ? 255 : sobel_out_wire[j][7:0];
+                    m_axis_tdata[j*PIXEL_SIZE+:PIXEL_SIZE] <= (sobel_out_wire[j] > (2**PIXEL_SIZE-1)) ? (2**PIXEL_SIZE-1) : sobel_out_wire[j][PIXEL_SIZE-1:0];
                 end
             end
         end
@@ -210,12 +217,12 @@ module CONV_SOBEL #(
     
     // logic for tlast
 
-    localparam TOTAL_LATENCY = 16; // actually 17, but for code purpose, i gave the value 16
+    localparam TOTAL_LATENCY = 14; // actually 15, but for tlast coding purpose, i gave the value 14
 
     reg [TOTAL_LATENCY-1:0] tlast_pipe;
 
     wire safe_tlast;
-    assign safe_tlast = (s_axis_tvalid && s_axis_tready && (s_axis_tlast === 1'b1));
+    assign safe_tlast = (s_axis_tvalid && s_axis_tready && s_axis_tlast);
 
     always @(posedge aclk) begin
         if (!aresetn)
