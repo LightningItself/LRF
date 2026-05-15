@@ -34,10 +34,13 @@ wire mult_y_ready2 = &mul2_y_ready;
 
 wire [DATA_WIDTH-1:0] mu_x, mu_y;
 wire mu_valid_x, mu_valid_y, mu_last_x, mu_last_y, conv_gauss_x_ready, conv_gauss_y_ready;
+wire mu_pair_valid = mu_valid_x & mu_valid_y;
 
-CONV_GAUSS #(PIXELS_PER_BEAT, PIXEL_SIZE, IMAGE_DIM) mean_x (aclk, aresetn, s_axis_tdata_x, s_axis_tvalid_x, conv_gauss_x_ready, s_axis_tlast_x, mu_x, mu_valid_x, (advance & mult_x_ready2), mu_last_x);
+wire pair_valid = s_axis_tvalid_x & s_axis_tvalid_y;
 
-CONV_GAUSS #(PIXELS_PER_BEAT, PIXEL_SIZE, IMAGE_DIM) mean_y (aclk, aresetn, s_axis_tdata_y, s_axis_tvalid_y, conv_gauss_y_ready, s_axis_tlast_y, mu_y, mu_valid_y, (advance & mult_y_ready2), mu_last_y);
+CONV_GAUSS #(PIXELS_PER_BEAT, PIXEL_SIZE, IMAGE_DIM) mean_x (aclk, aresetn, s_axis_tdata_x, pair_valid, conv_gauss_x_ready, s_axis_tlast_x, mu_x, mu_valid_x, (advance & mult_x_ready2), mu_last_x);
+
+CONV_GAUSS #(PIXELS_PER_BEAT, PIXEL_SIZE, IMAGE_DIM) mean_y (aclk, aresetn, s_axis_tdata_y, pair_valid, conv_gauss_y_ready, s_axis_tlast_y, mu_y, mu_valid_y, (advance & mult_y_ready2), mu_last_y);
 
 // ----end of mean-x and mean-y calculation------
 
@@ -56,11 +59,11 @@ generate
             .aclk(aclk),
             .aresetn(aresetn),
             .s_axis_tdata_x(s_axis_tdata_x[j*PIXEL_SIZE +:PIXEL_SIZE]),
-            .s_axis_tvalid_x(s_axis_tvalid_x),
+            .s_axis_tvalid_x(pair_valid),
             .s_axis_tready_x(mul1_x_ready[j]),
             .s_axis_tlast_x(s_axis_tlast_x),
             .s_axis_tdata_y(s_axis_tdata_y[j*PIXEL_SIZE +:PIXEL_SIZE]),
-            .s_axis_tvalid_y(s_axis_tvalid_y),
+            .s_axis_tvalid_y(pair_valid),
             .s_axis_tready_y(mul1_y_ready[j]),
             .s_axis_tlast_y(s_axis_tlast_y),
             .m_axis_tdata(mult_xy[j*2*PIXEL_SIZE +: 2*PIXEL_SIZE]),
@@ -93,11 +96,11 @@ generate
             .aclk(aclk),
             .aresetn(aresetn),
             .s_axis_tdata_x(mu_x[k*PIXEL_SIZE +:PIXEL_SIZE]),
-            .s_axis_tvalid_x(mu_valid_x),
+            .s_axis_tvalid_x(mu_pair_valid),
             .s_axis_tready_x(mul2_x_ready[k]),
             .s_axis_tlast_x(mu_last_x),
             .s_axis_tdata_y(mu_y[k*PIXEL_SIZE +:PIXEL_SIZE]),
-            .s_axis_tvalid_y(mu_valid_y),
+            .s_axis_tvalid_y(mu_pair_valid),
             .s_axis_tready_y(mul2_y_ready[k]),
             .s_axis_tlast_y(mu_last_y),
             .m_axis_tdata(mu_x_mu_y[k*2*PIXEL_SIZE +: 2*PIXEL_SIZE]),
@@ -135,7 +138,7 @@ always @(posedge aclk) begin
             m_axis_tdata[i*2*PIXEL_SIZE +:2*PIXEL_SIZE] <= $signed(out_gauss_xy[i*2*PIXEL_SIZE +:2*PIXEL_SIZE]) - $signed(mu_x_mu_y[i*2*PIXEL_SIZE +:2*PIXEL_SIZE]);
         end
     end
-end      
+end     
 
 always @(posedge aclk) begin
     if (~aresetn) begin
@@ -150,7 +153,7 @@ end
 
 // ---end of difference---
 
-assign s_axis_tready_x = conv_gauss_x_ready & advance & mult_x_ready1;
-assign s_axis_tready_y = conv_gauss_y_ready & advance & mult_y_ready1;
+assign s_axis_tready_x = conv_gauss_x_ready & conv_gauss_y_ready & mult_x_ready1 & mult_y_ready1 & advance & s_axis_tvalid_y;
+assign s_axis_tready_y = conv_gauss_x_ready & conv_gauss_y_ready & mult_x_ready1 & mult_y_ready1 & advance & s_axis_tvalid_x;
 
 endmodule
