@@ -44,7 +44,7 @@ always@(posedge aclk) begin
     end
 end
 
-assign s_axis_tready_x = m_axis_tready || !m_axis_tvalid;
-assign s_axis_tready_y = m_axis_tready || !m_axis_tvalid;
+assign s_axis_tready_x = s_axis_tvalid_y && (m_axis_tready || !m_axis_tvalid);
+assign s_axis_tready_y = s_axis_tvalid_x && (m_axis_tready || !m_axis_tvalid);
 
 endmodule     

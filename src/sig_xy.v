@@ -50,7 +50,7 @@ wire [PIXELS_PER_BEAT-1:0] mul1_y_ready;
 genvar j;
 generate
     for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
-        MULTIPLIER mult1 #(.DATA_WIDTH(PIXEL_SIZE))(
+        MULTIPLIER #(.DATA_WIDTH(PIXEL_SIZE)) mult1 (
             .aclk(aclk),
             .aresetn(aresetn),
             .s_axis_tdata_x(s_axis_tdata_x[j*PIXEL_SIZE +:PIXEL_SIZE]),
@@ -87,7 +87,7 @@ wire [PIXELS_PER_BEAT-1:0] mul2_y_ready;
 genvar k;
 generate
     for (k=0; k<PIXELS_PER_BEAT; k=k+1) begin
-        MULTIPLIER mult2 #(.DATA_WIDTH(PIXEL_SIZE))(
+        MULTIPLIER #(.DATA_WIDTH(PIXEL_SIZE)) mult2 (
             .aclk(aclk),
             .aresetn(aresetn),
             .s_axis_tdata_x(mu_x[k*PIXEL_SIZE +:PIXEL_SIZE]),
@@ -124,14 +124,15 @@ CONV_GAUSS #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) gauss_xy (aclk,
 // ----end of gauss(xy) calculation------
 
 // ---difference---
+integer i;
 
 always @(posedge aclk) begin
     if (~aresetn) begin
         m_axis_tdata <= 0;
     end
     else if(advance & out_gauss_xy_valid & mu_x_mu_y_valid) begin
-        for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
-            m_axis_tdata[j*2*PIXEL_SIZE +:2*PIXEL_SIZE] <= $signed(out_gauss_xy[j*2*PIXEL_SIZE +:2*PIXEL_SIZE]) - $signed(mu_x_mu_y[j*2*PIXEL_SIZE +:2*PIXEL_SIZE]);
+        for(i=0; i<PIXELS_PER_BEAT; i=i+1) begin
+            m_axis_tdata[i*2*PIXEL_SIZE +:2*PIXEL_SIZE] <= $signed(out_gauss_xy[i*2*PIXEL_SIZE +:2*PIXEL_SIZE]) - $signed(mu_x_mu_y[i*2*PIXEL_SIZE +:2*PIXEL_SIZE]);
         end
     end
 end      
