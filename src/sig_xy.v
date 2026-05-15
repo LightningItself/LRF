@@ -27,6 +27,8 @@ module SIG_XY #(
 
 wire gauss_xy_ready;
 wire advance = (m_axis_tready || !m_axis_tvalid);
+wire mult_x_ready2 = &mul2_x_ready;
+wire mult_y_ready2 = &mul2_y_ready;
 
 // ----mean-x and mean-y calculation------
 
@@ -106,8 +108,6 @@ generate
     end
 endgenerate
 
-wire mult_x_ready2 = &mul2_x_ready;
-wire mult_y_ready2 = &mul2_y_ready;
 wire mu_x_mu_y_valid = &mu_x_mu_y_val;
 wire mu_x_mu_y_last  = &mu_x_mu_y_la;
 
