@@ -67,8 +67,8 @@ if {[file exists ${UTILS_SV_DIR}/sim_axis.sv]} {
     set_property file_type SystemVerilog [get_files ${UTILS_SV_DIR}/sim_axis.sv]
 }
 
-add_files -fileset sim_1 ${TEST_DIR}/tb_axis_buff.sv
-set_property file_type SystemVerilog [get_files ${TEST_DIR}/tb_axis_buff.sv]
+add_files -fileset sim_1 ${TEST_DIR}/tb_conv_sobel.sv
+set_property file_type SystemVerilog [get_files ${TEST_DIR}/tb_conv_sobel.sv]
 
 # Include the generated config from workspace
 add_files -fileset sim_1 ${WORKSPACE_DIR}/tb_config.svh
