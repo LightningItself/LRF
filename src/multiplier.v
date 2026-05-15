@@ -16,14 +16,14 @@ module MULTIPLIER #(
     output                 s_axis_tready_y,
     input                  s_axis_tlast_y,
     // AXIS interface for output
-    output reg signed [2*DATA_WIDTH-1:0] m_axis_tdata,
+    output reg [2*DATA_WIDTH-1:0] m_axis_tdata,
     output reg                  m_axis_tvalid,
     input                       m_axis_tready,
     output reg                  m_axis_tlast
 );
 
 wire pair_valid = s_axis_tvalid_x & s_axis_tvalid_y;
-wire pair_last = s_axis_tlast_x || s_axis_tlast_y;
+wire pair_last = s_axis_tlast_x & s_axis_tlast_y;
 
 always@(posedge aclk) begin
     if(!aresetn) begin
