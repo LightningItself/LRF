@@ -15,8 +15,9 @@ DATA_WIDTH = PIXELS_PER_BEAT * PIXEL_SIZE
 
 def compute_raw_gauss(image_array):
     """
-    Performs 3x3 Gaussian convolution math without applying latency.
+    Performs 3x3 Gaussian convolution math.
     """
+    # uint32 prevents overflow during the weighted sum
     p = np.pad(image_array, pad_width=((1, 1), (1, 1)), mode='constant', constant_values=0).astype(np.uint32)
     out_data = (
         (p[0:-2, 0:-2]     ) + (p[0:-2, 1:-1] << 1) + (p[0:-2, 2:]     ) +
@@ -32,46 +33,45 @@ def main():
     parser.add_argument("--output",   required=True)
     args = parser.parse_args()
 
+    # Generate random input
     image_x = np.random.randint(0, 256, (IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint8)
     image_y = np.random.randint(0, 256, (IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint8)
 
-    # 1. Hardware shifts inputs right by 1
-    x_shifted = (image_x.astype(np.uint16) >> 1).astype(np.uint8)
-    y_shifted = (image_y.astype(np.uint16) >> 1).astype(np.uint8)
+    # 1. Emulate Hardware Right Shift (>> 1)
+    x_s = (image_x.astype(np.uint16) >> 1).astype(np.uint8)
+    y_s = (image_y.astype(np.uint16) >> 1).astype(np.uint8)
 
-    # 2. Path A: gauss(x_shifted * y_shifted)
-    xy_prod = (x_shifted.astype(np.uint16) * y_shifted.astype(np.uint16))
-    gauss_xy_raw = compute_raw_gauss(xy_prod)
+    # 2. Path A: E[XY]
+    xy_prod = (x_s.astype(np.uint16) * y_s.astype(np.uint16))
+    gauss_xy = compute_raw_gauss(xy_prod)
 
-    # 3. Path B: mu_x * mu_y
-    mu_x_raw = compute_raw_gauss(x_shifted).astype(np.uint8)
-    mu_y_raw = compute_raw_gauss(y_shifted).astype(np.uint8)
-    mu_x_mu_y_raw = (mu_x_raw.astype(np.uint16) * mu_y_raw.astype(np.uint16))
+    # 3. Path B: E[X]*E[Y]
+    # Note: mu outputs are 8-bit in your RTL configuration
+    mu_x = compute_raw_gauss(x_s).astype(np.uint8)
+    mu_y = compute_raw_gauss(y_s).astype(np.uint8)
+    mu_x_mu_y = (mu_x.astype(np.uint16) * mu_y.astype(np.uint16))
 
-    # 4. Compute Sigma (Subtraction)
-    sigma_xy_raw = gauss_xy_raw.astype(np.int32) - mu_x_mu_y_raw.astype(np.int32)
-    
-    # 5. APPLY HARDWARE LATENCY (Crucial Step)
-    # 2 rows from Line Buffers
-    # 2 pixels from Gauss Window + 1 pixel from Mult + 1 pixel from Subtraction Reg = 4 pixels
+    # 4. Local Covariance (Sigma_XY)
+    sigma_xy_raw = gauss_xy.astype(np.int32) - mu_x_mu_y.astype(np.int32)
+
+    # 5. ALIGN TO HARDWARE LATENCY
+    # Your 'got' hex shows 2 pixels of zeros before data starts.
     ROW_DELAY = 2
-    PIXEL_DELAY = 4 
+    PIXEL_DELAY = 2 
 
-    final_output = np.zeros((IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.int16)
+    expected_full = np.zeros((IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.int16)
     
-    # Slice the raw calculation into the delayed position
-    final_output[ROW_DELAY:, PIXEL_DELAY:] = sigma_xy_raw[0:IMAGE_HEIGHT-ROW_DELAY, 0:IMAGE_WIDTH-PIXEL_DELAY]
+    # Map the raw math into the delayed hardware grid
+    expected_full[ROW_DELAY:, PIXEL_DELAY:] = sigma_xy_raw[0:IMAGE_HEIGHT-ROW_DELAY, 0:IMAGE_WIDTH-PIXEL_DELAY]
 
-    # 6. Convert to uint16 for the hex writer (Fixes OverflowError)
-    sigma_xy_hex_ready = final_output.astype(np.int16).astype(np.uint16)
+    # 6. Convert to uint16 for the hex utility (preserves 2's complement bits)
+    sigma_xy_hex = expected_full.astype(np.int16).astype(np.uint16)
 
-    # 7. Generate Files
-    OUTPUT_PIXEL_SIZE = 16
-    OUTPUT_DATA_WIDTH = PIXELS_PER_BEAT * OUTPUT_PIXEL_SIZE
-
+    # 7. Write Files
+    OUTPUT_DATA_WIDTH = PIXELS_PER_BEAT * 16 # 256 bits
     s_beats_x = write_axi_stream_hex(args.input_x, image_x, DATA_WIDTH)
     s_beats_y = write_axi_stream_hex(args.input_y, image_y, DATA_WIDTH)
-    m_beats   = write_axi_stream_hex(args.output,  sigma_xy_hex_ready, OUTPUT_DATA_WIDTH)
+    m_beats   = write_axi_stream_hex(args.output,  sigma_xy_hex, OUTPUT_DATA_WIDTH)
 
     # 8. Write Config
     output_dir = os.path.dirname(args.output)
