@@ -48,6 +48,8 @@ create_project -force sim_project ${WORKSPACE_DIR}/sim_project
 add_files -fileset sources_1 [file normalize ${SRC_DIR}/multiplier.v]
 add_files -fileset sources_1 [file normalize ${SRC_DIR}/conv_gauss.v]
 add_files -fileset sources_1 [file normalize ${SRC_DIR}/sig_xy.v]
+add_files -fileset sources_1 [file normalize ${SRC_DIR}/axis_sub.v]
+
 
 # Ensure the hierarchy is updated
 update_compile_order -fileset sources_1

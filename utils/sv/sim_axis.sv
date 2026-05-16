@@ -160,116 +160,290 @@ endclass
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ─────────────────────────────────────────────────────────────────────────────
-
-class axis_sim_dual #(
-    parameter S_AXIS_DATA_WIDTH  = 128,
-    parameter M_AXIS_DATA_WIDTH  = 256,
-    parameter S_AXIS_TOTAL_BEATS = 32032,
-    parameter M_AXIS_TOTAL_BEATS = 32032
+class axis_input_agent #(
+    parameter int NUM_AXIS = 1,
+    parameter int DATA_WIDTH = 128
 );
-    // Two drivers, one monitor
-    axis_driver  #(S_AXIS_DATA_WIDTH) drv_x;
-    axis_driver  #(S_AXIS_DATA_WIDTH) drv_y;
-    axis_monitor #(M_AXIS_DATA_WIDTH) mon;
+    axis_driver #(DATA_WIDTH) drv [NUM_AXIS];
+    mailbox gen2drv [NUM_AXIS];
 
-    // Mailboxes
-    mailbox gen2drv_x;
-    mailbox gen2drv_y;
-    mailbox mon2scb;
+    virtual axis_if #(DATA_WIDTH) vif [NUM_AXIS];
 
-    // Virtual interfaces
-    virtual axis_if #(S_AXIS_DATA_WIDTH) s_vif_x;
-    virtual axis_if #(S_AXIS_DATA_WIDTH) s_vif_y;
-    virtual axis_if #(M_AXIS_DATA_WIDTH) m_vif;
+    function new(virtual axis_if #(DATA_WIDTH) axis_vif [NUM_AXIS]);
+        foreach (drv[i]) begin
+            vif[i] = axis_vif[i];
+            gen2drv[i] = new();
+            drv[i] = new(vif[i], gen2drv[i]);
+        end
+    endfunction
+
+    task run();
+        foreach (drv[i]) begin
+            automatic int axis_idx = i;
+            fork
+                drv[axis_idx].run();
+            join_none
+        end
+    endtask
+
+    task load_file(int axis_idx, string file_name, int total_beats);
+        logic [DATA_WIDTH-1:0] input_data [];
+        axis_transaction #(DATA_WIDTH) transaction;
+
+        if (axis_idx < 0 || axis_idx >= NUM_AXIS) begin
+            $display("[AXIS INPUT] Invalid axis index %0d. NUM_AXIS=%0d", axis_idx, NUM_AXIS);
+            return;
+        end
+
+        input_data = new[total_beats];
+
+        $display("[AXIS INPUT %0d] Loading input file: %s", axis_idx, file_name);
+        $readmemh(file_name, input_data);
+
+        for (int i = 0; i < total_beats; i++) begin
+            transaction = new(input_data[i], (i == total_beats - 1));
+            gen2drv[axis_idx].put(transaction);
+        end
+    endtask
+
+    task load_files(string file_names [NUM_AXIS], int total_beats [NUM_AXIS]);
+        for (int i = 0; i < NUM_AXIS; i++) begin
+            load_file(i, file_names[i], total_beats[i]);
+        end
+    endtask
+endclass
+
+
+class axis_output_agent #(
+    parameter int NUM_AXIS = 1,
+    parameter int DATA_WIDTH = 128
+);
+    axis_monitor #(DATA_WIDTH) mon [NUM_AXIS];
+    mailbox mon2scb [NUM_AXIS];
+
+    virtual axis_if #(DATA_WIDTH) vif [NUM_AXIS];
 
     int errors = 0;
 
-    function new(
-        virtual axis_if #(S_AXIS_DATA_WIDTH) s_vif_x,
-        virtual axis_if #(S_AXIS_DATA_WIDTH) s_vif_y,
-        virtual axis_if #(M_AXIS_DATA_WIDTH) m_vif
-    );
-        this.s_vif_x = s_vif_x;
-        this.s_vif_y = s_vif_y;
-        this.m_vif   = m_vif;
-
-        gen2drv_x = new();
-        gen2drv_y = new();
-        mon2scb   = new();
-
-        drv_x = new(s_vif_x, gen2drv_x);
-        drv_y = new(s_vif_y, gen2drv_y);
-        mon   = new(m_vif,   mon2scb);
+    function new(virtual axis_if #(DATA_WIDTH) axis_vif [NUM_AXIS]);
+        foreach (mon[i]) begin
+            vif[i] = axis_vif[i];
+            mon2scb[i] = new();
+            mon[i] = new(vif[i], mon2scb[i]);
+        end
     endfunction
 
-    // Loads IN_FILE_NAME_X → gen2drv_x
-    task stimulus_x();
-        logic [S_AXIS_DATA_WIDTH-1:0] input_data [S_AXIS_TOTAL_BEATS-1:0];
-        axis_transaction #(S_AXIS_DATA_WIDTH) transaction;
-        string input_file_x = "inputs_x.hex";
-
-        $value$plusargs("IN_FILE_NAME_X=%s", input_file_x);
-        $display("[AXIS SIM DUAL] Loading X input file: %s", input_file_x);
-        $readmemh(input_file_x, input_data);
-
-        for (int i = 0; i < S_AXIS_TOTAL_BEATS; i++) begin
-            transaction = new(input_data[i], (i == S_AXIS_TOTAL_BEATS - 1));
-            gen2drv_x.put(transaction);
+    task run();
+        foreach (mon[i]) begin
+            automatic int axis_idx = i;
+            fork
+                mon[axis_idx].run();
+            join_none
         end
     endtask
 
-    // Loads IN_FILE_NAME_Y → gen2drv_y
-    task stimulus_y();
-        logic [S_AXIS_DATA_WIDTH-1:0] input_data [S_AXIS_TOTAL_BEATS-1:0];
-        axis_transaction #(S_AXIS_DATA_WIDTH) transaction;
-        string input_file_y = "inputs_y.hex";
+    task check_file(int axis_idx, string file_name, int total_beats);
+        logic [DATA_WIDTH-1:0] expected_data [];
+        axis_transaction #(DATA_WIDTH) transaction;
 
-        $value$plusargs("IN_FILE_NAME_Y=%s", input_file_y);
-        $display("[AXIS SIM DUAL] Loading Y input file: %s", input_file_y);
-        $readmemh(input_file_y, input_data);
-
-        for (int i = 0; i < S_AXIS_TOTAL_BEATS; i++) begin
-            transaction = new(input_data[i], (i == S_AXIS_TOTAL_BEATS - 1));
-            gen2drv_y.put(transaction);
+        if (axis_idx < 0 || axis_idx >= NUM_AXIS) begin
+            $display("[AXIS OUTPUT] Invalid axis index %0d. NUM_AXIS=%0d", axis_idx, NUM_AXIS);
+            errors++;
+            return;
         end
-    endtask
 
-    // Identical check logic to axis_sim — reads OUT_FILE_NAME, compares beat by beat
-    task check();
-        logic [M_AXIS_DATA_WIDTH-1:0] expected_data [M_AXIS_TOTAL_BEATS-1:0];
-        axis_transaction #(M_AXIS_DATA_WIDTH) transaction;
-        string output_file = "outputs.hex";
+        expected_data = new[total_beats];
 
-        $value$plusargs("OUT_FILE_NAME=%s", output_file);
-        $display("[AXIS SIM DUAL] Loading expected output file: %s", output_file);
-        $readmemh(output_file, expected_data);
+        $display("[AXIS OUTPUT %0d] Loading expected output file: %s", axis_idx, file_name);
+        $readmemh(file_name, expected_data);
 
-        for (int i = 0; i < M_AXIS_TOTAL_BEATS; i++) begin
-            mon2scb.get(transaction);
+        for (int i = 0; i < total_beats; i++) begin
+            mon2scb[axis_idx].get(transaction);
+
             if (transaction.tdata !== expected_data[i]) begin
-                $display("Mismatch at beat %0d: got %h, expected %h", i, transaction.tdata, expected_data[i]);
+                $display("[AXIS OUTPUT %0d] Mismatch at beat %0d: got %h, expected %h",
+                         axis_idx, i, transaction.tdata, expected_data[i]);
                 errors++;
             end else begin
-                $display("Match at beat %0d: got %h, expected %h", i, transaction.tdata, expected_data[i]);
+                $display("[AXIS OUTPUT %0d] Match at beat %0d: got %h, expected %h",
+                         axis_idx, i, transaction.tdata, expected_data[i]);
+            end
+
+            if (transaction.tlast !== (i == total_beats - 1)) begin
+                $display("[AXIS OUTPUT %0d] TLAST mismatch at beat %0d: got %b, expected %b",
+                         axis_idx, i, transaction.tlast, (i == total_beats - 1));
+                errors++;
             end
         end
     endtask
 
-    task run();
-        // Start both drivers and monitor in background — they loop forever
-        fork
-            drv_x.run();
-            drv_y.run();
-            mon.run();
-        join_none
-        // Feed stimuli for X and Y in parallel, wait for both to finish loading
-        // then wait for scoreboard check to complete
-        fork
-            stimulus_x();
-            stimulus_y();
-        join  // both hex files fully loaded into mailboxes before check starts
-        check();
-        $display("Errors Detected: %0d", errors);
+    task check_files(string file_names [NUM_AXIS], int total_beats [NUM_AXIS]);
+        for (int i = 0; i < NUM_AXIS; i++) begin
+            check_file(i, file_names[i], total_beats[i]);
+        end
+    endtask
+endclass
+
+
+class axis_sim_env #(
+    parameter int NUM_S_AXIS = 1,
+    parameter int NUM_M_AXIS = 1,
+    parameter int S_AXIS_DATA_WIDTH = 128,
+    parameter int M_AXIS_DATA_WIDTH = 128
+);
+    axis_input_agent #(
+        .NUM_AXIS(NUM_S_AXIS),
+        .DATA_WIDTH(S_AXIS_DATA_WIDTH)
+    ) input_agent;
+
+    axis_output_agent #(
+        .NUM_AXIS(NUM_M_AXIS),
+        .DATA_WIDTH(M_AXIS_DATA_WIDTH)
+    ) output_agent;
+
+    int errors = 0;
+
+    function new(
+        virtual axis_if #(S_AXIS_DATA_WIDTH) s_vif [NUM_S_AXIS],
+        virtual axis_if #(M_AXIS_DATA_WIDTH) m_vif [NUM_M_AXIS]
+    );
+        input_agent = new(s_vif);
+        output_agent = new(m_vif);
+    endfunction
+
+    task run_agents();
+        input_agent.run();
+        output_agent.run();
     endtask
 
+    task run(
+        string input_files [NUM_S_AXIS],
+        int input_total_beats [NUM_S_AXIS],
+        string output_files [NUM_M_AXIS],
+        int output_total_beats [NUM_M_AXIS]
+    );
+        run_agents();
+
+        input_agent.load_files(input_files, input_total_beats);
+        output_agent.check_files(output_files, output_total_beats);
+
+        errors = output_agent.errors;
+        $display("Errors Detected: %0d", errors);
+    endtask
 endclass
+
+
+
+
+// class axis_sim_dual #(
+//     parameter S_AXIS_DATA_WIDTH  = 128,
+//     parameter M_AXIS_DATA_WIDTH  = 256,
+//     parameter S_AXIS_TOTAL_BEATS = 32032,
+//     parameter M_AXIS_TOTAL_BEATS = 32032
+// );
+//     // Two drivers, one monitor
+//     axis_driver  #(S_AXIS_DATA_WIDTH) drv_x;
+//     axis_driver  #(S_AXIS_DATA_WIDTH) drv_y;
+//     axis_monitor #(M_AXIS_DATA_WIDTH) mon;
+
+//     // Mailboxes
+//     mailbox gen2drv_x;
+//     mailbox gen2drv_y;
+//     mailbox mon2scb;
+
+//     // Virtual interfaces
+//     virtual axis_if #(S_AXIS_DATA_WIDTH) s_vif_x;
+//     virtual axis_if #(S_AXIS_DATA_WIDTH) s_vif_y;
+//     virtual axis_if #(M_AXIS_DATA_WIDTH) m_vif;
+
+//     int errors = 0;
+
+//     function new(
+//         virtual axis_if #(S_AXIS_DATA_WIDTH) s_vif_x,
+//         virtual axis_if #(S_AXIS_DATA_WIDTH) s_vif_y,
+//         virtual axis_if #(M_AXIS_DATA_WIDTH) m_vif
+//     );
+//         this.s_vif_x = s_vif_x;
+//         this.s_vif_y = s_vif_y;
+//         this.m_vif   = m_vif;
+
+//         gen2drv_x = new();
+//         gen2drv_y = new();
+//         mon2scb   = new();
+
+//         drv_x = new(s_vif_x, gen2drv_x);
+//         drv_y = new(s_vif_y, gen2drv_y);
+//         mon   = new(m_vif,   mon2scb);
+//     endfunction
+
+//     // Loads IN_FILE_NAME_X → gen2drv_x
+//     task stimulus_x();
+//         logic [S_AXIS_DATA_WIDTH-1:0] input_data [S_AXIS_TOTAL_BEATS-1:0];
+//         axis_transaction #(S_AXIS_DATA_WIDTH) transaction;
+//         string input_file_x = "inputs_x.hex";
+
+//         $value$plusargs("IN_FILE_NAME_X=%s", input_file_x);
+//         $display("[AXIS SIM DUAL] Loading X input file: %s", input_file_x);
+//         $readmemh(input_file_x, input_data);
+
+//         for (int i = 0; i < S_AXIS_TOTAL_BEATS; i++) begin
+//             transaction = new(input_data[i], (i == S_AXIS_TOTAL_BEATS - 1));
+//             gen2drv_x.put(transaction);
+//         end
+//     endtask
+
+//     // Loads IN_FILE_NAME_Y → gen2drv_y
+//     task stimulus_y();
+//         logic [S_AXIS_DATA_WIDTH-1:0] input_data [S_AXIS_TOTAL_BEATS-1:0];
+//         axis_transaction #(S_AXIS_DATA_WIDTH) transaction;
+//         string input_file_y = "inputs_y.hex";
+
+//         $value$plusargs("IN_FILE_NAME_Y=%s", input_file_y);
+//         $display("[AXIS SIM DUAL] Loading Y input file: %s", input_file_y);
+//         $readmemh(input_file_y, input_data);
+
+//         for (int i = 0; i < S_AXIS_TOTAL_BEATS; i++) begin
+//             transaction = new(input_data[i], (i == S_AXIS_TOTAL_BEATS - 1));
+//             gen2drv_y.put(transaction);
+//         end
+//     endtask
+
+//     // Identical check logic to axis_sim — reads OUT_FILE_NAME, compares beat by beat
+//     task check();
+//         logic [M_AXIS_DATA_WIDTH-1:0] expected_data [M_AXIS_TOTAL_BEATS-1:0];
+//         axis_transaction #(M_AXIS_DATA_WIDTH) transaction;
+//         string output_file = "outputs.hex";
+
+//         $value$plusargs("OUT_FILE_NAME=%s", output_file);
+//         $display("[AXIS SIM DUAL] Loading expected output file: %s", output_file);
+//         $readmemh(output_file, expected_data);
+
+//         for (int i = 0; i < M_AXIS_TOTAL_BEATS; i++) begin
+//             mon2scb.get(transaction);
+//             if (transaction.tdata !== expected_data[i]) begin
+//                 $display("Mismatch at beat %0d: got %h, expected %h", i, transaction.tdata, expected_data[i]);
+//                 errors++;
+//             end else begin
+//                 $display("Match at beat %0d: got %h, expected %h", i, transaction.tdata, expected_data[i]);
+//             end
+//         end
+//     endtask
+
+//     task run();
+//         // Start both drivers and monitor in background — they loop forever
+//         fork
+//             drv_x.run();
+//             drv_y.run();
+//             mon.run();
+//         join_none
+//         // Feed stimuli for X and Y in parallel, wait for both to finish loading
+//         // then wait for scoreboard check to complete
+//         fork
+//             stimulus_x();
+//             stimulus_y();
+//         join  // both hex files fully loaded into mailboxes before check starts
+//         check();
+//         $display("Errors Detected: %0d", errors);
+//     endtask
+
+// endclass

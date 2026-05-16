@@ -48,10 +48,21 @@ set IP_FILE "${IP_DIR}/cordic_0.xci"
 if {[file exists $IP_FILE]} {
     # This command copies the IP into the project workspace
     import_ip -files $IP_FILE -name cordic_0
-    
-    # Generate targets locally in the workspace
-    generate_target all [get_ips cordic_0]
-    export_ip_user_files -of_objects [get_ips cordic_0] -no_script -sync -force -quiet
+
+    set CORDIC_IP [get_ips cordic_0]
+
+    # Imported IPs from another Vivado version can be locked until upgraded.
+    # Upgrade the project-local copy first, then regenerate output products.
+    report_ip_status
+    if {[catch {upgrade_ip $CORDIC_IP} upgrade_result]} {
+        puts "WARNING: upgrade_ip reported: $upgrade_result"
+    } else {
+        puts $upgrade_result
+    }
+
+    reset_target all $CORDIC_IP
+    generate_target all $CORDIC_IP
+    export_ip_user_files -of_objects $CORDIC_IP -no_script -sync -force -quiet
 } else {
     puts "ERROR: CORDIC IP not found at $IP_FILE"
     return -code error
