@@ -22,7 +22,6 @@ module MULTIPLIER #(
     output reg                  m_axis_tlast
 );
 
-wire pair_valid = s_axis_tvalid_x & s_axis_tvalid_y;
 wire pair_last = s_axis_tlast_x & s_axis_tlast_y;
 
 always@(posedge aclk) begin
@@ -32,7 +31,7 @@ always@(posedge aclk) begin
         m_axis_tlast <=0;
     end
     else begin
-        if(pair_valid && s_axis_tready_x && s_axis_tready_y) begin
+        if(s_axis_tready_x && s_axis_tready_y) begin
             m_axis_tdata <= s_axis_tdata_x * s_axis_tdata_y;
             m_axis_tvalid <= 1;
             m_axis_tlast <= pair_last;
@@ -45,7 +44,7 @@ always@(posedge aclk) begin
     end
 end
 
-assign s_axis_tready_x = (m_axis_tready || !m_axis_tvalid);
-assign s_axis_tready_y = (m_axis_tready || !m_axis_tvalid);
+assign s_axis_tready_x = (m_axis_tready || !m_axis_tvalid) && s_axis_tvalid_y;
+assign s_axis_tready_y = (m_axis_tready || !m_axis_tvalid) && s_axis_tvalid_x;
 
 endmodule
