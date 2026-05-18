@@ -25,32 +25,33 @@ module AXIS_SUB #(
     output reg                    m_axis_tlast
 );
 
-    wire out_ready = (m_axis_tready || !m_axis_tvalid);
+wire pair_last = s_axis_a_tlast & s_axis_b_tlast;
 
-    assign s_axis_a_tready = s_axis_b_tvalid && out_ready;
-    assign s_axis_b_tready = s_axis_a_tvalid && out_ready;
+integer i;
 
-    integer i;
-
-    always @(posedge aclk) begin
-        if (~aresetn) begin
+always @(posedge aclk) begin
+    if (~aresetn) begin
+        m_axis_tdata  <= 0;
+        m_axis_tvalid <= 0;
+        m_axis_tlast  <= 0;
+    end 
+    else begin 
+        if (s_axis_a_tready && s_axis_b_tready) begin
+            for (i = 0; i < PIXELS_PER_BEAT; i = i + 1) begin
+                m_axis_tdata[i*COMP_WIDTH +: COMP_WIDTH] <= $signed($signed({1'b0, s_axis_a_tdata[i*COMP_WIDTH +: COMP_WIDTH]}) - $signed({1'b0, s_axis_b_tdata[i*COMP_WIDTH +: COMP_WIDTH]}));
+            end
+            m_axis_tvalid <= 1;
+            m_axis_tlast  <= pair_last;
+        end
+        else if (m_axis_tvalid && m_axis_tready) begin
             m_axis_tdata  <= 0;
             m_axis_tvalid <= 0;
             m_axis_tlast  <= 0;
-        end 
-        else begin 
-            if (s_axis_a_tready && s_axis_b_tready && out_ready) begin
-                for (i = 0; i < PIXELS_PER_BEAT; i = i + 1) begin
-                    m_axis_tdata[i*COMP_WIDTH +: COMP_WIDTH] <= $signed({1'b0, s_axis_a_tdata[i*COMP_WIDTH +: COMP_WIDTH]}) - $signed({1'b0, s_axis_b_tdata[i*COMP_WIDTH +: COMP_WIDTH]});
-                end
-                m_axis_tvalid <= 1;
-                m_axis_tlast  <= s_axis_a_tlast & s_axis_b_tlast;
-            end
-            else if (m_axis_tvalid && m_axis_tready) begin
-                m_axis_tdata  <= 0;
-                m_axis_tvalid <= 0;
-                m_axis_tlast  <= 0;
-            end
         end
     end
+end
+
+assign s_axis_a_tready = (m_axis_tready || !m_axis_tvalid) && s_axis_b_tvalid;
+assign s_axis_b_tready = (m_axis_tready || !m_axis_tvalid) && s_axis_a_tvalid;
+
 endmodule
