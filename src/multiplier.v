@@ -31,7 +31,7 @@ always@(posedge aclk) begin
         m_axis_tlast <=0;
     end
     else begin
-        if(s_axis_tready_x && s_axis_tready_y) begin
+        if(s_axis_tready_x && s_axis_tready_y && (m_axis_tready || !m_axis_tvalid)) begin
             m_axis_tdata <= s_axis_tdata_x * s_axis_tdata_y;
             m_axis_tvalid <= 1;
             m_axis_tlast <= pair_last;
