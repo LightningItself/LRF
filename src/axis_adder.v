@@ -11,14 +11,18 @@ module axis_adder #(
     input                  s_axis_tvalid_y,
     output                 s_axis_tready_y,
     input                  s_axis_tlast_y,
-    output reg [DATA_WIDTH:0] m_axis_tdata,
-    output reg                m_axis_tvalid,
-    input                     m_axis_tready,
-    output reg                m_axis_tlast
+    input [DATA_WIDTH-1:0] s_axis_tdata_z,
+    input                  s_axis_tvalid_z,
+    output                 s_axis_tready_z,
+    input                  s_axis_tlast_z,
+    output reg [DATA_WIDTH+1:0] m_axis_tdata,
+    output reg                  m_axis_tvalid,
+    input                       m_axis_tready,
+    output reg                  m_axis_tlast
 );
 
-wire pair_last = s_axis_tlast_x & s_axis_tlast_y;
-wire pair_valid = s_axis_tvalid_x & s_axis_tvalid_y;
+wire pair_last = s_axis_tlast_x & s_axis_tlast_y & s_axis_tlast_z;
+wire pair_valid = s_axis_tvalid_x & s_axis_tvalid_y & s_axis_tvalid_z;
 
 always@(posedge aclk) begin
     if(!aresetn) begin
@@ -28,7 +32,7 @@ always@(posedge aclk) begin
     end
     else begin
         if(pair_valid && (m_axis_tready || !m_axis_tvalid)) begin
-            m_axis_tdata <= s_axis_tdata_x + s_axis_tdata_y;
+            m_axis_tdata <= s_axis_tdata_x + s_axis_tdata_y + s_axis_tdata_z;
             m_axis_tvalid <= 1;
             m_axis_tlast <= pair_last;
         end
@@ -40,7 +44,8 @@ always@(posedge aclk) begin
     end
 end
 
-assign s_axis_tready_x = (m_axis_tready || !m_axis_tvalid) && s_axis_tvalid_y;
-assign s_axis_tready_y = (m_axis_tready || !m_axis_tvalid) && s_axis_tvalid_x;
+assign s_axis_tready_x = (m_axis_tready || !m_axis_tvalid) && s_axis_tvalid_y && s_axis_tvalid_z;
+assign s_axis_tready_y = (m_axis_tready || !m_axis_tvalid) && s_axis_tvalid_x && s_axis_tvalid_z;
+assign s_axis_tready_z = (m_axis_tready || !m_axis_tvalid) && s_axis_tvalid_x && s_axis_tvalid_y;
 
 endmodule
