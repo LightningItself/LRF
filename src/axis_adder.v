@@ -1,3 +1,5 @@
+`timescale 1ns/10ps
+
 module axis_adder #(
     parameter DATA_WIDTH = 16
 )(
