@@ -372,7 +372,7 @@
         wire signed [2*PIXEL_SIZE+2:0] raw_sum_x_full;
         assign stage4_sign_x[m] = raw_sum_x_full[2*PIXEL_SIZE+2];
 
-            axis_adder #(.DATA_WIDTH(2*PIXEL_SIZE+1)) numr_part_2_x_adder (
+            axis_adder_signed #(.DATA_WIDTH(2*PIXEL_SIZE+1)) numr_part_2_x_adder (
                 .aclk(aclk),
                 .aresetn(aresetn),
                 .s_axis_tdata_x($signed({{1{out_sig_xy[m*(2*PIXEL_SIZE) + (2*PIXEL_SIZE)-1]}},out_sig_xy[m*(2*PIXEL_SIZE)+:(2*PIXEL_SIZE)]}) <<< 1),
