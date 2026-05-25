@@ -426,7 +426,7 @@
             stage4_sign_x_r1 <= 0;
         end
         else begin
-            if(numr_part_2_x_valid & numr_x_multiplier_ready_y) begin
+            if(numr_part_1_x_valid & numr_x_multiplier_ready_x & numr_part_2_x_valid & numr_x_multiplier_ready_y) begin
                 stage4_sign_x_r1 <= stage4_sign_x;
             end
         end
