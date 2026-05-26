@@ -51,10 +51,6 @@ assign denr_if.tlast  = numr_if.tlast;
 assign sign_if.tvalid = numr_if.tvalid;
 assign sign_if.tlast  = numr_if.tlast;
 
-// out_ready only asserts when all three receivers are ready
-// denr_if.tready driven by axis_monitor (random backpressure) — that's the controlling ready
-// sign_if.tready driven by axis_monitor (random backpressure)
-// numr_if.tready is the AND — must not be driven by any monitor
 assign numr_if.tready = denr_if.tready & sign_if.tready;
 
 // sim_env drives inputs only — NUM_M_AXIS=0 not possible, so use 1 output for denr
