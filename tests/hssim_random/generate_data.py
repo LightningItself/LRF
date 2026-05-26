@@ -7,106 +7,128 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../u
 from axis_hex import write_axi_stream_hex
 from compute_gauss import compute_gauss
 
-IMAGE_WIDTH     = 512
-IMAGE_HEIGHT    = 512
-PIXELS_PER_BEAT = 16
-PIXEL_SIZE      = 8
-DATA_WIDTH      = PIXELS_PER_BEAT * PIXEL_SIZE
+IMAGE_WIDTH      = 512
+IMAGE_HEIGHT     = 512
+PIXELS_PER_BEAT  = 16
+PIXEL_SIZE       = 8
+DATA_WIDTH       = PIXELS_PER_BEAT * PIXEL_SIZE
 
 C1 = 6
 C2 = 58
 
+PART_BITS  = 2 * PIXEL_SIZE + 2
+PROD_BITS  = 2 * PART_BITS
+PART_MASK  = (1 << PART_BITS) - 1
+PROD_MASK  = (1 << PROD_BITS) - 1
+
+def compute_sigma_xy(image_x, image_y):
+    xy_prod   = image_x.astype(np.uint32) * image_y.astype(np.uint32)
+    gauss_xy  = compute_gauss(xy_prod, dtype=np.uint32)
+    mu_x      = compute_gauss(image_x, dtype=np.uint8)
+    mu_y      = compute_gauss(image_y, dtype=np.uint8)
+    mu_x_mu_y = mu_x.astype(np.uint32) * mu_y.astype(np.uint32)
+    sigma_xy  = gauss_xy.astype(np.int64) - mu_x_mu_y.astype(np.int64)
+    return np.clip(sigma_xy, -(1 << (2*PIXEL_SIZE - 1)), (1 << (2*PIXEL_SIZE - 1)) - 1).astype(np.int32)
+
+def compute_sigma_sq(image):
+    x_sq     = image.astype(np.uint32) ** 2
+    gauss_x2 = compute_gauss(x_sq, dtype=np.uint32)
+    mu       = compute_gauss(image, dtype=np.uint8)
+    mu_sq    = mu.astype(np.uint32) ** 2
+    sigma_sq = gauss_x2.astype(np.int64) - mu_sq.astype(np.int64)
+    return np.clip(sigma_sq, 0, (1 << (2 * PIXEL_SIZE)) - 1).astype(np.uint32)
+
+def write_wide_hex(filename, arr_2d, total_bits, pixel_bits):
+    hex_chars = total_bits // 4
+    with open(filename, 'w') as f:
+        for row in arr_2d:
+            beat_val = 0
+            for i, v in enumerate(row):
+                beat_val |= (int(v) << (i * pixel_bits))
+            f.write(f"{beat_val:0{hex_chars}X}\n")
+    return len(arr_2d)
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--input_old", required=True)
-    parser.add_argument("--input_avg", required=True)
-    parser.add_argument("--input_new", required=True)
-    parser.add_argument("--output",    required=True)
+    parser.add_argument("--out_dir", required=True)
     args = parser.parse_args()
 
-    old_map = np.random.randint(0, 256, (IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint8)
-    avg_map = np.random.randint(0, 256, (IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint8)
-    new_map = np.random.randint(0, 256, (IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint8)
+    os.makedirs(args.out_dir, exist_ok=True)
 
-    mu_x = compute_gauss(old_map, dtype=np.uint8)
-    mu_y = compute_gauss(avg_map, dtype=np.uint8)
-    mu_z = compute_gauss(new_map, dtype=np.uint8)
+    input_x_path     = os.path.join(args.out_dir, "inputs_x.hex")
+    input_y_path     = os.path.join(args.out_dir, "inputs_y.hex")
+    output_numr_path = os.path.join(args.out_dir, "outputs_numr.hex")
+    output_denr_path = os.path.join(args.out_dir, "outputs_denr.hex")
+    output_sign_path = os.path.join(args.out_dir, "outputs_sign.hex")
 
-    gauss_old_sq  = compute_gauss(old_map.astype(np.uint16) * old_map.astype(np.uint16), dtype=np.uint16)
-    gauss_avg_sq  = compute_gauss(avg_map.astype(np.uint16) * avg_map.astype(np.uint16), dtype=np.uint16)
-    gauss_new_sq  = compute_gauss(new_map.astype(np.uint16) * new_map.astype(np.uint16), dtype=np.uint16)
-    gauss_old_avg = compute_gauss(old_map.astype(np.uint16) * avg_map.astype(np.uint16), dtype=np.uint16)
-    gauss_new_avg = compute_gauss(new_map.astype(np.uint16) * avg_map.astype(np.uint16), dtype=np.uint16)
+    image_x = np.random.randint(0, 256, (IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint8)
+    image_y = np.random.randint(0, 256, (IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint8)
 
-    mu_x32 = mu_x.astype(np.int32)
-    mu_y32 = mu_y.astype(np.int32)
-    mu_z32 = mu_z.astype(np.int32)
+    mu_x   = compute_gauss(image_x, dtype=np.uint8)
+    mu_y   = compute_gauss(image_y, dtype=np.uint8)
+    mu_x_u = mu_x.astype(np.uint32)
+    mu_y_u = mu_y.astype(np.uint32)
 
-    sig_sq_x = np.clip(gauss_old_sq.astype(np.int32) - (mu_x32 * mu_x32), -32768, 32767).astype(np.int16)
-    sig_sq_y = np.clip(gauss_avg_sq.astype(np.int32) - (mu_y32 * mu_y32), -32768, 32767).astype(np.int16)
-    sig_sq_z = np.clip(gauss_new_sq.astype(np.int32) - (mu_z32 * mu_z32), -32768, 32767).astype(np.int16)
-    sig_xy   = np.clip(gauss_old_avg.astype(np.int32) - (mu_x32 * mu_y32), -32768, 32767).astype(np.int16)
-    sig_zy   = np.clip(gauss_new_avg.astype(np.int32) - (mu_z32 * mu_y32), -32768, 32767).astype(np.int16)
+    muX_sq   = (mu_x_u * mu_x_u) & ((1 << (2 * PIXEL_SIZE)) - 1)
+    muY_sq   = (mu_y_u * mu_y_u) & ((1 << (2 * PIXEL_SIZE)) - 1)
+    int_muXY = (mu_x_u * mu_y_u) & ((1 << (2 * PIXEL_SIZE)) - 1)
 
-    mu_x_sq   = mu_x32 * mu_x32
-    mu_y_sq   = mu_y32 * mu_y32
-    mu_z_sq   = mu_z32 * mu_z32
-    mu_x_mu_y = mu_x32 * mu_y32
-    mu_z_mu_y = mu_z32 * mu_y32
+    muX_sq_plus_muY_sq = (muX_sq + muY_sq) & ((1 << (2 * PIXEL_SIZE + 1)) - 1)
 
-    sig_sq_x64 = sig_sq_x.astype(np.int64)
-    sig_sq_y64 = sig_sq_y.astype(np.int64)
-    sig_sq_z64 = sig_sq_z.astype(np.int64)
-    sig_xy64   = sig_xy.astype(np.int64)
-    sig_zy64   = sig_zy.astype(np.int64)
+    two_muXY    = (int_muXY << 1) & ((1 << (2 * PIXEL_SIZE + 1)) - 1)
+    numr_part_1 = (two_muXY + C1)           & PART_MASK
+    denr_part_1 = (muX_sq_plus_muY_sq + C1) & PART_MASK
 
-    numr_part1_x = (2 * mu_x_mu_y + C1).astype(np.int64)
-    numr_part1_z = (2 * mu_z_mu_y + C1).astype(np.int64)
-    denr_part1_x = (mu_x_sq + mu_y_sq + C1).astype(np.int64)
-    denr_part1_z = (mu_z_sq + mu_y_sq + C1).astype(np.int64)
- 
-    numr_part2_x = (2 * sig_xy64 + C2)
-    numr_part2_z = (2 * sig_zy64 + C2)
-    denr_part2_x = (sig_sq_x64 + sig_sq_y64 + C2)
-    denr_part2_z = (sig_sq_z64 + sig_sq_y64 + C2)
+    sigma_xy   = compute_sigma_xy(image_x, image_y)
+    sigma_sq_x = compute_sigma_sq(image_x)
+    sigma_sq_y = compute_sigma_sq(image_y)
 
-    numr_x = numr_part1_x * numr_part2_x
-    numr_z = numr_part1_z * numr_part2_z
-    denr_x = denr_part1_x * denr_part2_x
-    denr_z = denr_part1_z * denr_part2_z
+    raw_sum = sigma_xy.astype(np.int64) * 2 + C2
 
-    p1 = numr_x * denr_z
-    p2 = numr_z * denr_x
+    numr_sign_flat = (raw_sum.flatten() < 0).astype(np.uint16)
+    numr_sign_flat = numr_sign_flat.reshape(-1, PIXELS_PER_BEAT)
+    sign_packed    = np.zeros(numr_sign_flat.shape[0], dtype=np.uint16)
+    for bit in range(PIXELS_PER_BEAT):
+        sign_packed |= (numr_sign_flat[:, bit].astype(np.uint16) << bit)
+    sign_packed = sign_packed.reshape(IMAGE_HEIGHT, IMAGE_WIDTH // PIXELS_PER_BEAT)
 
-    del_out = np.where(p2 > p1, np.uint8(255), np.uint8(0))
+    abs_raw_sum = np.abs(raw_sum).astype(np.int64) & PART_MASK
+    denr_part_2 = (sigma_sq_x.astype(np.int64) + sigma_sq_y.astype(np.int64) + C2) & PART_MASK
 
-    OUTPUT_DATA_WIDTH = PIXELS_PER_BEAT * PIXEL_SIZE
+    numr_2d = ((numr_part_1.astype(object) * abs_raw_sum.astype(object)) & PROD_MASK).reshape(IMAGE_HEIGHT * IMAGE_WIDTH // PIXELS_PER_BEAT, PIXELS_PER_BEAT)
+    denr_2d = ((denr_part_1.astype(object) * denr_part_2.astype(object)) & PROD_MASK).reshape(IMAGE_HEIGHT * IMAGE_WIDTH // PIXELS_PER_BEAT, PIXELS_PER_BEAT)
 
-    s_beats_old = write_axi_stream_hex(args.input_old, old_map, DATA_WIDTH)
-    s_beats_avg = write_axi_stream_hex(args.input_avg, avg_map, DATA_WIDTH)
-    s_beats_new = write_axi_stream_hex(args.input_new, new_map, DATA_WIDTH)
-    m_beats     = write_axi_stream_hex(args.output,    del_out, OUTPUT_DATA_WIDTH)
+    NUMR_DENR_DATA_WIDTH = PROD_BITS * PIXELS_PER_BEAT
+    SIGN_DATA_WIDTH      = PIXELS_PER_BEAT
 
-    if not (s_beats_old == s_beats_avg == s_beats_new):
-        raise ValueError(f"Beat count mismatch: old={s_beats_old}, avg={s_beats_avg}, new={s_beats_new}")
+    s_beats_x = write_axi_stream_hex(input_x_path,     image_x,     DATA_WIDTH)
+    s_beats_y = write_axi_stream_hex(input_y_path,     image_y,     DATA_WIDTH)
+    m_beats_n = write_wide_hex(output_numr_path, numr_2d, NUMR_DENR_DATA_WIDTH, PROD_BITS)
+    m_beats_d = write_wide_hex(output_denr_path, denr_2d, NUMR_DENR_DATA_WIDTH, PROD_BITS)
+    m_beats_s = write_axi_stream_hex(output_sign_path, sign_packed, SIGN_DATA_WIDTH)
 
-    output_dir  = os.path.dirname(args.output)
-    os.makedirs(output_dir, exist_ok=True)
-    config_path = os.path.join(output_dir, "tb_config.svh")
+    if s_beats_x != s_beats_y:
+        raise ValueError(f"Beat count mismatch: x={s_beats_x}, y={s_beats_y}")
+    if not (m_beats_n == m_beats_d == m_beats_s):
+        raise ValueError(f"Output beat count mismatch: numr={m_beats_n}, denr={m_beats_d}, sign={m_beats_s}")
 
+    config_path = os.path.join(args.out_dir, "tb_config.svh")
     with open(config_path, 'w') as f:
-        f.write("`define NUM_S_AXIS 3\n")
-        f.write("`define NUM_M_AXIS 1\n")
-        f.write(f"`define S_AXIS_DATA_WIDTH    {DATA_WIDTH}\n")
-        f.write(f"`define M_AXIS_DATA_WIDTH    {OUTPUT_DATA_WIDTH}\n")
-        f.write(f"`define S_AXIS_TOTAL_BEATS   {s_beats_old}\n")
-        f.write(f"`define M_AXIS_TOTAL_BEATS   {m_beats}\n")
-        f.write(f"`define S_AXIS_TOTAL_BEATS_0 {s_beats_old}\n")
-        f.write(f"`define S_AXIS_TOTAL_BEATS_1 {s_beats_avg}\n")
-        f.write(f"`define S_AXIS_TOTAL_BEATS_2 {s_beats_new}\n")
-        f.write(f"`define M_AXIS_TOTAL_BEATS_0 {m_beats}\n")
+        f.write("`define NUM_S_AXIS 2\n")
+        f.write("`define NUM_M_AXIS 3\n")
+        f.write(f"`define S_AXIS_DATA_WIDTH      {DATA_WIDTH}\n")
+        f.write(f"`define M_AXIS_DATA_WIDTH      {NUMR_DENR_DATA_WIDTH}\n")
+        f.write(f"`define S_AXIS_TOTAL_BEATS     {s_beats_x}\n")
+        f.write(f"`define M_AXIS_TOTAL_BEATS     {m_beats_n}\n")
+        f.write(f"`define S_AXIS_TOTAL_BEATS_0   {s_beats_x}\n")
+        f.write(f"`define S_AXIS_TOTAL_BEATS_1   {s_beats_y}\n")
+        f.write(f"`define M_AXIS_TOTAL_BEATS_0   {m_beats_n}\n")
+        f.write(f"`define M_AXIS_TOTAL_BEATS_1   {m_beats_d}\n")
+        f.write(f"`define M_AXIS_TOTAL_BEATS_2   {m_beats_s}\n")
+        f.write(f"`define NUMR_DENR_DATA_WIDTH   {NUMR_DENR_DATA_WIDTH}\n")
+        f.write(f"`define SIGN_DATA_WIDTH        {SIGN_DATA_WIDTH}\n")
 
-    print(f"Success. Files generated in {output_dir}")
+    print(f"Success. Files generated in {args.out_dir}")
 
 if __name__ == "__main__":
     main()

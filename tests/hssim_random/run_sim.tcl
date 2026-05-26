@@ -1,93 +1,71 @@
-set TEST_NAME     "hssim_random"
-set SRC_DIR       "../src"
+set TEST_NAME "hssim_random"
+set SRC_DIR "../src"
 set WORKSPACE_DIR "./${TEST_NAME}"
-set TEST_DIR      "../tests/${TEST_NAME}"
-set UTILS_SV_DIR  "../utils/sv"
-
-set LAUNCH_DIR    [pwd]
-
-set INPUT_OLD_HEX "${WORKSPACE_DIR}/input_old.hex"
-set INPUT_AVG_HEX "${WORKSPACE_DIR}/input_avg.hex"
-set INPUT_NEW_HEX "${WORKSPACE_DIR}/input_new.hex"
-set OUTPUT_HEX    "${WORKSPACE_DIR}/outputs.hex"
+set TEST_DIR "../tests/${TEST_NAME}"
+set UTILS_SV_DIR "../utils/sv"
 
 file mkdir $WORKSPACE_DIR
 
-puts "--- \[TCL\] Step 1: Running Python Data Generator ---"
+set INPUT_HEX_X     "${WORKSPACE_DIR}/inputs_x.hex"
+set INPUT_HEX_Y     "${WORKSPACE_DIR}/inputs_y.hex"
+set OUTPUT_HEX_NUMR "${WORKSPACE_DIR}/outputs_numr.hex"
+set OUTPUT_HEX_DENR "${WORKSPACE_DIR}/outputs_denr.hex"
+set OUTPUT_HEX_SIGN "${WORKSPACE_DIR}/outputs_sign.hex"
+
+puts "Generating test pattern with expected outputs..."
+puts ""
 
 set has_pythonhome [info exists env(PYTHONHOME)]
 set has_pythonpath [info exists env(PYTHONPATH)]
+if {$has_pythonhome} { set saved_pythonhome $env(PYTHONHOME); unset env(PYTHONHOME) }
+if {$has_pythonpath} { set saved_pythonpath $env(PYTHONPATH); unset env(PYTHONPATH) }
 
-if {$has_pythonhome} {
-    set saved_pythonhome $env(PYTHONHOME)
-    unset env(PYTHONHOME)
-}
-if {$has_pythonpath} {
-    set saved_pythonpath $env(PYTHONPATH)
-    unset env(PYTHONPATH)
-}
-
-if {[catch {
-    exec py $TEST_DIR/generate_data.py \
-        --input_old $INPUT_OLD_HEX \
-        --input_avg $INPUT_AVG_HEX \
-        --input_new $INPUT_NEW_HEX \
-        --output    $OUTPUT_HEX
-} result]} {
+if {[catch {exec py $TEST_DIR/generate_data.py --out_dir $WORKSPACE_DIR} result]} {
     puts "ERROR running Python script:\n$result"
     return -code error
 } else {
     puts $result
 }
 
-if {$has_pythonhome} {
-    set env(PYTHONHOME) $saved_pythonhome
-}
-if {$has_pythonpath} {
-    set env(PYTHONPATH) $saved_pythonpath
-}
+if {$has_pythonhome} { set env(PYTHONHOME) $saved_pythonhome }
+if {$has_pythonpath} { set env(PYTHONPATH) $saved_pythonpath }
 
-puts "--- \[TCL\] Step 2: Creating Vivado Project ---"
+puts "Generating vivado project..."
 
 create_project -force sim_project ${WORKSPACE_DIR}/sim_project
 
-add_files -fileset sources_1 [file normalize ${SRC_DIR}/multiplier.v]
-add_files -fileset sources_1 [file normalize ${SRC_DIR}/conv_gauss.v]
-add_files -fileset sources_1 [file normalize ${SRC_DIR}/axis_sub.v]
-add_files -fileset sources_1 [file normalize ${SRC_DIR}/sig_xy.v]
-add_files -fileset sources_1 [file normalize ${SRC_DIR}/axis_adder.v]
-add_files -fileset sources_1 [file normalize ${SRC_DIR}/hssim.v]
-update_compile_order -fileset sources_1
+add_files -fileset sources_1 ${SRC_DIR}/multiplier.v
+add_files -fileset sources_1 ${SRC_DIR}/axis_adder.v
+add_files -fileset sources_1 ${SRC_DIR}/axis_adder_signed.v
+add_files -fileset sources_1 ${SRC_DIR}/conv_gauss.v
+add_files -fileset sources_1 ${SRC_DIR}/sig_xy.v
+add_files -fileset sources_1 ${SRC_DIR}/axis_sub.v
+add_files -fileset sources_1 ${SRC_DIR}/hssim.v
 
-add_files -fileset sim_1 [file normalize ${UTILS_SV_DIR}/sim_axis.sv]
+add_files -fileset sim_1 ${UTILS_SV_DIR}/sim_axis.sv
 set_property file_type SystemVerilog [get_files ${UTILS_SV_DIR}/sim_axis.sv]
 
-add_files -fileset sim_1 [file normalize ${TEST_DIR}/tb_hssim.sv]
+add_files -fileset sim_1 ${TEST_DIR}/tb_hssim.sv
 set_property file_type SystemVerilog [get_files ${TEST_DIR}/tb_hssim.sv]
 
-set_property include_dirs [file normalize $WORKSPACE_DIR] [get_filesets sim_1]
+set_property include_dirs $WORKSPACE_DIR [get_filesets sim_1]
 
-add_files -fileset sim_1 [file normalize $INPUT_OLD_HEX]
-add_files -fileset sim_1 [file normalize $INPUT_AVG_HEX]
-add_files -fileset sim_1 [file normalize $INPUT_NEW_HEX]
-add_files -fileset sim_1 [file normalize $OUTPUT_HEX]
+add_files -fileset sim_1 $INPUT_HEX_X $INPUT_HEX_Y $OUTPUT_HEX_NUMR $OUTPUT_HEX_DENR $OUTPUT_HEX_SIGN
 
 set_property top tb_top [get_filesets sim_1]
 set_property top_lib xil_defaultlib [get_filesets sim_1]
 
-set ABS_INPUT_OLD_HEX [file normalize [file join $LAUNCH_DIR $INPUT_OLD_HEX]]
-set ABS_INPUT_AVG_HEX [file normalize [file join $LAUNCH_DIR $INPUT_AVG_HEX]]
-set ABS_INPUT_NEW_HEX [file normalize [file join $LAUNCH_DIR $INPUT_NEW_HEX]]
-set ABS_OUTPUT_HEX    [file normalize [file join $LAUNCH_DIR $OUTPUT_HEX]]
+set ABS_INPUT_HEX_X     [file normalize $INPUT_HEX_X]
+set ABS_INPUT_HEX_Y     [file normalize $INPUT_HEX_Y]
+set ABS_OUTPUT_HEX_NUMR [file normalize $OUTPUT_HEX_NUMR]
+set ABS_OUTPUT_HEX_DENR [file normalize $OUTPUT_HEX_DENR]
+set ABS_OUTPUT_HEX_SIGN [file normalize $OUTPUT_HEX_SIGN]
 
 set_property -name {xsim.simulate.xsim.more_options} \
-    -value "-testplusarg IN_FILE_NAME_0=$ABS_INPUT_OLD_HEX \
-            -testplusarg IN_FILE_NAME_1=$ABS_INPUT_AVG_HEX \
-            -testplusarg IN_FILE_NAME_2=$ABS_INPUT_NEW_HEX \
-            -testplusarg OUT_FILE_NAME_0=$ABS_OUTPUT_HEX" \
-    -objects [get_filesets sim_1]
+-value "-testplusarg IN_FILE_NAME_X=$ABS_INPUT_HEX_X -testplusarg IN_FILE_NAME_Y=$ABS_INPUT_HEX_Y -testplusarg OUT_FILE_NAME_NUMR=$ABS_OUTPUT_HEX_NUMR -testplusarg OUT_FILE_NAME_DENR=$ABS_OUTPUT_HEX_DENR -testplusarg OUT_FILE_NAME_SIGN=$ABS_OUTPUT_HEX_SIGN" \
+-objects [get_filesets sim_1]
 
-puts "--- \[TCL\] Step 3: Launching Simulation ---"
+puts "Running simulation..."
 
 launch_simulation
 run all

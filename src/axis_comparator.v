@@ -18,6 +18,8 @@ module axis_comparator #(
     output reg               m_axis_tlast
 );
 
+wire out_ready = m_axis_tready || !m_axis_tvalid;
+
 localparam HALF_WIDTH = DATA_WIDTH / 2;
 
 reg [HALF_WIDTH-1:0] lo1_reg, lo2_reg;
@@ -63,8 +65,6 @@ always @(posedge aclk) begin
         end
     end
 end
-
-wire out_ready = m_axis_tready || !m_axis_tvalid;
 
 assign s_axis_tready_1 = out_ready && !pipe1_valid;
 assign s_axis_tready_2 = out_ready && !pipe1_valid;
