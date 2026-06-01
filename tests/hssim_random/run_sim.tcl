@@ -6,11 +6,9 @@ set UTILS_SV_DIR "../utils/sv"
 
 file mkdir $WORKSPACE_DIR
 
-set INPUT_HEX_X     "${WORKSPACE_DIR}/inputs_x.hex"
-set INPUT_HEX_Y     "${WORKSPACE_DIR}/inputs_y.hex"
-set OUTPUT_HEX_NUMR "${WORKSPACE_DIR}/outputs_numr.hex"
-set OUTPUT_HEX_DENR "${WORKSPACE_DIR}/outputs_denr.hex"
-set OUTPUT_HEX_SIGN "${WORKSPACE_DIR}/outputs_sign.hex"
+set INPUT_HEX_X      "${WORKSPACE_DIR}/inputs_x.hex"
+set INPUT_HEX_Y      "${WORKSPACE_DIR}/inputs_y.hex"
+set OUTPUT_HEX_PACKED "${WORKSPACE_DIR}/outputs_packed.hex"
 
 puts "Generating test pattern with expected outputs..."
 puts ""
@@ -36,7 +34,6 @@ create_project -force sim_project ${WORKSPACE_DIR}/sim_project
 
 add_files -fileset sources_1 ${SRC_DIR}/multiplier.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_adder.v
-add_files -fileset sources_1 ${SRC_DIR}/axis_adder_signed.v
 add_files -fileset sources_1 ${SRC_DIR}/conv_gauss.v
 add_files -fileset sources_1 ${SRC_DIR}/sig_xy.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_sub.v
@@ -44,25 +41,22 @@ add_files -fileset sources_1 ${SRC_DIR}/hssim.v
 
 add_files -fileset sim_1 ${UTILS_SV_DIR}/sim_axis.sv
 set_property file_type SystemVerilog [get_files ${UTILS_SV_DIR}/sim_axis.sv]
-
 add_files -fileset sim_1 ${TEST_DIR}/tb_hssim.sv
 set_property file_type SystemVerilog [get_files ${TEST_DIR}/tb_hssim.sv]
 
 set_property include_dirs $WORKSPACE_DIR [get_filesets sim_1]
 
-add_files -fileset sim_1 $INPUT_HEX_X $INPUT_HEX_Y $OUTPUT_HEX_NUMR $OUTPUT_HEX_DENR $OUTPUT_HEX_SIGN
+add_files -fileset sim_1 $INPUT_HEX_X $INPUT_HEX_Y $OUTPUT_HEX_PACKED
 
 set_property top tb_top [get_filesets sim_1]
 set_property top_lib xil_defaultlib [get_filesets sim_1]
 
-set ABS_INPUT_HEX_X     [file normalize $INPUT_HEX_X]
-set ABS_INPUT_HEX_Y     [file normalize $INPUT_HEX_Y]
-set ABS_OUTPUT_HEX_NUMR [file normalize $OUTPUT_HEX_NUMR]
-set ABS_OUTPUT_HEX_DENR [file normalize $OUTPUT_HEX_DENR]
-set ABS_OUTPUT_HEX_SIGN [file normalize $OUTPUT_HEX_SIGN]
+set ABS_INPUT_HEX_X      [file normalize $INPUT_HEX_X]
+set ABS_INPUT_HEX_Y      [file normalize $INPUT_HEX_Y]
+set ABS_OUTPUT_HEX_PACKED [file normalize $OUTPUT_HEX_PACKED]
 
 set_property -name {xsim.simulate.xsim.more_options} \
--value "-testplusarg IN_FILE_NAME_X=$ABS_INPUT_HEX_X -testplusarg IN_FILE_NAME_Y=$ABS_INPUT_HEX_Y -testplusarg OUT_FILE_NAME_NUMR=$ABS_OUTPUT_HEX_NUMR -testplusarg OUT_FILE_NAME_DENR=$ABS_OUTPUT_HEX_DENR -testplusarg OUT_FILE_NAME_SIGN=$ABS_OUTPUT_HEX_SIGN" \
+-value "-testplusarg IN_FILE_NAME_X=$ABS_INPUT_HEX_X -testplusarg IN_FILE_NAME_Y=$ABS_INPUT_HEX_Y -testplusarg OUT_FILE_NAME_PACKED=$ABS_OUTPUT_HEX_PACKED" \
 -objects [get_filesets sim_1]
 
 puts "Running simulation..."
