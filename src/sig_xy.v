@@ -16,7 +16,7 @@ module SIG_XY #(
     input                  s_axis_tvalid_y,
     output                 s_axis_tready_y,
     input                  s_axis_tlast_y,
-    output reg signed [2*DATA_WIDTH-1:0] m_axis_tdata,
+    output reg signed [(2*PIXEL_SIZE+1) * PIXELS_PER_BEAT-1:0] m_axis_tdata,
     output reg                  m_axis_tvalid,
     input                       m_axis_tready,
     output reg                  m_axis_tlast
@@ -30,7 +30,10 @@ wire [PIXELS_PER_BEAT-1:0] mul2_x_ready;
 wire [PIXELS_PER_BEAT-1:0] mul2_y_ready;
 wire mult_x_ready2 = &mul2_x_ready;
 wire mult_y_ready2 = &mul2_y_ready;
-wire sub_a_ready, sub_b_ready;
+wire [PIXELS_PER_BEAT-1:0] sub_1_ready, sub_2_ready, sub_val, sub_la;
+
+wire sub_a_ready = &sub_1_ready;
+wire sub_b_ready = &sub_2_ready;
 wire pair_valid = s_axis_tvalid_x & s_axis_tvalid_y;
 
 wire [DATA_WIDTH-1:0] mu_x, mu_y;
@@ -59,8 +62,11 @@ localparam CONV_GAUSS_INPUT_WIDTH = 2 * PIXEL_SIZE;
 wire [CONV_GAUSS_INPUT_WIDTH*PIXELS_PER_BEAT-1:0] out_gauss_xy;
 wire out_gauss_xy_valid, out_gauss_xy_last;
 
-wire [2*PIXEL_SIZE*PIXELS_PER_BEAT-1:0] sub_out;
-wire sub_valid, sub_last;
+wire signed[(2*PIXEL_SIZE+1) * PIXELS_PER_BEAT -1:0] sub_out;
+wire sub_valid = &sub_val;
+wire sub_last  = &sub_la;
+
+
 
 // DATAPATH
 
@@ -71,7 +77,7 @@ CONV_GAUSS #(PIXELS_PER_BEAT, PIXEL_SIZE, IMAGE_DIM) mean_y (aclk, aresetn, s_ax
 genvar k;
 generate
     for (k=0; k<PIXELS_PER_BEAT; k=k+1) begin
-        MULTIPLIER #(.DATA_WIDTH(PIXEL_SIZE)) mult2 (
+        MULTIPLIER #(.DATA_WIDTH(PIXEL_SIZE), .mode(0)) mult2 (
             .aclk(aclk),
             .aresetn(aresetn),
             .s_axis_tdata_x(mu_x[k*PIXEL_SIZE +:PIXEL_SIZE]),
@@ -93,7 +99,7 @@ endgenerate
 genvar j;
 generate
     for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
-        MULTIPLIER #(.DATA_WIDTH(PIXEL_SIZE)) mult1 (
+        MULTIPLIER #(.DATA_WIDTH(PIXEL_SIZE), .mode (0)) mult1 (
             .aclk(aclk),
             .aresetn(aresetn),
             .s_axis_tdata_x(s_axis_tdata_x[j*PIXEL_SIZE +:PIXEL_SIZE]),
@@ -114,25 +120,30 @@ endgenerate
 
 CONV_GAUSS #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) gauss_xy (aclk, aresetn, mult_xy, mult_xy_valid, gauss_xy_ready, mult_xy_last, out_gauss_xy, out_gauss_xy_valid, sub_a_ready, out_gauss_xy_last);
 
-AXIS_SUB #(
-        .PIXELS_PER_BEAT(PIXELS_PER_BEAT),
-        .PIXEL_SIZE(PIXEL_SIZE)
+genvar i;
+generate begin
+    for (i=0; i<PIXELS_PER_BEAT; i=i+1) begin
+    AXIS_SUB #(
+    .DATA_WIDTH(2*PIXEL_SIZE)
     ) sub (
         .aclk(aclk),
         .aresetn(aresetn),
-        .s_axis_a_tdata(out_gauss_xy),
+        .s_axis_a_tdata(out_gauss_xy[i*2*PIXEL_SIZE +: 2*PIXEL_SIZE]),
         .s_axis_a_tvalid(out_gauss_xy_valid),
-        .s_axis_a_tready(sub_a_ready),
+        .s_axis_a_tready(sub_1_ready[i]),
         .s_axis_a_tlast(out_gauss_xy_last),
-        .s_axis_b_tdata(mu_x_mu_y),
+        .s_axis_b_tdata(mu_x_mu_y[i*2*PIXEL_SIZE +: 2*PIXEL_SIZE]),
         .s_axis_b_tvalid(mu_x_mu_y_valid),
-        .s_axis_b_tready(sub_b_ready),
+        .s_axis_b_tready(sub_2_ready[i]),
         .s_axis_b_tlast(mu_x_mu_y_last),
-        .m_axis_tdata(sub_out),
-        .m_axis_tvalid(sub_valid),
+        .m_axis_tdata(sub_out[i*(2*PIXEL_SIZE+1)+: 2*PIXEL_SIZE+1]),
+        .m_axis_tvalid(sub_val[i]),
         .m_axis_tready(advance),
-        .m_axis_tlast(sub_last)
-);
+        .m_axis_tlast(sub_la[i])
+    );
+    end
+end
+endgenerate
 
 always @(posedge aclk) begin
     if (!aresetn) begin
