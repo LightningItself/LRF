@@ -66,8 +66,8 @@ def main():
     input_y_path       = os.path.join(args.out_dir, "inputs_y.hex")
     output_packed_path = os.path.join(args.out_dir, "outputs_packed.hex")
 
-    image_x = np.zeros((IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint8)
-    image_y = np.zeros((IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint8)
+    image_x = np.random.randint(0, 256, size=(IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint8)
+    image_y = np.random.randint(0, 256, size=(IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint8)
 
     mu_x   = compute_gauss(image_x, dtype=np.uint8)
     mu_y   = compute_gauss(image_y, dtype=np.uint8)
