@@ -24,8 +24,8 @@ PROD_MASK  = (1 << PROD_BITS) - 1
 SIG_XY_BITS = 2 * PIXEL_SIZE + 1
 SIG_XY_MASK = (1 << SIG_XY_BITS) - 1
 
-STREAM_COMPONENT_WIDTH = PROD_BITS * PIXELS_PER_BEAT        # 576 bits
-PACKED_AXIS_DATA_WIDTH = (2 * STREAM_COMPONENT_WIDTH) + PIXELS_PER_BEAT  # 1168 bits
+STREAM_COMPONENT_WIDTH = PROD_BITS * PIXELS_PER_BEAT
+PACKED_AXIS_DATA_WIDTH = (2 * STREAM_COMPONENT_WIDTH) + PIXELS_PER_BEAT
 
 def compute_sigma_xy(image_x, image_y):
     xy_prod   = image_x.astype(np.uint32) * image_y.astype(np.uint32)
@@ -66,8 +66,18 @@ def main():
     input_y_path       = os.path.join(args.out_dir, "inputs_y.hex")
     output_packed_path = os.path.join(args.out_dir, "outputs_packed.hex")
 
-    image_x = np.random.randint(0, 256, size=(IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint8)
-    image_y = np.random.randint(0, 256, size=(IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint8)
+    total_pixels = IMAGE_HEIGHT * IMAGE_WIDTH
+    total_beats = total_pixels // PIXELS_PER_BEAT
+
+    # 1. Initialize background to all zeros
+    beats_x = np.zeros((total_beats, PIXELS_PER_BEAT), dtype=np.uint8)
+    beats_y = np.zeros((total_beats, PIXELS_PER_BEAT), dtype=np.uint8)
+    mid_beat = (total_beats // 2) + 1
+    # Lane 0 gets 0xFF (2 Fs), Lane 1 gets 0x0F (1 F) -> Total 3 Fs (0xFFF)
+    beats_x[:,:] = 255
+    beats_y[:,:] = 255
+    image_x = beats_x.reshape((IMAGE_HEIGHT, IMAGE_WIDTH))
+    image_y = beats_y.reshape((IMAGE_HEIGHT, IMAGE_WIDTH))
 
     mu_x   = compute_gauss(image_x, dtype=np.uint8)
     mu_y   = compute_gauss(image_y, dtype=np.uint8)
