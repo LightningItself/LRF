@@ -69,13 +69,8 @@ def main():
     total_pixels = IMAGE_HEIGHT * IMAGE_WIDTH
     total_beats = total_pixels // PIXELS_PER_BEAT
 
-    # 1. Initialize background to all zeros
-    beats_x = np.zeros((total_beats, PIXELS_PER_BEAT), dtype=np.uint8)
-    beats_y = np.zeros((total_beats, PIXELS_PER_BEAT), dtype=np.uint8)
-    mid_beat = (total_beats // 2) + 1
-    # Lane 0 gets 0xFF (2 Fs), Lane 1 gets 0x0F (1 F) -> Total 3 Fs (0xFFF)
-    beats_x[:,:] = 255
-    beats_y[:,:] = 255
+    beats_x = np.random.randint(0, 256, size=(total_beats, PIXELS_PER_BEAT), dtype=np.uint8)
+    beats_y = np.random.randint(0, 256, size=(total_beats, PIXELS_PER_BEAT), dtype=np.uint8)
     image_x = beats_x.reshape((IMAGE_HEIGHT, IMAGE_WIDTH))
     image_y = beats_y.reshape((IMAGE_HEIGHT, IMAGE_WIDTH))
 

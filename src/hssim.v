@@ -32,10 +32,10 @@ wire gauss_map_x_ready, out_mu_x_valid, out_mu_x_last;
 wire [PIXEL_SIZE*PIXELS_PER_BEAT-1:0] out_mu_y;
 wire gauss_map_y_ready, out_mu_y_valid, out_mu_y_last;
 
-wire [(2*PIXEL_SIZE)*PIXELS_PER_BEAT-1:0] out_sig_sq_x; // always positive so ignore the sign bit
+wire [(2*PIXEL_SIZE+1)*PIXELS_PER_BEAT-1:0] out_sig_sq_x;
 wire out_sig_sq_x_ready_x, out_sig_sq_x_ready_y, out_sig_sq_x_valid, out_sig_sq_x_last;
 
-wire [(2*PIXEL_SIZE)*PIXELS_PER_BEAT-1:0] out_sig_sq_y; // always positive so ignore the sign bit
+wire [(2*PIXEL_SIZE+1)*PIXELS_PER_BEAT-1:0] out_sig_sq_y;
 wire out_sig_sq_y_ready_x, out_sig_sq_y_ready_y, out_sig_sq_y_valid, out_sig_sq_y_last;
 
 wire [(2*PIXEL_SIZE+1)*PIXELS_PER_BEAT-1:0] out_sig_xy;
@@ -113,7 +113,42 @@ wire numr_x_last = &numr_x_la;
 wire denr_x_valid = &denr_x_val;
 wire denr_x_last = &denr_x_la;
 
+wire [DATA_WIDTH-1:0] map_x_buff, map_y_buff;
+wire map_x_buff_valid, map_x_buff_last, map_y_buff_valid, map_y_buff_last;
+wire buff_map_x_ready, buff_map_y_ready;
+
+wire [((2*PIXEL_SIZE+2)*PIXELS_PER_BEAT)-1:0] buff_numr_part_1_x_data;
+wire buff_numr_part_1_x_valid, buff_numr_part_1_x_ready, buff_numr_part_1_x_last;
+wire [((2*PIXEL_SIZE+2)*PIXELS_PER_BEAT)-1:0] buff_denr_part_1_x_data;
+wire buff_denr_part_1_x_valid, buff_denr_part_1_x_ready, buff_denr_part_1_x_last;
+
 // Datapath
+
+axis_buff #( .S_AXIS_DATA_WIDTH(DATA_WIDTH), .M_AXIS_DATA_WIDTH(DATA_WIDTH) )buff_map_x (
+    .aclk(aclk),
+    .aresetn(aresetn),
+    .s_axis_tdata(map_x),
+    .s_axis_tvalid(map_x_valid & map_y_valid),
+    .s_axis_tready(buff_map_x_ready),
+    .s_axis_tlast(map_x_last),
+    .m_axis_tdata(map_x_buff),
+    .m_axis_tvalid(map_x_buff_valid),
+    .m_axis_tready(gauss_map_x_ready & gauss_map_y_ready),
+    .m_axis_tlast(map_x_buff_last)
+);
+
+axis_buff #( .S_AXIS_DATA_WIDTH(DATA_WIDTH), .M_AXIS_DATA_WIDTH(DATA_WIDTH) ) buff_map_y (
+    .aclk(aclk),
+    .aresetn(aresetn),
+    .s_axis_tdata(map_y),
+    .s_axis_tvalid(map_x_valid & map_y_valid),
+    .s_axis_tready(buff_map_y_ready),
+    .s_axis_tlast(map_y_last),
+    .m_axis_tdata(map_y_buff),
+    .m_axis_tvalid(map_y_buff_valid),
+    .m_axis_tready(gauss_map_x_ready & gauss_map_y_ready),
+    .m_axis_tlast(map_y_buff_last)
+);
 
 CONV_GAUSS #(
     .PIXELS_PER_BEAT(PIXELS_PER_BEAT),
@@ -122,10 +157,10 @@ CONV_GAUSS #(
 ) gauss_map_x (
     .aclk(aclk),
     .aresetn(aresetn),
-    .s_axis_tdata(map_x),
-    .s_axis_tvalid(map_x_valid),
+    .s_axis_tdata(map_x_buff),
+    .s_axis_tvalid(map_x_buff_valid),
     .s_axis_tready(gauss_map_x_ready),
-    .s_axis_tlast(map_x_last),
+    .s_axis_tlast(map_x_buff_last),
     .m_axis_tdata(out_mu_x),
     .m_axis_tvalid(out_mu_x_valid),
     .m_axis_tready(muX_sq_ready_x & muX_sq_ready_y & muX_muY_ready_x),
@@ -139,10 +174,10 @@ CONV_GAUSS #(
 ) gauss_map_y (
     .aclk(aclk),
     .aresetn(aresetn),
-    .s_axis_tdata(map_y),
-    .s_axis_tvalid(map_y_valid),
+    .s_axis_tdata(map_y_buff),
+    .s_axis_tvalid(map_y_buff_valid),
     .s_axis_tready(gauss_map_y_ready),
-    .s_axis_tlast(map_y_last),
+    .s_axis_tlast(map_y_buff_last),
     .m_axis_tdata(out_mu_y),
     .m_axis_tvalid(out_mu_y_valid),
     .m_axis_tready(muY_sq_ready_x & muY_sq_ready_y & muX_muY_ready_y),
@@ -157,11 +192,11 @@ SIG_XY #(
     .aclk(aclk),
     .aresetn(aresetn),
     .s_axis_tdata_x(map_x),
-    .s_axis_tvalid_x(map_x_valid),
+    .s_axis_tvalid_x(map_x_valid & map_y_valid),
     .s_axis_tready_x(out_sig_sq_x_ready_x),
     .s_axis_tlast_x(map_x_last),
     .s_axis_tdata_y(map_x),
-    .s_axis_tvalid_y(map_x_valid),
+    .s_axis_tvalid_y(map_x_valid & map_y_valid),
     .s_axis_tready_y(out_sig_sq_x_ready_y),
     .s_axis_tlast_y(map_x_last),
     .m_axis_tdata(out_sig_sq_x),
@@ -178,11 +213,11 @@ SIG_XY #(
     .aclk(aclk),
     .aresetn(aresetn),
     .s_axis_tdata_x(map_y),
-    .s_axis_tvalid_x(map_y_valid),
+    .s_axis_tvalid_x(map_x_valid & map_y_valid),
     .s_axis_tready_x(out_sig_sq_y_ready_x),
     .s_axis_tlast_x(map_y_last),
     .s_axis_tdata_y(map_y),
-    .s_axis_tvalid_y(map_y_valid),
+    .s_axis_tvalid_y(map_x_valid & map_y_valid),
     .s_axis_tready_y(out_sig_sq_y_ready_y),
     .s_axis_tlast_y(map_y_last),
     .m_axis_tdata(out_sig_sq_y),
@@ -199,11 +234,11 @@ SIG_XY #(
     .aclk(aclk),
     .aresetn(aresetn),
     .s_axis_tdata_x(map_x),
-    .s_axis_tvalid_x(map_x_valid),
+    .s_axis_tvalid_x(map_x_valid & map_y_valid),
     .s_axis_tready_x(out_sig_xy_ready_x),
     .s_axis_tlast_x(map_x_last),
     .s_axis_tdata_y(map_y),
-    .s_axis_tvalid_y(map_y_valid),
+    .s_axis_tvalid_y(map_x_valid & map_y_valid),
     .s_axis_tready_y(out_sig_xy_ready_y),
     .s_axis_tlast_y(map_y_last),
     .m_axis_tdata(out_sig_xy),
@@ -409,11 +444,11 @@ generate
         axis_adder #(.DATA_WIDTH(2*PIXEL_SIZE), .mode(0)) denr_part_2_x_adder (
             .aclk(aclk),
             .aresetn(aresetn),
-            .s_axis_tdata_x(out_sig_sq_x[m*(2*PIXEL_SIZE)+:2*PIXEL_SIZE]),
+            .s_axis_tdata_x(out_sig_sq_x[m*(2*PIXEL_SIZE+1)+:2*PIXEL_SIZE]),
             .s_axis_tvalid_x(out_sig_sq_x_valid),
             .s_axis_tready_x(denr_part_2_x_ready_1[m]),
             .s_axis_tlast_x(out_sig_sq_x_last),
-            .s_axis_tdata_y(out_sig_sq_y[m*(2*PIXEL_SIZE)+:2*PIXEL_SIZE]),
+            .s_axis_tdata_y(out_sig_sq_y[m*(2*PIXEL_SIZE+1)+:2*PIXEL_SIZE]),
             .s_axis_tvalid_y(out_sig_sq_y_valid),
             .s_axis_tready_y(denr_part_2_x_ready_2[m]),
             .s_axis_tlast_y(out_sig_sq_y_last),
@@ -504,7 +539,7 @@ always @(posedge aclk) begin
     end
 end
 
-assign map_x_ready = gauss_map_x_ready & out_sig_sq_x_ready_x & out_sig_sq_x_ready_y & out_sig_xy_ready_x & map_y_valid;
-assign map_y_ready = gauss_map_y_ready & out_sig_sq_y_ready_x & out_sig_sq_y_ready_y & out_sig_xy_ready_y & map_x_valid;
+assign map_x_ready = buff_map_x_ready & out_sig_sq_x_ready_x & out_sig_sq_x_ready_y & out_sig_xy_ready_x & map_y_valid;
+assign map_y_ready = buff_map_y_ready & out_sig_sq_y_ready_x & out_sig_sq_y_ready_y & out_sig_xy_ready_y & map_x_valid;
 
 endmodule
