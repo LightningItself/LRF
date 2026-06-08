@@ -1,4 +1,5 @@
 `timescale 1ns/10ps
+
 module axis_comparator #(
     parameter DATA_WIDTH = 72
 )(
@@ -27,13 +28,18 @@ reg                  msb_gt_reg, msb_eq_reg;
 reg                  pipe1_valid;
 reg                  pipe1_tlast;
 
+wire pipe1_ready = out_ready || !pipe1_valid;
+
+assign s_axis_tready_1 = pipe1_ready && s_axis_tvalid_2;
+assign s_axis_tready_2 = pipe1_ready && s_axis_tvalid_1;
+
 always @(posedge aclk) begin
     if (!aresetn) begin
         pipe1_valid <= 1'b0;
         pipe1_tlast <= 1'b0;
     end 
     else begin
-        if (s_axis_tready_1 && s_axis_tvalid_1 && s_axis_tvalid_2) begin
+        if (s_axis_tready_1 && s_axis_tvalid_1) begin
             lo1_reg     <= s_axis_tdata_1[HALF_WIDTH-1:0];
             lo2_reg     <= s_axis_tdata_2[HALF_WIDTH-1:0];
             msb_gt_reg  <= (s_axis_tdata_1[DATA_WIDTH-1:HALF_WIDTH] > s_axis_tdata_2[DATA_WIDTH-1:HALF_WIDTH]);
@@ -65,8 +71,5 @@ always @(posedge aclk) begin
         end
     end
 end
-
-assign s_axis_tready_1 = out_ready && !pipe1_valid;
-assign s_axis_tready_2 = out_ready && !pipe1_valid;
 
 endmodule
