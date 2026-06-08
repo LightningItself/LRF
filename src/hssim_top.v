@@ -27,7 +27,7 @@ module HSSIM_TOP #(
 );
 
 // Wire Declarations 
-
+wire maps_valid = old_map_valid & avg_map_valid & new_map_valid;
 wire advance = (del_ready || !del_valid);
 
 wire [((2*(2*(2*PIXEL_SIZE+2))+1)*PIXELS_PER_BEAT)-1:0] hssim_out_old_avg;
@@ -69,17 +69,19 @@ wire comp_last = &comp_last_1;
 
 reg [PIXELS_PER_BEAT-1:0] numr_x_sign_2, numr_z_sign_2;
 
+reg [PIXELS_PER_BEAT-1:0] numr_x_sign_3,numr_z_sign_3;
+
 // DataPath
 
 HSSIM #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .PIXEL_SIZE(PIXEL_SIZE), .IMAGE_DIM(IMAGE_DIM)) old_avg (
     .aclk(aclk),
     .aresetn(aresetn),
     .map_x(old_map),
-    .map_x_valid(old_map_valid),
+    .map_x_valid(maps_valid),
     .map_x_ready(hssim_old_avg_ready_1),
     .map_x_last(old_map_last),
     .map_y(avg_map),
-    .map_y_valid(avg_map_valid),
+    .map_y_valid(maps_valid),
     .map_y_ready(hssim_old_avg_ready_2),
     .map_y_last(avg_map_last),
     .sign_numr_denr(hssim_out_old_avg),
@@ -92,11 +94,11 @@ HSSIM #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .PIXEL_SIZE(PIXEL_SIZE), .IMAGE_DIM(
     .aclk(aclk),
     .aresetn(aresetn),
     .map_x(avg_map),
-    .map_x_valid(avg_map_valid),
+    .map_x_valid(maps_valid),
     .map_x_ready(hssim_avg_new_ready_1),
     .map_x_last(avg_map_last),
     .map_y(new_map),
-    .map_y_valid(new_map_valid),
+    .map_y_valid(maps_valid),
     .map_y_ready(hssim_avg_new_ready_2),
     .map_y_last(new_map_last),
     .sign_numr_denr(hssim_out_avg_new),
@@ -154,10 +156,6 @@ always @(posedge aclk) begin
             numr_x_sign_1 <= numr_x_sign;
             numr_z_sign_1 <= numr_z_sign;
         end
-        else if (p1_valid & p2_valid & comp_ready_x & comp_ready_y) begin
-            numr_x_sign_1 <= 0;
-            numr_z_sign_1 <= 0;
-        end
     end
 end
 
@@ -193,9 +191,18 @@ always @(posedge aclk) begin
             numr_x_sign_2 <= numr_x_sign_1;
             numr_z_sign_2 <= numr_z_sign_1;
         end
-        else if (comp_valid & advance) begin
-            numr_x_sign_2 <= 0;
-            numr_z_sign_2 <= 0;
+    end
+end
+
+always @(posedge aclk) begin
+    if(!aresetn) begin
+        numr_x_sign_3 <= 0;
+        numr_z_sign_3 <= 0;
+    end
+    else begin
+        if(advance || !comp_valid) begin
+            numr_x_sign_3 <= numr_x_sign_2;
+            numr_z_sign_3 <= numr_z_sign_2;
         end
     end
 end
@@ -210,13 +217,13 @@ always @(posedge aclk) begin
     else begin
         for (k = 0; k < PIXELS_PER_BEAT; k = k + 1) begin
             if (comp_valid & advance) begin
-                if (numr_x_sign_2[k] == 1'b1 && numr_z_sign_2[k] == 1'b0) begin
+                if (numr_x_sign_3[k] == 1'b1 && numr_z_sign_3[k] == 1'b0) begin
                     del[k*PIXEL_SIZE +: PIXEL_SIZE] <= 255;
                 end
-                else if (numr_x_sign_2[k] == 1'b0 && numr_z_sign_2[k] == 1'b1) begin
+                else if (numr_x_sign_3[k] == 1'b0 && numr_z_sign_3[k] == 1'b1) begin
                     del[k*PIXEL_SIZE +: PIXEL_SIZE] <= 0;
                 end
-                else if (numr_x_sign_2[k] == 1'b0 && numr_z_sign_2[k] == 1'b0) begin
+                else if (numr_x_sign_3[k] == 1'b0 && numr_z_sign_3[k] == 1'b0) begin
                     del[k*PIXEL_SIZE +: PIXEL_SIZE] <= {PIXEL_SIZE{comp_out[k]}};
                 end
                 else begin
@@ -239,8 +246,8 @@ always @(posedge aclk) begin
     end
 end
 
-assign old_map_ready = hssim_old_avg_ready_1 & avg_map_valid & new_map_valid;
-assign avg_map_ready = hssim_old_avg_ready_2 & hssim_avg_new_ready_1 & old_map_valid & new_map_valid;
-assign new_map_ready = hssim_avg_new_ready_2 & old_map_valid & avg_map_valid;
+assign old_map_ready = hssim_old_avg_ready_1 & hssim_old_avg_ready_2 & hssim_avg_new_ready_1 & hssim_avg_new_ready_2 & avg_map_valid & new_map_valid;
+assign avg_map_ready = hssim_old_avg_ready_1 & hssim_old_avg_ready_2 & hssim_avg_new_ready_1 & hssim_avg_new_ready_2 & old_map_valid & new_map_valid;
+assign new_map_ready = hssim_old_avg_ready_1 & hssim_old_avg_ready_2 & hssim_avg_new_ready_1 & hssim_avg_new_ready_2 & old_map_valid & avg_map_valid;
 
 endmodule

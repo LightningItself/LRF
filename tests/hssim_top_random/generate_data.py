@@ -90,26 +90,17 @@ def main():
     total_pixels = IMAGE_HEIGHT * IMAGE_WIDTH
     total_beats = total_pixels // PIXELS_PER_BEAT
 
-    # Generate random matrix base sets
     beats_old = np.random.randint(0, 256, size=(total_beats, PIXELS_PER_BEAT), dtype=np.uint8)
     beats_avg = np.random.randint(0, 256, size=(total_beats, PIXELS_PER_BEAT), dtype=np.uint8)
     beats_new = np.random.randint(0, 256, size=(total_beats, PIXELS_PER_BEAT), dtype=np.uint8)
-    # beats_old = np.zeros((total_beats, PIXELS_PER_BEAT), dtype=np.uint8)
-    # beats_avg = np.zeros((total_beats, PIXELS_PER_BEAT), dtype=np.uint8)
-    # beats_new = np.zeros((total_beats, PIXELS_PER_BEAT), dtype=np.uint8)
-    #beats_old = np.full((total_beats, PIXELS_PER_BEAT), 255, dtype=np.uint8)
-    # beats_avg = np.full((total_beats, PIXELS_PER_BEAT), 255, dtype=np.uint8)
-    # beats_new = np.full((total_beats, PIXELS_PER_BEAT), 255, dtype=np.uint8)
     
     image_old = beats_old.reshape((IMAGE_HEIGHT, IMAGE_WIDTH))
     image_avg = beats_avg.reshape((IMAGE_HEIGHT, IMAGE_WIDTH))
     image_new = beats_new.reshape((IMAGE_HEIGHT, IMAGE_WIDTH))
 
-    # Compute intermediate components for both structural paths
     numr_p1_x, raw_sum_x, denr_x = get_hssim_components(image_old, image_avg)
     numr_p1_z, raw_sum_z, denr_z = get_hssim_components(image_avg, image_new)
 
-    # Convert to standard 1D flat structures for linear beat packing
     numr_p1_x_f = numr_p1_x.flatten()
     raw_sum_x_f = raw_sum_x.flatten()
     denr_x_f    = denr_x.flatten()
@@ -125,22 +116,18 @@ def main():
         for lane in range(PIXELS_PER_BEAT):
             idx = b * PIXELS_PER_BEAT + lane
             
-            # Extract true high-level signed representation for both numerators
             numr_x_signed = int(numr_p1_x_f[idx]) * int(raw_sum_x_f[idx])
             numr_z_signed = int(numr_p1_z_f[idx]) * int(raw_sum_z_f[idx])
             
-            # Execute true mathematical signed cross-multiplications
             p1_signed = numr_x_signed * int(denr_z_f[idx])
             p2_signed = numr_z_signed * int(denr_x_f[idx])
             
-            # Decide mask value based on direct high-level comparison
             pixel_mask = 255 if (p2_signed > p1_signed) else 0
             
             del_beat_val |= pixel_mask << (lane * PIXEL_SIZE)
             
         packed_list.append(del_beat_val)
 
-    # Write out the three input streams and the single combined mask master file
     s_beats_old = write_axi_stream_hex(input_old_path, image_old, DATA_WIDTH)
     s_beats_avg = write_axi_stream_hex(input_avg_path, image_avg, DATA_WIDTH)
     s_beats_new = write_axi_stream_hex(input_new_path, image_new, DATA_WIDTH)
