@@ -26,56 +26,26 @@ module HSSIM_TOP #(
     output reg              del_last
 );
 
+// Wire Declarations 
 
 wire advance = (del_ready || !del_valid);
-wire hssim_old_avg_x_ready, hssim_old_avg_y_ready, out_valid_x, out_last_x;
-wire [(2*(2*PIXEL_SIZE+2)*PIXELS_PER_BEAT)-1:0] numr_x, denr_x;
-wire [PIXELS_PER_BEAT-1:0] numr_sign_x;
 
-HSSIM #(.PIXELS_PER_BEAT(PIXELS_PER_BEAT), .PIXEL_SIZE(PIXEL_SIZE), .IMAGE_DIM(IMAGE_DIM)
-) HSSIM_OLD_AVG (
-    .aclk(aclk),
-    .aresetn(aresetn),
-    .map_x(old_map),
-    .map_x_valid(old_map_valid),
-    .map_x_ready(hssim_old_avg_x_ready),
-    .map_x_last(old_map_last),
-    .map_y(avg_map),
-    .map_y_valid(avg_map_valid),
-    .map_y_ready(hssim_old_avg_y_ready),
-    .map_y_last(avg_map_last),
-    .numr(numr_x),
-    .denr(denr_x),
-    .numr_sign(numr_sign_x),
-    .out_valid(out_valid_x),
-    .out_ready(p1_mult_ready_x & p2_mult_ready_y),
-    .out_last(out_last_x)
-);
+wire [((2*(2*(2*PIXEL_SIZE+2))+1)*PIXELS_PER_BEAT)-1:0] hssim_out_old_avg;
+wire hssim_old_avg_ready_1, hssim_old_avg_ready_2, hssim_out_old_avg_valid, hssim_out_old_avg_last;
 
-wire hssim_avg_new_x_ready, hssim_avg_new_y_ready, out_valid_z, out_last_z;
-wire [(2*(2*PIXEL_SIZE+2)*PIXELS_PER_BEAT)-1:0] numr_z, denr_z;
-wire [PIXELS_PER_BEAT-1:0] numr_sign_z;
+wire [((2*(2*(2*PIXEL_SIZE+2))+1)*PIXELS_PER_BEAT)-1:0] hssim_out_avg_new;
+wire hssim_avg_new_ready_1, hssim_avg_new_ready_2, hssim_out_avg_new_valid, hssim_out_avg_new_last;
 
+wire [((2*(2*PIXEL_SIZE+2))*PIXELS_PER_BEAT)-1:0] numr_x, denr_x, numr_z, denr_z;
+wire [PIXELS_PER_BEAT-1:0] numr_x_sign, numr_z_sign;
 
-HSSIM #(.PIXELS_PER_BEAT(PIXELS_PER_BEAT), .PIXEL_SIZE(PIXEL_SIZE), .IMAGE_DIM(IMAGE_DIM)
-) HSSIM_AVG_NEW (
-    .aclk(aclk),
-    .aresetn(aresetn),
-    .map_x(avg_map),
-    .map_x_valid(avg_map_valid),
-    .map_x_ready(hssim_avg_new_x_ready),
-    .map_x_last(avg_map_last),
-    .map_y(new_map),
-    .map_y_valid(new_map_valid),
-    .map_y_ready(hssim_avg_new_y_ready),
-    .map_y_last(new_map_last),
-    .numr(numr_z),
-    .denr(denr_z),
-    .numr_sign(numr_sign_z),
-    .out_valid(out_valid_z),
-    .out_ready(p2_mult_ready_x & p1_mult_ready_y),
-    .out_last(out_last_z)
-);
+assign numr_x_sign = hssim_out_old_avg[((2*(2*(2*PIXEL_SIZE+2))*PIXELS_PER_BEAT) + PIXELS_PER_BEAT)- 1:(2*(2*(2*PIXEL_SIZE+2))*PIXELS_PER_BEAT)];
+assign numr_x = hssim_out_old_avg[(2*(2*(2*PIXEL_SIZE+2))*PIXELS_PER_BEAT)-1:(2*(2*PIXEL_SIZE+2))*PIXELS_PER_BEAT];
+assign denr_x = hssim_out_old_avg[((2*(2*PIXEL_SIZE+2))*PIXELS_PER_BEAT)-1:0];
+
+assign numr_z_sign = hssim_out_avg_new[((2*(2*(2*PIXEL_SIZE+2))*PIXELS_PER_BEAT) + PIXELS_PER_BEAT)- 1:(2*(2*(2*PIXEL_SIZE+2))*PIXELS_PER_BEAT)];
+assign numr_z = hssim_out_avg_new[(2*(2*(2*PIXEL_SIZE+2))*PIXELS_PER_BEAT)-1:(2*(2*PIXEL_SIZE+2))*PIXELS_PER_BEAT];
+assign denr_z = hssim_out_avg_new[((2*(2*PIXEL_SIZE+2))*PIXELS_PER_BEAT)-1:0];
 
 wire [(2*2*(2*PIXEL_SIZE+2)*PIXELS_PER_BEAT)-1:0] p1, p2;
 wire [PIXELS_PER_BEAT-1:0] p1_mult_ready_1, p1_mult_ready_2, p1_valid_1, p1_last_1, p2_mult_ready_1, p2_mult_ready_2, p2_valid_1, p2_last_1;
@@ -88,164 +58,189 @@ wire p2_mult_ready_y = &p2_mult_ready_2;
 wire p2_valid = &p2_valid_1;
 wire p2_last = &p2_last_1;
 
-genvar i;
-generate
-    for (i = 0; i < PIXELS_PER_BEAT; i = i+1) begin
+reg [PIXELS_PER_BEAT-1:0] numr_x_sign_1, numr_z_sign_1;
 
-        MULTIPLIER #(.DATA_WIDTH(2*(2*PIXEL_SIZE+2))) p1_multiplier (
-            .aclk(aclk),
-            .aresetn(aresetn),
-            .s_axis_tdata_x(numr_x[i*2*(2*PIXEL_SIZE+2)+:2*(2*PIXEL_SIZE+2)]),
-            .s_axis_tvalid_x(out_valid_x),
-            .s_axis_tready_x(p1_mult_ready_1[i]),
-            .s_axis_tlast_x(out_last_x),
-            .s_axis_tdata_y(denr_z[i*2*(2*PIXEL_SIZE+2)+:2*(2*PIXEL_SIZE+2)]),
-            .s_axis_tvalid_y(out_valid_z),
-            .s_axis_tready_y(p1_mult_ready_2[i]),
-            .s_axis_tlast_y(out_last_z),
-            .m_axis_tdata(p1[i*4*(2*PIXEL_SIZE+2)+:4*(2*PIXEL_SIZE+2)]),
-            .m_axis_tvalid(p1_valid_1[i]),
-            .m_axis_tready(comp_ready_x),
-            .m_axis_tlast(p1_last_1[i])
-        );
-
-        MULTIPLIER #(.DATA_WIDTH(2*(2*PIXEL_SIZE+2))) p2_multiplier (
-            .aclk(aclk),
-            .aresetn(aresetn),
-            .s_axis_tdata_x(numr_z[i*2*(2*PIXEL_SIZE+2)+:2*(2*PIXEL_SIZE+2)]),
-            .s_axis_tvalid_x(out_valid_z),
-            .s_axis_tready_x(p2_mult_ready_1[i]),
-            .s_axis_tlast_x(out_last_z),
-            .s_axis_tdata_y(denr_x[i*2*(2*PIXEL_SIZE+2)+:2*(2*PIXEL_SIZE+2)]),
-            .s_axis_tvalid_y(out_valid_x),
-            .s_axis_tready_y(p2_mult_ready_2[i]),
-            .s_axis_tlast_y(out_last_x),
-            .m_axis_tdata(p2[i*4*(2*PIXEL_SIZE+2)+:4*(2*PIXEL_SIZE+2)]),
-            .m_axis_tvalid(p2_valid_1[i]),
-            .m_axis_tready(comp_ready_y),
-            .m_axis_tlast(p2_last_1[i])
-        );
-
-    end
-endgenerate
-
-reg [PIXELS_PER_BEAT-1:0] numr_sign_x_1;
-
-always @(posedge aclk) begin
-    if(!aresetn) begin
-        numr_sign_x_1 <= 0;
-    end
-    else begin
-        if(out_valid_x & out_valid_z & p1_mult_ready_x & p1_mult_ready_y) begin
-            numr_sign_x_1 <= numr_sign_x;
-        end
-        else if(p1_valid & comp_ready_x) begin
-            numr_sign_x_1 <= 0;
-        end
-    end
-end
-
-reg [PIXELS_PER_BEAT-1:0] numr_sign_z_1;
-
-always @(posedge aclk) begin
-    if(!aresetn) begin
-        numr_sign_z_1 <= 0;
-    end
-    else begin
-        if(out_valid_x & out_valid_z & p2_mult_ready_x & p2_mult_ready_y) begin
-            numr_sign_z_1 <= numr_sign_z;
-        end
-        else if(p2_valid & comp_ready_y) begin
-            numr_sign_z_1 <= 0;
-        end
-    end
-end
-
-wire [PIXELS_PER_BEAT-1:0] s_axis_tready_1, s_axis_tready_2, comp, comp_valid_1, comp_last_1;
-wire comp_ready_x = &s_axis_tready_1;
-wire comp_ready_y = &s_axis_tready_2;
+wire [PIXELS_PER_BEAT-1:0] comp_out;
+wire [PIXELS_PER_BEAT-1:0] comp_ready_1, comp_ready_2, comp_valid_1, comp_last_1;
+wire comp_ready_x = &comp_ready_1;
+wire comp_ready_y = &comp_ready_2;
 wire comp_valid = &comp_valid_1;
 wire comp_last = &comp_last_1;
 
-genvar j;
+reg [PIXELS_PER_BEAT-1:0] numr_x_sign_2, numr_z_sign_2;
 
-generate
-    for(j = 0; j < PIXELS_PER_BEAT; j = j+1) begin
-        axis_comparator #( .DATA_WIDTH(2*2*(2*PIXEL_SIZE+2))
-    ) comp (
-        .aclk(aclk),
-        .aresetn(aresetn),
-        .s_axis_tdata_1(p1[j*4*(2*PIXEL_SIZE+2)+:4*(2*PIXEL_SIZE+2)]),
-        .s_axis_tvalid_1(p1_valid),
-        .s_axis_tready_1(s_axis_tready_1[j]),
-        .s_axis_tlast_1(p1_last),
-        .s_axis_tdata_2(p2[j*4*(2*PIXEL_SIZE+2)+:4*(2*PIXEL_SIZE+2)]),
-        .s_axis_tvalid_2(p2_valid),
-        .s_axis_tready_2(s_axis_tready_2[j]),
-        .s_axis_tlast_2(p2_last),
-        .m_axis_tdata(comp[j]),
-        .m_axis_tvalid(comp_valid_1[j]),
-        .m_axis_tready(advance),
-        .m_axis_tlast(comp_last_1[j])
-    );
+// DataPath
+
+HSSIM #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .PIXEL_SIZE(PIXEL_SIZE), .IMAGE_DIM(IMAGE_DIM)) old_avg (
+    .aclk(aclk),
+    .aresetn(aresetn),
+    .map_x(old_map),
+    .map_x_valid(old_map_valid),
+    .map_x_ready(hssim_old_avg_ready_1),
+    .map_x_last(old_map_last),
+    .map_y(avg_map),
+    .map_y_valid(avg_map_valid),
+    .map_y_ready(hssim_old_avg_ready_2),
+    .map_y_last(avg_map_last),
+    .sign_numr_denr(hssim_out_old_avg),
+    .out_valid(hssim_out_old_avg_valid),
+    .out_ready(p1_mult_ready_x & p2_mult_ready_y & p1_mult_ready_y & p2_mult_ready_x),
+    .out_last(hssim_out_old_avg_last)
+);
+
+HSSIM #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .PIXEL_SIZE(PIXEL_SIZE), .IMAGE_DIM(IMAGE_DIM)) avg_new (
+    .aclk(aclk),
+    .aresetn(aresetn),
+    .map_x(avg_map),
+    .map_x_valid(avg_map_valid),
+    .map_x_ready(hssim_avg_new_ready_1),
+    .map_x_last(avg_map_last),
+    .map_y(new_map),
+    .map_y_valid(new_map_valid),
+    .map_y_ready(hssim_avg_new_ready_2),
+    .map_y_last(new_map_last),
+    .sign_numr_denr(hssim_out_avg_new),
+    .out_valid(hssim_out_avg_new_valid),
+    .out_ready(p1_mult_ready_y & p2_mult_ready_x & p1_mult_ready_x & p2_mult_ready_y),
+    .out_last(hssim_out_avg_new_last)
+);
+
+genvar i;
+generate  
+    for (i = 0; i < PIXELS_PER_BEAT; i = i + 1) begin
+        MULTIPLIER #( .DATA_WIDTH((2*(2*PIXEL_SIZE+2))), .mode(0)) p1_mul (
+            .aclk(aclk),
+            .aresetn(aresetn),
+            .s_axis_tdata_x(numr_x[i*2*(2*PIXEL_SIZE+2)+:2*(2*PIXEL_SIZE+2)]),
+            .s_axis_tvalid_x(hssim_out_old_avg_valid),
+            .s_axis_tready_x(p1_mult_ready_1[i]),
+            .s_axis_tlast_x(hssim_out_old_avg_last),
+            .s_axis_tdata_y(denr_z[i*2*(2*PIXEL_SIZE+2)+:2*(2*PIXEL_SIZE+2)]),
+            .s_axis_tvalid_y(hssim_out_avg_new_valid),
+            .s_axis_tready_y(p1_mult_ready_2[i]),
+            .s_axis_tlast_y(hssim_out_avg_new_last),
+            .m_axis_tdata(p1[i*4*(2*PIXEL_SIZE+2)+:4*(2*PIXEL_SIZE+2)]),
+            .m_axis_tvalid(p1_valid_1[i]),
+            .m_axis_tready(comp_ready_x & comp_ready_y),
+            .m_axis_tlast(p1_last_1[i])
+        );
+
+        MULTIPLIER #( .DATA_WIDTH((2*(2*PIXEL_SIZE+2))), .mode(0)) p2_mul (
+            .aclk(aclk),
+            .aresetn(aresetn),
+            .s_axis_tdata_x(numr_z[i*2*(2*PIXEL_SIZE+2)+:2*(2*PIXEL_SIZE+2)]),
+            .s_axis_tvalid_x(hssim_out_avg_new_valid),
+            .s_axis_tready_x(p2_mult_ready_1[i]),
+            .s_axis_tlast_x(hssim_out_avg_new_last),
+            .s_axis_tdata_y(denr_x[i*2*(2*PIXEL_SIZE+2)+:2*(2*PIXEL_SIZE+2)]),
+            .s_axis_tvalid_y(hssim_out_old_avg_valid),
+            .s_axis_tready_y(p2_mult_ready_2[i]),
+            .s_axis_tlast_y(hssim_out_old_avg_last),
+            .m_axis_tdata(p2[i*4*(2*PIXEL_SIZE+2)+:4*(2*PIXEL_SIZE+2)]),
+            .m_axis_tvalid(p2_valid_1[i]),
+            .m_axis_tready(comp_ready_x & comp_ready_y),
+            .m_axis_tlast(p2_last_1[i])
+        );
     end
 endgenerate
 
-reg [PIXELS_PER_BEAT-1:0] numr_sign_x_2, numr_sign_z_2;
-
 always @(posedge aclk) begin
     if(!aresetn) begin
-        numr_sign_x_2 <= 0;
-        numr_sign_z_2 <= 0;
+        numr_x_sign_1 <= 0;
+        numr_z_sign_1 <= 0;
     end
     else begin
-        if(p1_valid & p2_valid & comp_ready_x & comp_ready_y) begin
-            numr_sign_x_2 <= numr_sign_x_1;
-            numr_sign_z_2 <= numr_sign_z_1;
+        if(p1_mult_ready_x & p1_mult_ready_y & p2_mult_ready_x & p2_mult_ready_y & hssim_out_old_avg_valid & hssim_out_avg_new_valid) begin
+            numr_x_sign_1 <= numr_x_sign;
+            numr_z_sign_1 <= numr_z_sign;
         end
-        else if(advance & comp_valid) begin
-            numr_sign_x_2 <= 0;
-            numr_sign_z_2 <= 0;
+        else if (p1_valid & p2_valid & comp_ready_x & comp_ready_y) begin
+            numr_x_sign_1 <= 0;
+            numr_z_sign_1 <= 0;
         end
     end
 end
 
-integer idx;
+genvar j;
+generate
+    for (j = 0; j < PIXELS_PER_BEAT; j = j + 1) begin
+        axis_comparator #( .DATA_WIDTH(2*2*(2*PIXEL_SIZE+2))) comp (
+            .aclk(aclk),
+            .aresetn(aresetn),
+            .s_axis_tdata_1(p2[j*4*(2*PIXEL_SIZE+2)+:4*(2*PIXEL_SIZE+2)]),
+            .s_axis_tvalid_1(p2_valid),
+            .s_axis_tready_1(comp_ready_1[j]),
+            .s_axis_tlast_1(p2_last),
+            .s_axis_tdata_2(p1[j*4*(2*PIXEL_SIZE+2)+:4*(2*PIXEL_SIZE+2)]), 
+            .s_axis_tvalid_2(p1_valid),
+            .s_axis_tready_2(comp_ready_2[j]),
+            .s_axis_tlast_2(p1_last),
+            .m_axis_tdata(comp_out[j]), // 1 if p2 > p1 else 0
+            .m_axis_tvalid(comp_valid_1[j]),
+            .m_axis_tready(advance),
+            .m_axis_tlast(comp_last_1[j])
+        );
+    end
+endgenerate
+
 always @(posedge aclk) begin
-    if (!aresetn) begin
+    if(!aresetn) begin
+        numr_x_sign_2 <= 0;
+        numr_z_sign_2 <= 0;
+    end
+    else begin
+        if(comp_ready_x & comp_ready_y & p1_valid & p2_valid) begin
+            numr_x_sign_2 <= numr_x_sign_1;
+            numr_z_sign_2 <= numr_z_sign_1;
+        end
+        else if (comp_valid & advance) begin
+            numr_x_sign_2 <= 0;
+            numr_z_sign_2 <= 0;
+        end
+    end
+end
+
+integer k;
+always @(posedge aclk) begin
+    if(!aresetn) begin
         del <= 0;
         del_valid <= 0;
         del_last <= 0;
     end
     else begin
-        if (comp_valid & advance) begin
-            for (idx = 0; idx < PIXELS_PER_BEAT; idx = idx+1) begin
-                if((numr_sign_x_2[idx] == 0) && (numr_sign_z_2[idx] == 0)) begin
-                    del[idx*PIXEL_SIZE+:PIXEL_SIZE] <= !comp[idx] ? 8'd255 : 8'd0;
+        for (k = 0; k < PIXELS_PER_BEAT; k = k + 1) begin
+            if (comp_valid & advance) begin
+                if (numr_x_sign_2[k] == 1'b1 && numr_z_sign_2[k] == 1'b0) begin
+                    del[k*PIXEL_SIZE +: PIXEL_SIZE] <= 255;
                 end
-                else if((numr_sign_x_2[idx] == 1) && (numr_sign_z_2[idx] == 0)) begin
-                    del[idx*PIXEL_SIZE+:PIXEL_SIZE] <= 8'd255;
+                else if (numr_x_sign_2[k] == 1'b0 && numr_z_sign_2[k] == 1'b1) begin
+                    del[k*PIXEL_SIZE +: PIXEL_SIZE] <= 0;
                 end
-                else if((numr_sign_x_2[idx] == 0) && (numr_sign_z_2[idx] == 1)) begin
-                    del[idx*PIXEL_SIZE+:PIXEL_SIZE] <= 8'd0;
+                else if (numr_x_sign_2[k] == 1'b0 && numr_z_sign_2[k] == 1'b0) begin
+                    del[k*PIXEL_SIZE +: PIXEL_SIZE] <= {PIXEL_SIZE{comp_out[k]}};
                 end
                 else begin
-                    del[idx*PIXEL_SIZE+:PIXEL_SIZE] <= comp[idx] ? 8'd255 : 8'd0;
+                    del[k*PIXEL_SIZE +: PIXEL_SIZE] <= {PIXEL_SIZE{!comp_out[k]}};
                 end
             end
-            del_valid <= 1;
-            del_last  <= comp_last;
+            else if (del_ready && del_valid) begin
+                del[k*PIXEL_SIZE +: PIXEL_SIZE] <= 0;
+            end
         end
-        else if (del_valid & del_ready) begin
-            del <= 0;
-            del_valid <= 0;
-            del_last <= 0;
+
+        if (comp_valid & advance) begin
+            del_valid <= 1'b1;
+            del_last <= comp_last;
+        end
+        else if (del_ready && del_valid) begin
+            del_valid <= 1'b0;
+            del_last <= 1'b0;
         end
     end
 end
 
-assign old_map_ready = hssim_old_avg_x_ready;
-assign avg_map_ready = hssim_old_avg_y_ready & hssim_avg_new_x_ready;
-assign new_map_ready = hssim_avg_new_y_ready;
+assign old_map_ready = hssim_old_avg_ready_1 & avg_map_valid & new_map_valid;
+assign avg_map_ready = hssim_old_avg_ready_2 & hssim_avg_new_ready_1 & old_map_valid & new_map_valid;
+assign new_map_ready = hssim_avg_new_ready_2 & old_map_valid & avg_map_valid;
 
 endmodule
