@@ -4,8 +4,8 @@ module LSU #(
     parameter PIXELS_PER_BEAT = 16,
     parameter IMAGE_DIM  = 512,
     parameter BIT_WIDTH = 8,
-    parameter WRITE_DELAY = 0,
-    parameter RW_SHIFT = 0,
+    parameter WRITE_DELAY = 1,
+    parameter RW_SHIFT = 1,
     parameter DATA_WIDTH = PIXELS_PER_BEAT*BIT_WIDTH
 ) (
     input wire aclk,
@@ -37,11 +37,14 @@ wire read_enable = data_available && output_stage_advance;
 
 always @(posedge aclk) begin
     if(~aresetn) begin
-        write_ptr <= -WRITE_DELAY;
+        write_ptr <= MEM_DEPTH - WRITE_DELAY;
     end
     else if(write_enable) begin
         ram[write_ptr] <= {s_axis_tlast, s_axis_tdata};
-        write_ptr <= write_ptr + 1;
+        if(write_ptr == MEM_DEPTH - WRITE_DELAY) begin
+            write_ptr <= 0;
+        end
+        else write_ptr <= write_ptr + 1;
     end
 end
 

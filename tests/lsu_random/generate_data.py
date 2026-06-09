@@ -1,5 +1,6 @@
 import argparse
 import random
+import numpy as np
 
 def main():
     parser = argparse.ArgumentParser(description="Structural Golden Data Generator for LSU")
@@ -13,12 +14,15 @@ def main():
     MEM_DEPTH = 16384
     
     # Structural Offsets
-    WRITE_DELAY = 0
-    RW_SHIFT = 0
+    WRITE_DELAY = 1
+    RW_SHIFT = 1
 
     # 1. Generate 1 full frame of random input data beats
-    inputs = [random.randint(0, (1 << S_AXIS_DATA_WIDTH) - 1) for _ in range(S_AXIS_TOTAL_BEATS)]
-    
+    # inputs = [random.randint(0, (1 << S_AXIS_DATA_WIDTH) - 1) for _ in range(S_AXIS_TOTAL_BEATS)]
+    inputs = [0] * S_AXIS_TOTAL_BEATS
+    inputs[0] = (1 << S_AXIS_DATA_WIDTH) - 1  # 128 bits of 1s (all Fs in hex)
+
+
     # 2. Create an array similar to RAM (Initialized to 0)
     ram = [0] * MEM_DEPTH
 

@@ -11,7 +11,7 @@
 `define M_AXIS_TOTAL_BEATS 16384
 
 `define BIT_WIDTH          8
-`define WRITE_DELAY        0
-`define RW_SHIFT           0
+`define WRITE_DELAY        1
+`define RW_SHIFT           1
 
 `endif 
