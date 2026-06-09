@@ -12,16 +12,13 @@ module tb_top;
     
     always #5 clk = ~clk;
 
-    // Physical Interfaces
     axis_if #(`S_AXIS_DATA_WIDTH) s_if [1] (clk, rst_n);
     axis_if #(`M_AXIS_DATA_WIDTH) m_if [1] (clk, rst_n);
 
     LSU #(
         .PIXELS_PER_BEAT(`S_AXIS_DATA_WIDTH / `BIT_WIDTH),
         .IMAGE_DIM(`IMAGE_WIDTH),
-        .BIT_WIDTH(`BIT_WIDTH),
-        .WRITE_DELAY(`WRITE_DELAY),
-        .RW_SHIFT(`RW_SHIFT)
+        .BIT_WIDTH(`BIT_WIDTH)
     ) dut (
         .aclk(clk), 
         .aresetn(rst_n),
