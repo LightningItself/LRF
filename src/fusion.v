@@ -35,7 +35,7 @@ wire last = old_frame_tlast & new_frame_tlast & del_gauss_tlast;
 
 wire [DATA_WIDTH-1:0] dbar;
 
-reg [2*DATA_WIDTH-1:0] x_dbar, y_d;
+wire [2*DATA_WIDTH-1:0] x_dbar, y_d;
 wire [PIXELS_PER_BEAT-1:0] x_dbar_mult_ready_1, x_dbar_mult_ready_2, x_dbar_valid_1, x_dbar_last_1;
 wire [PIXELS_PER_BEAT-1:0] y_d_mult_ready_1, y_d_mult_ready_2, y_d_valid_1, y_d_last_1;
 wire x_dbar_mult_ready_x = &x_dbar_mult_ready_1;
@@ -62,13 +62,13 @@ genvar j;
 generate
 for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
 
-    assign dbar[j*PIXEL_SIZE+:PIXEL_SIZE] = ~del_gauss[j*PIXEL_SIZE+:PIXEL_SIZE];     // assign dbar[j*9+:9] = {1'b0, ~del_gauss[j*8+:8]}+9'b1;
+    assign dbar[j*PIXEL_SIZE+:PIXEL_SIZE] = ~del_gauss[j*PIXEL_SIZE+:PIXEL_SIZE];
 
     MULTIPLIER #( .DATA_WIDTH(PIXEL_SIZE), .mode(0)) x_dbar_mult (
         .aclk(aclk),
         .aresetn(aresetn),
         .s_axis_tdata_x(old_frame[j*PIXEL_SIZE+:PIXEL_SIZE]),
-        .s_axis_tvalid_x(old_frame_tvalid),
+        .s_axis_tvalid_x(old_frame_tvalid & new_frame_tvalid),
         .s_axis_tready_x(x_dbar_mult_ready_1[j]),
         .s_axis_tlast_x(old_frame_tlast),
         .s_axis_tdata_y(dbar[j*PIXEL_SIZE+:PIXEL_SIZE]),
@@ -85,7 +85,7 @@ for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
         .aclk(aclk),
         .aresetn(aresetn),
         .s_axis_tdata_x(new_frame[j*PIXEL_SIZE+:PIXEL_SIZE]),
-        .s_axis_tvalid_x(new_frame_tvalid),
+        .s_axis_tvalid_x(new_frame_tvalid & old_frame_tvalid),
         .s_axis_tready_x(y_d_mult_ready_1[j]),
         .s_axis_tlast_x(new_frame_tlast),
         .s_axis_tdata_y(del_gauss[j*PIXEL_SIZE+:PIXEL_SIZE]),
