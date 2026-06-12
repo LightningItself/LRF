@@ -1,7 +1,7 @@
 module axis_buff #(
     parameter S_AXIS_DATA_WIDTH = 8,
     parameter M_AXIS_DATA_WIDTH = 16,
-    parameter DEPTH = 14  // latency = DEPTH+1 = 15
+    parameter DEPTH = 1  // latency = DEPTH+1
 )(
     input wire aclk,
     input wire aresetn,
