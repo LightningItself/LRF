@@ -1,4 +1,4 @@
-module axis_buff #(
+module axis_buff_depth #(
     parameter S_AXIS_DATA_WIDTH = 8,
     parameter M_AXIS_DATA_WIDTH = 16,
     parameter DEPTH = 1  // latency = DEPTH+1
