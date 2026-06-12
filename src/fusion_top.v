@@ -40,8 +40,11 @@ wire hssim_ready_x, hssim_ready_y, hssim_ready_z, del_valid, del_last;
 wire [DATA_WIDTH-1:0] del_gauss;
 wire gauss_ready, del_gauss_valid, del_gauss_last;
 
-reg [DATA_WIDTH-1:0] old_fused_buff_1, new_buff_1;
-reg old_fused_buff_1_valid, old_fused_buff_1_last, new_buff_1_valid, new_buff_1_last;
+wire [DATA_WIDTH-1:0] old_fused_buff_1, new_buff_1;
+wire old_fused_buff_1_valid, old_fused_buff_1_last, new_buff_1_valid, new_buff_1_last;
+wire old_fused_buff_1_valid, old_fused_buff_1_ready, new_buff_1_valid, new_buff_1_last, old_fused_buff_1_valid_valid, old_fused_buff_1_valid_last;
+wire old_fused_buff_1_last_valid, old_fused_buff_1_last_last, new_buff_1_valid_valid, new_buff_1_valid_ready, new_buff_1_last_valid, new_buff_1_last_last;
+wire sob_buff_1_ready , sob_buff_2_ready , sob_buff_3_ready, sob_buff_4_ready, sob_buff_5_ready, sob_buff_6_ready;
 
 reg [DATA_WIDTH-1:0] old_fused_buff_2, new_buff_2;
 reg old_fused_buff_2_valid, old_fused_buff_2_last, new_buff_2_valid, new_buff_2_last;
@@ -102,32 +105,81 @@ CONV_SOBEL #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .PIXEL_SIZE(PIXEL_SIZE), .IMAGE
     .m_axis_tlast(new_edge_last)
 );
 
-always @(posedge aclk) begin
-    if(~aresetn) begin
-        old_fused_buff_1 <= 0;
-        new_buff_1 <= 0;
-        old_fused_buff_1_valid <= 0;
-        old_fused_buff_1_last <= 0;
-        new_buff_1_valid <= 0;
-        new_buff_1_last <= 0;
-    end
-    else begin
-        if(s_axis_old_fused_tvalid & sob_old_fused_ready & s_axis_new_tvalid & sob_new_ready) begin
-            old_fused_buff_1 <= s_axis_old_fused_tdata;
-            new_buff_1 <= s_axis_new_tdata;
-            old_fused_buff_1_valid <= s_axis_old_fused_tvalid;
-            old_fused_buff_1_last <= s_axis_old_fused_tlast;
-            new_buff_1_valid <= s_axis_new_tvalid;
-            new_buff_1_last <= s_axis_new_tlast;
-        end
-        else if(old_fused_edge_valid & hssim_ready_x & new_edge_valid & hssim_ready_z) begin
-            old_fused_buff_1_valid <= 0;
-            old_fused_buff_1_last <= 0;
-            new_buff_1_valid <= 0;
-            new_buff_1_last <= 0;
-        end
-    end
-end
+axis_buff #( .S_AXIS_DATA_WIDTH(DATA_WIDTH), M_AXIS_DATA_WIDTH(DATA_WIDTH), DEPTH(14)) sob_buff_1(
+    .aclk(aclk),
+    .aresetn(aresetn),
+    .s_axis_tdata(s_axis_old_fused_tdata),
+    .s_axis_tvalid(s_axis_old_fused_tvalid),
+    .s_axis_tready(sob_buff_1_ready),
+    .s_axis_tlast(s_axis_old_fused_tlast),
+    .m_axis_tdata(old_fused_buff_1),
+    .m_axis_tvalid(old_fused_buff_1_valid),
+    .m_axis_tready(hssim_ready_x & hssim_ready_y & hssim_ready_z),
+    .m_axis_tlast(old_fused_buff_1_last)
+);
+axis_buff #( .S_AXIS_DATA_WIDTH(DATA_WIDTH), M_AXIS_DATA_WIDTH(DATA_WIDTH), DEPTH(14)) sob_buff_2(
+    .aclk(aclk),
+    .aresetn(aresetn),
+    .s_axis_tdata(s_axis_new_tdata),
+    .s_axis_tvalid(s_axis_new_tvalid),
+    .s_axis_tready(sob_buff_2_ready),
+    .s_axis_tlast(s_axis_new_tlast),
+    .m_axis_tdata(new_buff_1),
+    .m_axis_tvalid(new_buff_1_valid),
+    .m_axis_tready(hssim_ready_x & hssim_ready_y & hssim_ready_z),
+    .m_axis_tlast(new_buff_1_last)
+);
+
+axis_buff #( .S_AXIS_DATA_WIDTH(1), M_AXIS_DATA_WIDTH(1), DEPTH(14)) sob_buff_3(
+    .aclk(aclk),
+    .aresetn(aresetn),
+    .s_axis_tdata(s_axis_old_fused_tvalid),
+    .s_axis_tvalid(s_axis_old_fused_tvalid),
+    .s_axis_tready(sob_buff_3_ready),
+    .s_axis_tlast(s_axis_old_fused_tlast),
+    .m_axis_tdata(old_fused_buff_1_valid),
+    .m_axis_tvalid(old_fused_buff_1_valid_valid),
+    .m_axis_tready(hssim_ready_x & hssim_ready_y & hssim_ready_z),
+    .m_axis_tlast(old_fused_buff_1_valid_last,)
+);
+
+axis_buff #( .S_AXIS_DATA_WIDTH(1), M_AXIS_DATA_WIDTH(1), DEPTH(14)) sob_buff_4(
+    .aclk(aclk),
+    .aresetn(aresetn),
+    .s_axis_tdata(s_axis_old_fused_tlast),
+    .s_axis_tvalid(s_axis_old_fused_tvalid),
+    .s_axis_tready(sob_buff_4_ready),
+    .s_axis_tlast(s_axis_old_fused_tlast),
+    .m_axis_tdata(old_fused_buff_1_last),
+    .m_axis_tvalid(old_fused_buff_1_last_valid),
+    .m_axis_tready(hssim_ready_x & hssim_ready_y & hssim_ready_z),
+    .m_axis_tlast(old_fused_buff_1_last_last)
+);
+axis_buff #( .S_AXIS_DATA_WIDTH(1), M_AXIS_DATA_WIDTH(1), DEPTH(14)) sob_buff_5(
+    .aclk(aclk),
+    .aresetn(aresetn),
+    .s_axis_tdata(s_axis_new_tvalid),
+    .s_axis_tvalid(s_axis_new_tvalid),
+    .s_axis_tready(sob_buff_5_ready),
+    .s_axis_tlast(s_axis_new_tlast),
+    .m_axis_tdata(new_buff_1_valid),
+    .m_axis_tvalid(new_buff_1_valid_valid),
+    .m_axis_tready(hssim_ready_x & hssim_ready_y & hssim_ready_z),
+    .m_axis_tlast(new_buff_1_valid_last)
+);
+
+axis_buff #( .S_AXIS_DATA_WIDTH(1), M_AXIS_DATA_WIDTH(1), DEPTH(14)) sob_buff_6(
+    .aclk(aclk),
+    .aresetn(aresetn),
+    .s_axis_tdata(s_axis_new_tlast),
+    .s_axis_tvalid(s_axis_new_tvalid),
+    .s_axis_tready(sob_buff_6_ready),
+    .s_axis_tlast(s_axis_new_tlast),
+    .m_axis_tdata(new_buff_1_last),
+    .m_axis_tvalid(new_buff_1_last_valid),
+    .m_axis_tready(hssim_ready_x & hssim_ready_y & hssim_ready_z),
+    .m_axis_tlast(new_buff_1_last_last)
+);
 
 HSSIM_TOP #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .PIXEL_SIZE(PIXEL_SIZE), .IMAGE_DIM(IMAGE_DIM)) hssim(
     .aclk(aclk),
@@ -176,6 +228,84 @@ always @(posedge aclk) begin
         end
     end
 end
+
+axis_buff #( .S_AXIS_DATA_WIDTH(DATA_WIDTH), M_AXIS_DATA_WIDTH(DATA_WIDTH), DEPTH(10)) buff_2_1(
+    .aclk(aclk),
+    .aresetn(aresetn),
+    .s_axis_tdata(),
+    .s_axis_tvalid(),
+    .s_axis_tready(),
+    .s_axis_tlast(),
+    .m_axis_tdata(),
+    .m_axis_tvalid(),
+    .m_axis_tready(),
+    .m_axis_tlast()
+);
+
+axis_buff #( .S_AXIS_DATA_WIDTH(DATA_WIDTH), M_AXIS_DATA_WIDTH(DATA_WIDTH), DEPTH(10)) buff_2_2(
+    .aclk(aclk),
+    .aresetn(aresetn),
+    .s_axis_tdata(),
+    .s_axis_tvalid(),
+    .s_axis_tready(),
+    .s_axis_tlast(),
+    .m_axis_tdata(),
+    .m_axis_tvalid(),
+    .m_axis_tready(),
+    .m_axis_tlast()
+);
+
+axis_buff #( .S_AXIS_DATA_WIDTH(1), M_AXIS_DATA_WIDTH(1), DEPTH(10)) buff_2_3(
+    .aclk(aclk),
+    .aresetn(aresetn),
+    .s_axis_tdata(),
+    .s_axis_tvalid(),
+    .s_axis_tready(),
+    .s_axis_tlast(),
+    .m_axis_tdata(),
+    .m_axis_tvalid(),
+    .m_axis_tready(),
+    .m_axis_tlast()
+);
+
+axis_buff #( .S_AXIS_DATA_WIDTH(1), M_AXIS_DATA_WIDTH(1), DEPTH(10)) buff_2_4(
+    .aclk(aclk),
+    .aresetn(aresetn),
+    .s_axis_tdata(),
+    .s_axis_tvalid(),
+    .s_axis_tready(),
+    .s_axis_tlast(),
+    .m_axis_tdata(),
+    .m_axis_tvalid(),
+    .m_axis_tready(),
+    .m_axis_tlast()
+);
+
+axis_buff #( .S_AXIS_DATA_WIDTH(1), M_AXIS_DATA_WIDTH(1), DEPTH(10)) buff_2_5(
+    .aclk(aclk),
+    .aresetn(aresetn),
+    .s_axis_tdata(),
+    .s_axis_tvalid(),
+    .s_axis_tready(),
+    .s_axis_tlast(),
+    .m_axis_tdata(),
+    .m_axis_tvalid(),
+    .m_axis_tready(),
+    .m_axis_tlast()
+);
+
+axis_buff #( .S_AXIS_DATA_WIDTH(1), M_AXIS_DATA_WIDTH(1), DEPTH(10)) buff_2_6(
+    .aclk(aclk),
+    .aresetn(aresetn),
+    .s_axis_tdata(),
+    .s_axis_tvalid(),
+    .s_axis_tready(),
+    .s_axis_tlast(),
+    .m_axis_tdata(),
+    .m_axis_tvalid(),
+    .m_axis_tready(),
+    .m_axis_tlast()
+);
 
 CONV_GAUSS #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .PIXEL_SIZE(PIXEL_SIZE), .IMAGE_WIDTH(IMAGE_DIM)) gauss(
     .aclk(aclk),
