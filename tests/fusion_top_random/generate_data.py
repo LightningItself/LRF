@@ -112,10 +112,13 @@ def main():
     args = parser.parse_args()
     os.makedirs(args.out_dir, exist_ok=True)
 
-    rng = np.random.default_rng(seed=42)
+    rng = np.random.default_rng()
     image_old = rng.integers(0, 256, (IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint8)
     image_avg = rng.integers(0, 256, (IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint8)
     image_new = rng.integers(0, 256, (IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint8)
+    # image_old = np.zeros((IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint8)
+    # image_avg = np.zeros((IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint8)
+    # image_new = np.zeros((IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint8)
 
     edge_old = compute_sobel(image_old)
     edge_avg = compute_sobel(image_avg)

@@ -60,6 +60,7 @@ add_files -fileset sources_1 ${SRC_DIR}/multiplier.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_adder.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_sub.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_buff.v
+add_files -fileset sources_1 ${SRC_DIR}/axis_buff_depth.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_comparator.v
 add_files -fileset sources_1 ${SRC_DIR}/sig_xy.v
 add_files -fileset sources_1 ${SRC_DIR}/hssim.v
@@ -94,6 +95,23 @@ set_property -name {xsim.simulate.xsim.more_options} \
             -testplusarg IN_FILE_NAME_NEW=$ABS_INPUT_HEX_NEW \
             -testplusarg OUT_FILE_NAME_TOP=$ABS_OUTPUT_HEX_TOP" \
     -objects [get_filesets sim_1]
+
+# =====================================================================
+# ADDED: Waveform Configuration Setup (.wcfg)
+# =====================================================================
+set ABS_WCFG_PATH [file normalize "../fusion_top.wcfg"]
+
+if {[file exists $ABS_WCFG_PATH]} {
+    puts "Found waveform configuration file: $ABS_WCFG_PATH"
+    # Associate the existing .wcfg file with the simulation fileset
+    add_files -fileset sim_1 [list $ABS_WCFG_PATH]
+    # Configure XSim to automatically open this view layout on start
+    set_property xsim.simulate.view $ABS_WCFG_PATH [get_filesets sim_1]
+} else {
+    puts "WARNING: Waveform layout not found at $ABS_WCFG_PATH."
+    puts "XSim will launch with a default layout. Save it to that path to use next time!"
+}
+# =====================================================================
 
 puts "Running simulation..."
 launch_simulation
