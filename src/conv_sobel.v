@@ -239,6 +239,6 @@ module CONV_SOBEL #(
     end
 
     
-    assign s_axis_tready = advance;
+    assign s_axis_tready = advance & s_axis_tvalid;
 
 endmodule

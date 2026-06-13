@@ -52,6 +52,6 @@ always @(posedge aclk) begin
     end
 end
 
-assign s_axis_tready = advance;
+assign s_axis_tready = advance & s_axis_tvalid;
 
 endmodule

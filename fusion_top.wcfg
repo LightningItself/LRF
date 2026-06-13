@@ -13,396 +13,286 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
-      <ZoomEndTime time="1,226.001 ns"></ZoomEndTime>
-      <Cursor1Time time="300.000 ns"></Cursor1Time>
+      <ZoomStartTime time="244.073 ns"></ZoomStartTime>
+      <ZoomEndTime time="492.274 ns"></ZoomEndTime>
+      <Cursor1Time time="285.439 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="308"></NameColumnWidth>
-      <ValueColumnWidth column_width="78"></ValueColumnWidth>
+      <NameColumnWidth column_width="366"></NameColumnWidth>
+      <ValueColumnWidth column_width="261"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="25" />
-   <wvobject type="logic" fp_name="/tb_top/dut/aclk">
-      <obj_property name="ElementShortName">aclk</obj_property>
-      <obj_property name="ObjectShortName">aclk</obj_property>
+   <WVObjectSize size="15" />
+   <wvobject fp_name="/tb_top/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
    </wvobject>
-   <wvobject type="logic" fp_name="/tb_top/dut/aresetn">
+   <wvobject fp_name="/tb_top/aresetn" type="logic">
       <obj_property name="ElementShortName">aresetn</obj_property>
       <obj_property name="ObjectShortName">aresetn</obj_property>
    </wvobject>
-   <wvobject fp_name="divider11" type="divider">
-      <obj_property name="label">Inputs</obj_property>
+   <wvobject type="divider" fp_name="divider274">
+      <obj_property name="label">inputs</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject type="group" fp_name="group12">
-      <obj_property name="label">Inputs</obj_property>
+   <wvobject fp_name="group275" type="group">
+      <obj_property name="label">inputs</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="array" fp_name="/tb_top/dut/s_axis_old_fused_tdata">
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_top/dut/s_axis_old_fused_tdata" type="array">
          <obj_property name="ElementShortName">s_axis_old_fused_tdata[127:0]</obj_property>
          <obj_property name="ObjectShortName">s_axis_old_fused_tdata[127:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/s_axis_old_fused_tvalid">
+      <wvobject fp_name="/tb_top/dut/s_axis_old_fused_tvalid" type="logic">
          <obj_property name="ElementShortName">s_axis_old_fused_tvalid</obj_property>
          <obj_property name="ObjectShortName">s_axis_old_fused_tvalid</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/s_axis_old_fused_tready">
+      <wvobject fp_name="/tb_top/dut/s_axis_old_fused_tready" type="logic">
          <obj_property name="ElementShortName">s_axis_old_fused_tready</obj_property>
          <obj_property name="ObjectShortName">s_axis_old_fused_tready</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/s_axis_old_fused_tlast">
+      <wvobject fp_name="/tb_top/dut/s_axis_old_fused_tlast" type="logic">
          <obj_property name="ElementShortName">s_axis_old_fused_tlast</obj_property>
          <obj_property name="ObjectShortName">s_axis_old_fused_tlast</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/s_axis_avg_tdata">
+      <wvobject fp_name="/tb_top/dut/s_axis_avg_tdata" type="array">
          <obj_property name="ElementShortName">s_axis_avg_tdata[127:0]</obj_property>
          <obj_property name="ObjectShortName">s_axis_avg_tdata[127:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/s_axis_avg_tvalid">
+      <wvobject fp_name="/tb_top/dut/s_axis_avg_tvalid" type="logic">
          <obj_property name="ElementShortName">s_axis_avg_tvalid</obj_property>
          <obj_property name="ObjectShortName">s_axis_avg_tvalid</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/s_axis_avg_tready">
+      <wvobject fp_name="/tb_top/dut/s_axis_avg_tready" type="logic">
          <obj_property name="ElementShortName">s_axis_avg_tready</obj_property>
          <obj_property name="ObjectShortName">s_axis_avg_tready</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/s_axis_avg_tlast">
+      <wvobject fp_name="/tb_top/dut/s_axis_avg_tlast" type="logic">
          <obj_property name="ElementShortName">s_axis_avg_tlast</obj_property>
          <obj_property name="ObjectShortName">s_axis_avg_tlast</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/s_axis_new_tdata">
+      <wvobject fp_name="/tb_top/dut/s_axis_new_tdata" type="array">
          <obj_property name="ElementShortName">s_axis_new_tdata[127:0]</obj_property>
          <obj_property name="ObjectShortName">s_axis_new_tdata[127:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/s_axis_new_tvalid">
+      <wvobject fp_name="/tb_top/dut/s_axis_new_tvalid" type="logic">
          <obj_property name="ElementShortName">s_axis_new_tvalid</obj_property>
          <obj_property name="ObjectShortName">s_axis_new_tvalid</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/s_axis_new_tready">
+      <wvobject fp_name="/tb_top/dut/s_axis_new_tready" type="logic">
          <obj_property name="ElementShortName">s_axis_new_tready</obj_property>
          <obj_property name="ObjectShortName">s_axis_new_tready</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/s_axis_new_tlast">
+      <wvobject fp_name="/tb_top/dut/s_axis_new_tlast" type="logic">
          <obj_property name="ElementShortName">s_axis_new_tlast</obj_property>
          <obj_property name="ObjectShortName">s_axis_new_tlast</obj_property>
       </wvobject>
    </wvobject>
-   <wvobject fp_name="divider25" type="divider">
-      <obj_property name="label">Sobels</obj_property>
+   <wvobject type="divider" fp_name="divider288">
+      <obj_property name="label">sobel</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject type="group" fp_name="group27">
-      <obj_property name="label">Sobels</obj_property>
+   <wvobject fp_name="group289" type="group">
+      <obj_property name="label">sobel</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="array" fp_name="/tb_top/dut/old_fused_edge">
-         <obj_property name="ElementShortName">old_fused_edge[127:0]</obj_property>
-         <obj_property name="ObjectShortName">old_fused_edge[127:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_top/dut/edge_old_fused" type="array">
+         <obj_property name="ElementShortName">edge_old_fused[127:0]</obj_property>
+         <obj_property name="ObjectShortName">edge_old_fused[127:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/old_fused_edge_valid">
-         <obj_property name="ElementShortName">old_fused_edge_valid</obj_property>
-         <obj_property name="ObjectShortName">old_fused_edge_valid</obj_property>
+      <wvobject fp_name="/tb_top/dut/edge_avg" type="array">
+         <obj_property name="ElementShortName">edge_avg[127:0]</obj_property>
+         <obj_property name="ObjectShortName">edge_avg[127:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/old_fused_edge_last">
-         <obj_property name="ElementShortName">old_fused_edge_last</obj_property>
-         <obj_property name="ObjectShortName">old_fused_edge_last</obj_property>
+      <wvobject fp_name="/tb_top/dut/edge_new" type="array">
+         <obj_property name="ElementShortName">edge_new[127:0]</obj_property>
+         <obj_property name="ObjectShortName">edge_new[127:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/sob_old_fused_ready">
+      <wvobject fp_name="/tb_top/dut/edge_old_fused_valid" type="logic">
+         <obj_property name="ElementShortName">edge_old_fused_valid</obj_property>
+         <obj_property name="ObjectShortName">edge_old_fused_valid</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_top/dut/edge_old_fused_last" type="logic">
+         <obj_property name="ElementShortName">edge_old_fused_last</obj_property>
+         <obj_property name="ObjectShortName">edge_old_fused_last</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_top/dut/edge_avg_valid" type="logic">
+         <obj_property name="ElementShortName">edge_avg_valid</obj_property>
+         <obj_property name="ObjectShortName">edge_avg_valid</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_top/dut/edge_avg_last" type="logic">
+         <obj_property name="ElementShortName">edge_avg_last</obj_property>
+         <obj_property name="ObjectShortName">edge_avg_last</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_top/dut/edge_new_valid" type="logic">
+         <obj_property name="ElementShortName">edge_new_valid</obj_property>
+         <obj_property name="ObjectShortName">edge_new_valid</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_top/dut/edge_new_last" type="logic">
+         <obj_property name="ElementShortName">edge_new_last</obj_property>
+         <obj_property name="ObjectShortName">edge_new_last</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_top/dut/sob_old_fused_ready" type="logic">
          <obj_property name="ElementShortName">sob_old_fused_ready</obj_property>
          <obj_property name="ObjectShortName">sob_old_fused_ready</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/avg_edge">
-         <obj_property name="ElementShortName">avg_edge[127:0]</obj_property>
-         <obj_property name="ObjectShortName">avg_edge[127:0]</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/avg_edge_valid">
-         <obj_property name="ElementShortName">avg_edge_valid</obj_property>
-         <obj_property name="ObjectShortName">avg_edge_valid</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/avg_edge_last">
-         <obj_property name="ElementShortName">avg_edge_last</obj_property>
-         <obj_property name="ObjectShortName">avg_edge_last</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/sob_avg_ready">
+      <wvobject fp_name="/tb_top/dut/sob_avg_ready" type="logic">
          <obj_property name="ElementShortName">sob_avg_ready</obj_property>
          <obj_property name="ObjectShortName">sob_avg_ready</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/new_edge">
-         <obj_property name="ElementShortName">new_edge[127:0]</obj_property>
-         <obj_property name="ObjectShortName">new_edge[127:0]</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/new_edge_valid">
-         <obj_property name="ElementShortName">new_edge_valid</obj_property>
-         <obj_property name="ObjectShortName">new_edge_valid</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/new_edge_last">
-         <obj_property name="ElementShortName">new_edge_last</obj_property>
-         <obj_property name="ObjectShortName">new_edge_last</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/sob_new_ready">
+      <wvobject fp_name="/tb_top/dut/sob_new_ready" type="logic">
          <obj_property name="ElementShortName">sob_new_ready</obj_property>
          <obj_property name="ObjectShortName">sob_new_ready</obj_property>
       </wvobject>
    </wvobject>
-   <wvobject fp_name="divider168" type="divider">
-      <obj_property name="label">sobel_buff</obj_property>
+   <wvobject type="divider" fp_name="divider302">
+      <obj_property name="label">Buff_1</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject type="group" fp_name="group170">
-      <obj_property name="label">buff_1</obj_property>
+   <wvobject fp_name="group832" type="group">
+      <obj_property name="label">Buff_1</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="array" fp_name="/tb_top/dut/old_fused_buff_1">
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_top/dut/old_fused_buff_1" type="array">
          <obj_property name="ElementShortName">old_fused_buff_1[127:0]</obj_property>
          <obj_property name="ObjectShortName">old_fused_buff_1[127:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/new_buff_1">
+      <wvobject fp_name="/tb_top/dut/new_buff_1" type="array">
          <obj_property name="ElementShortName">new_buff_1[127:0]</obj_property>
          <obj_property name="ObjectShortName">new_buff_1[127:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/old_fused_buff_1_valid">
+      <wvobject fp_name="/tb_top/dut/old_fused_buff_1_valid" type="logic">
          <obj_property name="ElementShortName">old_fused_buff_1_valid</obj_property>
          <obj_property name="ObjectShortName">old_fused_buff_1_valid</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/old_fused_buff_1_last">
+      <wvobject fp_name="/tb_top/dut/old_fused_buff_1_last" type="logic">
          <obj_property name="ElementShortName">old_fused_buff_1_last</obj_property>
          <obj_property name="ObjectShortName">old_fused_buff_1_last</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/new_buff_1_valid">
+      <wvobject fp_name="/tb_top/dut/new_buff_1_valid" type="logic">
          <obj_property name="ElementShortName">new_buff_1_valid</obj_property>
          <obj_property name="ObjectShortName">new_buff_1_valid</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/new_buff_1_last">
+      <wvobject fp_name="/tb_top/dut/new_buff_1_last" type="logic">
          <obj_property name="ElementShortName">new_buff_1_last</obj_property>
          <obj_property name="ObjectShortName">new_buff_1_last</obj_property>
       </wvobject>
+      <wvobject fp_name="/tb_top/dut/sob_buff_1_ready" type="logic">
+         <obj_property name="ElementShortName">sob_buff_1_ready</obj_property>
+         <obj_property name="ObjectShortName">sob_buff_1_ready</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_top/dut/sob_buff_2_ready" type="logic">
+         <obj_property name="ElementShortName">sob_buff_2_ready</obj_property>
+         <obj_property name="ObjectShortName">sob_buff_2_ready</obj_property>
+      </wvobject>
    </wvobject>
-   <wvobject fp_name="divider177" type="divider">
-      <obj_property name="label">hssim_top</obj_property>
+   <wvobject type="divider" fp_name="divider52">
+      <obj_property name="label">hssim</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject type="group" fp_name="group178">
-      <obj_property name="label">hssim_top</obj_property>
+   <wvobject fp_name="group53" type="group">
+      <obj_property name="label">hssim</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="array" fp_name="/tb_top/dut/del">
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_top/dut/del" type="array">
          <obj_property name="ElementShortName">del[127:0]</obj_property>
          <obj_property name="ObjectShortName">del[127:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/hssim_ready_x">
-         <obj_property name="ElementShortName">hssim_ready_x</obj_property>
-         <obj_property name="ObjectShortName">hssim_ready_x</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/hssim_ready_y">
-         <obj_property name="ElementShortName">hssim_ready_y</obj_property>
-         <obj_property name="ObjectShortName">hssim_ready_y</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/hssim_ready_z">
-         <obj_property name="ElementShortName">hssim_ready_z</obj_property>
-         <obj_property name="ObjectShortName">hssim_ready_z</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/del_valid">
+      <wvobject fp_name="/tb_top/dut/del_valid" type="logic">
          <obj_property name="ElementShortName">del_valid</obj_property>
          <obj_property name="ObjectShortName">del_valid</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/del_last">
+      <wvobject fp_name="/tb_top/dut/del_last" type="logic">
          <obj_property name="ElementShortName">del_last</obj_property>
          <obj_property name="ObjectShortName">del_last</obj_property>
       </wvobject>
+      <wvobject fp_name="/tb_top/dut/hssim_ready_x" type="logic">
+         <obj_property name="ElementShortName">hssim_ready_x</obj_property>
+         <obj_property name="ObjectShortName">hssim_ready_x</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_top/dut/hssim_ready_y" type="logic">
+         <obj_property name="ElementShortName">hssim_ready_y</obj_property>
+         <obj_property name="ObjectShortName">hssim_ready_y</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_top/dut/hssim_ready_z" type="logic">
+         <obj_property name="ElementShortName">hssim_ready_z</obj_property>
+         <obj_property name="ObjectShortName">hssim_ready_z</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_top/dut/hssim_ready" type="logic">
+         <obj_property name="ElementShortName">hssim_ready</obj_property>
+         <obj_property name="ObjectShortName">hssim_ready</obj_property>
+      </wvobject>
    </wvobject>
-   <wvobject fp_name="divider185" type="divider">
-      <obj_property name="label">hssim_buff</obj_property>
+   <wvobject type="divider" fp_name="divider65">
+      <obj_property name="label">Buff_2</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject type="group" fp_name="group186">
-      <obj_property name="label">buff_2</obj_property>
+   <wvobject fp_name="group66" type="group">
+      <obj_property name="label">Buff_2</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="array" fp_name="/tb_top/dut/old_fused_buff_2">
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_top/dut/old_fused_buff_2" type="array">
          <obj_property name="ElementShortName">old_fused_buff_2[127:0]</obj_property>
          <obj_property name="ObjectShortName">old_fused_buff_2[127:0]</obj_property>
       </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/new_buff_2">
+      <wvobject fp_name="/tb_top/dut/new_buff_2" type="array">
          <obj_property name="ElementShortName">new_buff_2[127:0]</obj_property>
          <obj_property name="ObjectShortName">new_buff_2[127:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/old_fused_buff_2_valid">
+      <wvobject fp_name="/tb_top/dut/old_fused_buff_2_valid" type="logic">
          <obj_property name="ElementShortName">old_fused_buff_2_valid</obj_property>
          <obj_property name="ObjectShortName">old_fused_buff_2_valid</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/old_fused_buff_2_last">
+      <wvobject fp_name="/tb_top/dut/old_fused_buff_2_last" type="logic">
          <obj_property name="ElementShortName">old_fused_buff_2_last</obj_property>
          <obj_property name="ObjectShortName">old_fused_buff_2_last</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/new_buff_2_valid">
+      <wvobject fp_name="/tb_top/dut/new_buff_2_valid" type="logic">
          <obj_property name="ElementShortName">new_buff_2_valid</obj_property>
          <obj_property name="ObjectShortName">new_buff_2_valid</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/new_buff_2_last">
+      <wvobject fp_name="/tb_top/dut/new_buff_2_last" type="logic">
          <obj_property name="ElementShortName">new_buff_2_last</obj_property>
          <obj_property name="ObjectShortName">new_buff_2_last</obj_property>
       </wvobject>
-   </wvobject>
-   <wvobject fp_name="divider193" type="divider">
-      <obj_property name="label">gauss</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="group" fp_name="group194">
-      <obj_property name="label">gauss</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="array" fp_name="/tb_top/dut/del_gauss">
-         <obj_property name="ElementShortName">del_gauss[127:0]</obj_property>
-         <obj_property name="ObjectShortName">del_gauss[127:0]</obj_property>
+      <wvobject fp_name="/tb_top/dut/hssim_buff_old_ready" type="logic">
+         <obj_property name="ElementShortName">hssim_buff_old_ready</obj_property>
+         <obj_property name="ObjectShortName">hssim_buff_old_ready</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/gauss_ready">
-         <obj_property name="ElementShortName">gauss_ready</obj_property>
-         <obj_property name="ObjectShortName">gauss_ready</obj_property>
+      <wvobject fp_name="/tb_top/dut/hssim_buff_new_ready" type="logic">
+         <obj_property name="ElementShortName">hssim_buff_new_ready</obj_property>
+         <obj_property name="ObjectShortName">hssim_buff_new_ready</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/del_gauss_valid">
-         <obj_property name="ElementShortName">del_gauss_valid</obj_property>
-         <obj_property name="ObjectShortName">del_gauss_valid</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/del_gauss_last">
-         <obj_property name="ElementShortName">del_gauss_last</obj_property>
-         <obj_property name="ObjectShortName">del_gauss_last</obj_property>
+      <wvobject fp_name="/tb_top/dut/hssim_buffs_ready" type="logic">
+         <obj_property name="ElementShortName">hssim_buffs_ready</obj_property>
+         <obj_property name="ObjectShortName">hssim_buffs_ready</obj_property>
       </wvobject>
    </wvobject>
-   <wvobject fp_name="divider199" type="divider">
-      <obj_property name="label">gauss_buff</obj_property>
+   <wvobject type="divider" fp_name="divider76">
+      <obj_property name="label">outputs</obj_property>
       <obj_property name="DisplayName">label</obj_property>
    </wvobject>
-   <wvobject type="group" fp_name="group201">
-      <obj_property name="label">Buff_3</obj_property>
+   <wvobject fp_name="group77" type="group">
+      <obj_property name="label">outputs</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="array" fp_name="/tb_top/dut/old_fused_buff_3">
-         <obj_property name="ElementShortName">old_fused_buff_3[127:0]</obj_property>
-         <obj_property name="ObjectShortName">old_fused_buff_3[127:0]</obj_property>
-      </wvobject>
-      <wvobject type="array" fp_name="/tb_top/dut/new_buff_3">
-         <obj_property name="ElementShortName">new_buff_3[127:0]</obj_property>
-         <obj_property name="ObjectShortName">new_buff_3[127:0]</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/old_fused_buff_3_valid">
-         <obj_property name="ElementShortName">old_fused_buff_3_valid</obj_property>
-         <obj_property name="ObjectShortName">old_fused_buff_3_valid</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/old_fused_buff_3_last">
-         <obj_property name="ElementShortName">old_fused_buff_3_last</obj_property>
-         <obj_property name="ObjectShortName">old_fused_buff_3_last</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/new_buff_3_valid">
-         <obj_property name="ElementShortName">new_buff_3_valid</obj_property>
-         <obj_property name="ObjectShortName">new_buff_3_valid</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/new_buff_3_last">
-         <obj_property name="ElementShortName">new_buff_3_last</obj_property>
-         <obj_property name="ObjectShortName">new_buff_3_last</obj_property>
-      </wvobject>
-   </wvobject>
-   <wvobject type="group" fp_name="group208">
-      <obj_property name="label">del_buff_1</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="array" fp_name="/tb_top/dut/del_buff_1">
-         <obj_property name="ElementShortName">del_buff_1[127:0]</obj_property>
-         <obj_property name="ObjectShortName">del_buff_1[127:0]</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/del_buff_1_valid">
-         <obj_property name="ElementShortName">del_buff_1_valid</obj_property>
-         <obj_property name="ObjectShortName">del_buff_1_valid</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/del_buff_1_last">
-         <obj_property name="ElementShortName">del_buff_1_last</obj_property>
-         <obj_property name="ObjectShortName">del_buff_1_last</obj_property>
-      </wvobject>
-   </wvobject>
-   <wvobject fp_name="divider212" type="divider">
-      <obj_property name="label">fusion</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="group" fp_name="group213">
-      <obj_property name="label">fusion</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="array" fp_name="/tb_top/dut/fused_frame">
-         <obj_property name="ElementShortName">fused_frame[127:0]</obj_property>
-         <obj_property name="ObjectShortName">fused_frame[127:0]</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/fused_frame_valid">
-         <obj_property name="ElementShortName">fused_frame_valid</obj_property>
-         <obj_property name="ObjectShortName">fused_frame_valid</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/fused_frame_last">
-         <obj_property name="ElementShortName">fused_frame_last</obj_property>
-         <obj_property name="ObjectShortName">fused_frame_last</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/fusion_ready_x">
-         <obj_property name="ElementShortName">fusion_ready_x</obj_property>
-         <obj_property name="ObjectShortName">fusion_ready_x</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/fusion_ready_y">
-         <obj_property name="ElementShortName">fusion_ready_y</obj_property>
-         <obj_property name="ObjectShortName">fusion_ready_y</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/fusion_ready_z">
-         <obj_property name="ElementShortName">fusion_ready_z</obj_property>
-         <obj_property name="ObjectShortName">fusion_ready_z</obj_property>
-      </wvobject>
-   </wvobject>
-   <wvobject fp_name="divider220" type="divider">
-      <obj_property name="label">fusion_buff</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="group" fp_name="group221">
-      <obj_property name="label">buff_4</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="array" fp_name="/tb_top/dut/old_fused_buff_4">
-         <obj_property name="ElementShortName">old_fused_buff_4[127:0]</obj_property>
-         <obj_property name="ObjectShortName">old_fused_buff_4[127:0]</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/old_fused_buff_4_valid">
-         <obj_property name="ElementShortName">old_fused_buff_4_valid</obj_property>
-         <obj_property name="ObjectShortName">old_fused_buff_4_valid</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/old_fused_buff_4_last">
-         <obj_property name="ElementShortName">old_fused_buff_4_last</obj_property>
-         <obj_property name="ObjectShortName">old_fused_buff_4_last</obj_property>
-      </wvobject>
-   </wvobject>
-   <wvobject type="group" fp_name="group225">
-      <obj_property name="label">del_buff_2</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="array" fp_name="/tb_top/dut/del_buff_2">
-         <obj_property name="ElementShortName">del_buff_2[127:0]</obj_property>
-         <obj_property name="ObjectShortName">del_buff_2[127:0]</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/del_buff_2_valid">
-         <obj_property name="ElementShortName">del_buff_2_valid</obj_property>
-         <obj_property name="ObjectShortName">del_buff_2_valid</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/del_buff_2_last">
-         <obj_property name="ElementShortName">del_buff_2_last</obj_property>
-         <obj_property name="ObjectShortName">del_buff_2_last</obj_property>
-      </wvobject>
-   </wvobject>
-   <wvobject fp_name="divider230" type="divider">
-      <obj_property name="label">Outputs</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-   </wvobject>
-   <wvobject type="group" fp_name="group231">
-      <obj_property name="label">Outputs</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="array" fp_name="/tb_top/dut/m_axis_tdata">
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/tb_top/dut/m_axis_tdata" type="array">
          <obj_property name="ElementShortName">m_axis_tdata[127:0]</obj_property>
          <obj_property name="ObjectShortName">m_axis_tdata[127:0]</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/m_axis_tvalid">
+      <wvobject fp_name="/tb_top/dut/m_axis_tvalid" type="logic">
          <obj_property name="ElementShortName">m_axis_tvalid</obj_property>
          <obj_property name="ObjectShortName">m_axis_tvalid</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/m_axis_tready">
+      <wvobject fp_name="/tb_top/dut/m_axis_tready" type="logic">
          <obj_property name="ElementShortName">m_axis_tready</obj_property>
          <obj_property name="ObjectShortName">m_axis_tready</obj_property>
       </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/m_axis_tlast">
+      <wvobject fp_name="/tb_top/dut/m_axis_tlast" type="logic">
          <obj_property name="ElementShortName">m_axis_tlast</obj_property>
          <obj_property name="ObjectShortName">m_axis_tlast</obj_property>
       </wvobject>
    </wvobject>
-   <wvobject type="logic" fp_name="/tb_top/dut/advance">
+   <wvobject fp_name="/tb_top/dut/advance" type="logic">
       <obj_property name="ElementShortName">advance</obj_property>
       <obj_property name="ObjectShortName">advance</obj_property>
    </wvobject>
