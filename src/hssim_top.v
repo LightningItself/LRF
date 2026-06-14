@@ -185,24 +185,43 @@ always @(posedge aclk) begin
     if(!aresetn) begin
         numr_x_sign_2 <= 0;
         numr_z_sign_2 <= 0;
+        p1_buff_1 <= 0;
+        p2_buff_1 <= 0;
+        p1_buff_1_valid <= 0;
+        p2_buff_1_valid <= 0;
     end
     else begin
         if(comp_ready_x & comp_ready_y & p1_valid & p2_valid) begin
             numr_x_sign_2 <= numr_x_sign_1;
             numr_z_sign_2 <= numr_z_sign_1;
+            p1_buff_1 <= p1;
+            p2_buff_1 <= p2;
+            p1_buff_1_valid <= p1_valid;
+            p2_buff_1_valid <= p2_valid;
         end
     end
 end
+
+reg [(2*2*(2*PIXEL_SIZE+2)*PIXELS_PER_BEAT)-1:0] p1_buff_1, p2_buff_1, p1_buff_2, p2_buff_2;
+reg p1_buff_1_valid, p2_buff_1_valid, p1_buff_2_valid, p2_buff_2_valid;
 
 always @(posedge aclk) begin
     if(!aresetn) begin
         numr_x_sign_3 <= 0;
         numr_z_sign_3 <= 0;
+        p1_buff_2 <= 0;
+        p2_buff_2 <= 0;
+        p1_buff_2_valid <= 0;
+        p2_buff_2_valid <= 0;
     end
     else begin
         if(advance || !comp_valid) begin
             numr_x_sign_3 <= numr_x_sign_2;
             numr_z_sign_3 <= numr_z_sign_2;
+            p1_buff_2 <= p1_buff_1;
+            p2_buff_2 <= p2_buff_1;
+            p1_buff_2_valid <= p1_buff_1_valid;
+            p2_buff_2_valid <= p2_buff_1_valid;
         end
     end
 end
@@ -227,7 +246,12 @@ always @(posedge aclk) begin
                     del[k*PIXEL_SIZE +: PIXEL_SIZE] <= {PIXEL_SIZE{comp_out[k]}};
                 end
                 else begin
-                    del[k*PIXEL_SIZE +: PIXEL_SIZE] <= {PIXEL_SIZE{!comp_out[k]}};
+                    if((p1_buff_2[k*4*(2*PIXEL_SIZE+2) +: 4*(2*PIXEL_SIZE+2)] != p2_buff_2[k*4*(2*PIXEL_SIZE+2) +: 4*(2*PIXEL_SIZE+2)]) & p1_buff_2_valid & p2_buff_2_valid) begin
+                        del[k*PIXEL_SIZE +: PIXEL_SIZE] <= {PIXEL_SIZE{!comp_out[k]}};
+                    end
+                    else if((p1_buff_2[k*4*(2*PIXEL_SIZE+2) +: 4*(2*PIXEL_SIZE+2)] == p2_buff_2[k*4*(2*PIXEL_SIZE+2) +: 4*(2*PIXEL_SIZE+2)]) & p1_buff_2_valid & p2_buff_2_valid) begin
+                        del[k*PIXEL_SIZE +: PIXEL_SIZE] <= 0;
+                    end
                 end
             end
             else if (del_ready && del_valid) begin
