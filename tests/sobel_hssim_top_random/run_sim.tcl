@@ -90,10 +90,3 @@ set_property -name {xsim.simulate.xsim.more_options} \
 puts "Running simulation..."
 launch_simulation
 run all
-
-
-set fp [open "/tmp/p1p2.txt" w]
-puts $fp "p1=[get_value -radix hex {/tb_top/dut/hssim/p1}]"
-puts $fp "p2=[get_value -radix hex {/tb_top/dut/hssim/p2}]"
-close $fp
-puts "Written to /tmp/p1p2.txt"

@@ -67,6 +67,7 @@ add_files -fileset sources_1 ${SRC_DIR}/hssim.v
 add_files -fileset sources_1 ${SRC_DIR}/hssim_top.v
 add_files -fileset sources_1 ${SRC_DIR}/conv_gauss.v
 add_files -fileset sources_1 ${SRC_DIR}/conv_sobel.v
+add_files -fileset sources_1 ${SRC_DIR}/sobel_hssim_top.v
 add_files -fileset sources_1 ${SRC_DIR}/fusion.v
 add_files -fileset sources_1 ${SRC_DIR}/fusion_top.v
 
