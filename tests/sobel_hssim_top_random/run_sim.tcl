@@ -1,9 +1,11 @@
 set TEST_NAME "sobel_hssim_top_random"
 set SRC_DIR "../src"
-set WORKSPACE_DIR "./${TEST_NAME}"
+set WORKSPACE_DIR [file normalize "./${TEST_NAME}"]
 set TEST_DIR "../tests/${TEST_NAME}"
 set UTILS_SV_DIR "../utils/sv"
+set IP_DIR "${SRC_DIR}/ips/cordic/cordic_0"
 
+if {[file exists $WORKSPACE_DIR]} { file delete -force $WORKSPACE_DIR }
 file mkdir $WORKSPACE_DIR
 
 set INPUT_HEX_OLD   "${WORKSPACE_DIR}/inputs_old.hex"
@@ -30,9 +32,26 @@ if {$has_pythonhome} { set env(PYTHONHOME) $saved_pythonhome }
 if {$has_pythonpath} { set env(PYTHONPATH) $saved_pythonpath }
 
 puts "Generating vivado project..."
-create_project -force sim_project ${WORKSPACE_DIR}/sim_project
+create_project -force sim_project ${WORKSPACE_DIR}/sim_project -part xc7z010clg225-1
 
-# Adding design sources
+set IP_FILE "${IP_DIR}/cordic_0.xci"
+if {[file exists $IP_FILE]} {
+    import_ip -files $IP_FILE -name cordic_0
+    set CORDIC_IP [get_ips cordic_0]
+    report_ip_status
+    if {[catch {upgrade_ip $CORDIC_IP} upgrade_result]} {
+        puts "WARNING: upgrade_ip reported: $upgrade_result"
+    } else {
+        puts $upgrade_result
+    }
+    reset_target all $CORDIC_IP
+    generate_target all $CORDIC_IP
+    export_ip_user_files -of_objects $CORDIC_IP -no_script -sync -force -quiet
+} else {
+    puts "ERROR: CORDIC IP not found at $IP_FILE"
+    return -code error
+}
+
 add_files -fileset sources_1 ${SRC_DIR}/multiplier.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_buff.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_buff_depth.v
@@ -46,17 +65,15 @@ add_files -fileset sources_1 ${SRC_DIR}/conv_gauss.v
 add_files -fileset sources_1 ${SRC_DIR}/conv_sobel.v
 add_files -fileset sources_1 ${SRC_DIR}/sobel_hssim_top.v
 
-# Adding simulation sources
 add_files -fileset sim_1 ${UTILS_SV_DIR}/sim_axis.sv
 set_property file_type SystemVerilog [get_files ${UTILS_SV_DIR}/sim_axis.sv]
 
 add_files -fileset sim_1 ${TEST_DIR}/tb_sobel_hssim_top.sv
 set_property file_type SystemVerilog [get_files ${TEST_DIR}/tb_sobel_hssim_top.sv]
 
-set_property include_dirs $WORKSPACE_DIR [get_filesets sim_1]
+set_property include_dirs [list $WORKSPACE_DIR $TEST_DIR] [get_filesets sim_1]
 
-# Adding test data
-add_files -fileset sim_1 $INPUT_HEX_OLD $INPUT_HEX_AVG $INPUT_HEX_NEW $OUTPUT_HEX_TOP
+add_files -fileset sim_1 [list $INPUT_HEX_OLD $INPUT_HEX_AVG $INPUT_HEX_NEW $OUTPUT_HEX_TOP]
 
 set_property top tb_top [get_filesets sim_1]
 set_property top_lib xil_defaultlib [get_filesets sim_1]
@@ -66,7 +83,6 @@ set ABS_INPUT_HEX_AVG  [file normalize $INPUT_HEX_AVG]
 set ABS_INPUT_HEX_NEW  [file normalize $INPUT_HEX_NEW]
 set ABS_OUTPUT_HEX_TOP [file normalize $OUTPUT_HEX_TOP]
 
-# Pass the absolute paths to the SystemVerilog testbench
 set_property -name {xsim.simulate.xsim.more_options} \
     -value "-testplusarg IN_FILE_NAME_OLD=$ABS_INPUT_HEX_OLD -testplusarg IN_FILE_NAME_AVG=$ABS_INPUT_HEX_AVG -testplusarg IN_FILE_NAME_NEW=$ABS_INPUT_HEX_NEW -testplusarg OUT_FILE_NAME_TOP=$ABS_OUTPUT_HEX_TOP" \
     -objects [get_filesets sim_1]
@@ -74,3 +90,10 @@ set_property -name {xsim.simulate.xsim.more_options} \
 puts "Running simulation..."
 launch_simulation
 run all
+
+
+set fp [open "/tmp/p1p2.txt" w]
+puts $fp "p1=[get_value -radix hex {/tb_top/dut/hssim/p1}]"
+puts $fp "p2=[get_value -radix hex {/tb_top/dut/hssim/p2}]"
+close $fp
+puts "Written to /tmp/p1p2.txt"

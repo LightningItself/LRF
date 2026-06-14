@@ -7,7 +7,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../u
 from axis_hex import write_axi_stream_hex
 from compute_gauss import compute_gauss
 
-# ── Parameters (must match RTL) ───────────────────────────────────────────────
 IMAGE_WIDTH     = 512
 IMAGE_HEIGHT    = 512
 PIXELS_PER_BEAT = 16
@@ -22,7 +21,6 @@ PART_MASK   = (1 << PART_BITS) - 1
 SIG_XY_BITS = 2 * PIXEL_SIZE + 1
 SIG_XY_MASK = (1 << SIG_XY_BITS) - 1
 
-# ── Sobel edge magnitude (matches CONV_SOBEL RTL) ────────────────────────────
 def compute_sobel(image):
     padded = np.pad(image, pad_width=((0, 2), (0, 2)), mode='constant', constant_values=0)
     p = padded.astype(np.int32)
@@ -41,7 +39,6 @@ def compute_sobel(image):
     result[2:, 2:] = out[0:-2, 0:-2]
     return result
 
-# ── HSSIM sub-functions ───────────────────────────────────────────────────────
 def compute_sigma_xy(image_x, image_y):
     xy_prod         = image_x.astype(np.uint32) * image_y.astype(np.uint32)
     gauss_xy        = compute_gauss(xy_prod, dtype=np.uint32)
@@ -65,67 +62,59 @@ def compute_sigma_sq(image):
     sigma_sq = gauss_x2.astype(np.int64) - mu_sq.astype(np.int64)
     return (sigma_sq & ((1 << (2 * PIXEL_SIZE)) - 1)).astype(np.uint32)
 
-# ── HSSIM del map ─────────────────────────────────────────────────────────────
-# del[i] = 0xFF if SSIM(avg,new) > SSIM(old,avg), else 0x00
 def compute_hssim_del(edge_old, edge_avg, edge_new):
-    mu_old = compute_gauss(edge_old, dtype=np.uint8).astype(np.uint32)
-    mu_avg = compute_gauss(edge_avg, dtype=np.uint8).astype(np.uint32)
-    mu_new = compute_gauss(edge_new, dtype=np.uint8).astype(np.uint32)
+    mu_old = compute_gauss(edge_old, dtype=np.uint8).astype(object)
+    mu_avg = compute_gauss(edge_avg, dtype=np.uint8).astype(object)
+    mu_new = compute_gauss(edge_new, dtype=np.uint8).astype(object)
 
-    # SSIM(old, avg)
     muOA_sq    = (mu_old * mu_old) & ((1 << (2*PIXEL_SIZE)) - 1)
     muAA_sq    = (mu_avg * mu_avg) & ((1 << (2*PIXEL_SIZE)) - 1)
     int_muOA   = (mu_old * mu_avg) & ((1 << (2*PIXEL_SIZE)) - 1)
     two_muOA   = (int_muOA << 1) & ((1 << (2*PIXEL_SIZE+1)) - 1)
     numr_p1_OA = (two_muOA + C1) & PART_MASK
     denr_p1_OA = ((muOA_sq + muAA_sq) + C1) & PART_MASK
-    sig_xy_OA  = compute_sigma_xy(edge_old, edge_avg)
-    sig_sq_O   = compute_sigma_sq(edge_old)
-    sig_sq_A   = compute_sigma_sq(edge_avg)
-    raw_OA     = sig_xy_OA.astype(np.int64) * 2 + C2
-    denr_p2_OA = (sig_sq_O.astype(np.int64) + sig_sq_A.astype(np.int64) + C2) & PART_MASK
-    denr_OA    = denr_p1_OA.astype(np.int64) * denr_p2_OA.astype(np.int64)
-    numr_OA    = numr_p1_OA.astype(np.int64) * raw_OA.astype(np.int64)
+    sig_xy_OA  = compute_sigma_xy(edge_old, edge_avg).astype(object)
+    sig_sq_O   = compute_sigma_sq(edge_old).astype(object)
+    sig_sq_A   = compute_sigma_sq(edge_avg).astype(object)
+    raw_OA     = sig_xy_OA * 2 + C2
+    denr_p2_OA = (sig_sq_O + sig_sq_A + C2) & PART_MASK
+    denr_OA    = denr_p1_OA * denr_p2_OA
+    numr_OA    = numr_p1_OA * raw_OA
 
-    # SSIM(avg, new)
     muNN_sq    = (mu_new * mu_new) & ((1 << (2*PIXEL_SIZE)) - 1)
     int_muAN   = (mu_avg * mu_new) & ((1 << (2*PIXEL_SIZE)) - 1)
     two_muAN   = (int_muAN << 1) & ((1 << (2*PIXEL_SIZE+1)) - 1)
     numr_p1_AN = (two_muAN + C1) & PART_MASK
     denr_p1_AN = ((muAA_sq + muNN_sq) + C1) & PART_MASK
-    sig_xy_AN  = compute_sigma_xy(edge_avg, edge_new)
-    sig_sq_N   = compute_sigma_sq(edge_new)
-    raw_AN     = sig_xy_AN.astype(np.int64) * 2 + C2
-    denr_p2_AN = (sig_sq_A.astype(np.int64) + sig_sq_N.astype(np.int64) + C2) & PART_MASK
-    denr_AN    = denr_p1_AN.astype(np.int64) * denr_p2_AN.astype(np.int64)
-    numr_AN    = numr_p1_AN.astype(np.int64) * raw_AN.astype(np.int64)
+    sig_xy_AN  = compute_sigma_xy(edge_avg, edge_new).astype(object)
+    sig_sq_N   = compute_sigma_sq(edge_new).astype(object)
+    raw_AN     = sig_xy_AN * 2 + C2
+    denr_p2_AN = (sig_sq_A + sig_sq_N + C2) & PART_MASK
+    denr_AN    = denr_p1_AN * denr_p2_AN
+    numr_AN    = numr_p1_AN * raw_AN
 
-    # Cross-multiply comparison (avoids division)
     p1 = numr_OA * denr_AN
     p2 = numr_AN * denr_OA
+
     return np.where(p2 > p1, np.uint8(0xFF), np.uint8(0x00)).astype(np.uint8)
 
-# ── Main ──────────────────────────────────────────────────────────────────────
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--out_dir', required=True)
     args = parser.parse_args()
     os.makedirs(args.out_dir, exist_ok=True)
 
-    rng = np.random.default_rng(seed=42)
+    rng = np.random.default_rng(seed=12)
     image_old = rng.integers(0, 256, (IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint8)
     image_avg = rng.integers(0, 256, (IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint8)
     image_new = rng.integers(0, 256, (IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint8)
 
-    # Stage 1: Sobel on all three inputs
     edge_old = compute_sobel(image_old)
     edge_avg = compute_sobel(image_avg)
     edge_new = compute_sobel(image_new)
 
-    # Stage 2: HSSIM del map
     del_map = compute_hssim_del(edge_old, edge_avg, edge_new)
 
-    # Write hex files
     s0 = write_axi_stream_hex(os.path.join(args.out_dir, 'inputs_old.hex'), image_old, DATA_WIDTH)
     s1 = write_axi_stream_hex(os.path.join(args.out_dir, 'inputs_avg.hex'), image_avg, DATA_WIDTH)
     s2 = write_axi_stream_hex(os.path.join(args.out_dir, 'inputs_new.hex'), image_new, DATA_WIDTH)

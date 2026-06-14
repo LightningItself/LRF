@@ -29,6 +29,7 @@ module SOBEL_HSSIM_TOP #(
 // Wire Declarations
 
 wire advance = (del_ready || ~del_valid);
+wire inputs_valid = old_map_valid & avg_map_valid & new_map_valid;
 
 wire [DATA_WIDTH-1:0] old_edge, avg_edge, new_edge;
 wire old_edge_valid, old_edge_last, avg_edge_valid, avg_edge_last, new_edge_valid, new_edge_last;
@@ -45,7 +46,7 @@ CONV_SOBEL #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .PIXEL_SIZE(PIXEL_SIZE), .IMAGE
     .aclk(aclk),
     .aresetn(aresetn),
     .s_axis_tdata(old_map),
-    .s_axis_tvalid(old_map_valid),
+    .s_axis_tvalid(inputs_valid),
     .s_axis_tready(sob_old_ready),
     .s_axis_tlast(old_map_last),
     .m_axis_tdata(old_edge),
@@ -58,7 +59,7 @@ CONV_SOBEL #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .PIXEL_SIZE(PIXEL_SIZE), .IMAGE
     .aclk(aclk),
     .aresetn(aresetn),
     .s_axis_tdata(avg_map),
-    .s_axis_tvalid(avg_map_valid),
+    .s_axis_tvalid(inputs_valid),
     .s_axis_tready(sob_avg_ready),
     .s_axis_tlast(avg_map_last),
     .m_axis_tdata(avg_edge),
@@ -71,7 +72,7 @@ CONV_SOBEL #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .PIXEL_SIZE(PIXEL_SIZE), .IMAGE
     .aclk(aclk),
     .aresetn(aresetn),
     .s_axis_tdata(new_map),
-    .s_axis_tvalid(new_map_valid),
+    .s_axis_tvalid(inputs_valid),
     .s_axis_tready(sob_new_ready),
     .s_axis_tlast(new_map_last),
     .m_axis_tdata(new_edge),
