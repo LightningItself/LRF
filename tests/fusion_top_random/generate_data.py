@@ -112,13 +112,32 @@ def main():
     args = parser.parse_args()
     os.makedirs(args.out_dir, exist_ok=True)
 
-    rng = np.random.default_rng()
-    image_old = rng.integers(0, 256, (IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint8)
-    image_avg = rng.integers(0, 256, (IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint8)
-    image_new = rng.integers(0, 256, (IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint8)
-    # image_old = np.zeros((IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint8)
-    # image_avg = np.zeros((IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint8)
-    # image_new = np.zeros((IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.uint8)
+    rng = np.random.default_rng(seed=20)
+
+    total_pixels = IMAGE_HEIGHT * IMAGE_WIDTH
+    pixels_per_beat = 16
+    total_beats = total_pixels // pixels_per_beat  # 16384 total beats
+
+    # Target the exact middle beat index
+    middle_beat = total_beats // 2                 # Beat 8192
+    
+    start_pixel = middle_beat * pixels_per_beat     # Pixel index 131072
+    end_pixel = start_pixel + pixels_per_beat       # Pixel index 131088
+
+    # 1. Start with completely flat zero frames
+    flat_old = np.zeros(total_pixels, dtype=np.uint8)
+    flat_avg = np.zeros(total_pixels, dtype=np.uint8)
+    flat_new = np.zeros(total_pixels, dtype=np.uint8)
+
+    # 2. Assign random data to ONLY that single 16-pixel wide center beat
+    flat_old[start_pixel:end_pixel] = rng.integers(0, 256, pixels_per_beat, dtype=np.uint8)
+    flat_avg[start_pixel:end_pixel] = rng.integers(0, 256, pixels_per_beat, dtype=np.uint8)
+    flat_new[start_pixel:end_pixel] = rng.integers(0, 256, pixels_per_beat, dtype=np.uint8)
+
+    # 3. Reshape back to the 2D dimensions your filters expect
+    image_old = flat_old.reshape((IMAGE_HEIGHT, IMAGE_WIDTH))
+    image_avg = flat_avg.reshape((IMAGE_HEIGHT, IMAGE_WIDTH))
+    image_new = flat_new.reshape((IMAGE_HEIGHT, IMAGE_WIDTH))
 
     edge_old = compute_sobel(image_old)
     edge_avg = compute_sobel(image_avg)
