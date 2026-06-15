@@ -40,7 +40,7 @@ always @(posedge aclk) begin
         ram[write_ptr] <= s_axis_tdata;
         write_ptr <= write_ptr + 1;
     end
-    else if((write_ptr == 16384) & m_axis_tlast) begin
+    else if((write_ptr == MEM_DEPTH) & m_axis_tlast) begin
         write_ptr <= 0;
     end
 end
@@ -55,9 +55,9 @@ always @(posedge aclk) begin
     else if (output_stage_advance) begin
         if (read_enable) begin
             m_axis_tdata <= ram[read_ptr];
-            m_axis_tlast <= (read_ptr == 16383);
+            m_axis_tlast <= (read_ptr == (MEM_DEPTH-1));
             m_axis_tvalid <= (write_ptr > read_ptr);
-            if(read_ptr == 16383) begin
+            if(read_ptr == (MEM_DEPTH-1)) begin
                 read_ptr <= 0;
             end
             else read_ptr <= read_ptr + 1;
