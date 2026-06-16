@@ -2,7 +2,7 @@
 -- Copyright 2022-2025 Advanced Micro Devices, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2025.1 (win64) Build 6140274 Thu May 22 00:12:29 MDT 2025
--- Date        : Tue Jun 16 10:29:13 2026
+-- Date        : Tue Jun 16 10:49:45 2026
 -- Host        : Sreenadh running 64-bit major release  (build 9200)
 -- Command     : write_vhdl -force -mode funcsim
 --               c:/Users/sreen/OneDrive/Desktop/zed_prac/fifo_ip_generation/fifo_ip_generation.gen/sources_1/ip/axis_data_fifo_0/axis_data_fifo_0_sim_netlist.vhdl
@@ -1152,10 +1152,10 @@ entity axis_data_fifo_0_xpm_memory_base is
     regcea : in STD_LOGIC;
     wea : in STD_LOGIC_VECTOR ( 0 to 0 );
     addra : in STD_LOGIC_VECTOR ( 5 downto 0 );
-    dina : in STD_LOGIC_VECTOR ( 13 downto 0 );
+    dina : in STD_LOGIC_VECTOR ( 163 downto 0 );
     injectsbiterra : in STD_LOGIC;
     injectdbiterra : in STD_LOGIC;
-    douta : out STD_LOGIC_VECTOR ( 13 downto 0 );
+    douta : out STD_LOGIC_VECTOR ( 163 downto 0 );
     sbiterra : out STD_LOGIC;
     dbiterra : out STD_LOGIC;
     clkb : in STD_LOGIC;
@@ -1164,10 +1164,10 @@ entity axis_data_fifo_0_xpm_memory_base is
     regceb : in STD_LOGIC;
     web : in STD_LOGIC_VECTOR ( 0 to 0 );
     addrb : in STD_LOGIC_VECTOR ( 5 downto 0 );
-    dinb : in STD_LOGIC_VECTOR ( 13 downto 0 );
+    dinb : in STD_LOGIC_VECTOR ( 163 downto 0 );
     injectsbiterrb : in STD_LOGIC;
     injectdbiterrb : in STD_LOGIC;
-    doutb : out STD_LOGIC_VECTOR ( 13 downto 0 );
+    doutb : out STD_LOGIC_VECTOR ( 163 downto 0 );
     sbiterrb : out STD_LOGIC;
     dbiterrb : out STD_LOGIC
   );
@@ -1178,9 +1178,9 @@ entity axis_data_fifo_0_xpm_memory_base is
   attribute AUTO_SLEEP_TIME : integer;
   attribute AUTO_SLEEP_TIME of axis_data_fifo_0_xpm_memory_base : entity is 0;
   attribute BYTE_WRITE_WIDTH_A : integer;
-  attribute BYTE_WRITE_WIDTH_A of axis_data_fifo_0_xpm_memory_base : entity is 14;
+  attribute BYTE_WRITE_WIDTH_A of axis_data_fifo_0_xpm_memory_base : entity is 164;
   attribute BYTE_WRITE_WIDTH_B : integer;
-  attribute BYTE_WRITE_WIDTH_B of axis_data_fifo_0_xpm_memory_base : entity is 14;
+  attribute BYTE_WRITE_WIDTH_B of axis_data_fifo_0_xpm_memory_base : entity is 164;
   attribute CASCADE_HEIGHT : integer;
   attribute CASCADE_HEIGHT of axis_data_fifo_0_xpm_memory_base : entity is 0;
   attribute CLOCKING_MODE : integer;
@@ -1204,7 +1204,7 @@ entity axis_data_fifo_0_xpm_memory_base is
   attribute MEMORY_PRIMITIVE : integer;
   attribute MEMORY_PRIMITIVE of axis_data_fifo_0_xpm_memory_base : entity is 0;
   attribute MEMORY_SIZE : integer;
-  attribute MEMORY_SIZE of axis_data_fifo_0_xpm_memory_base : entity is 896;
+  attribute MEMORY_SIZE of axis_data_fifo_0_xpm_memory_base : entity is 10496;
   attribute MEMORY_TYPE : integer;
   attribute MEMORY_TYPE of axis_data_fifo_0_xpm_memory_base : entity is 1;
   attribute MESSAGE_CONTROL : integer;
@@ -1226,17 +1226,17 @@ entity axis_data_fifo_0_xpm_memory_base is
   attribute P_MEMORY_PRIMITIVE : string;
   attribute P_MEMORY_PRIMITIVE of axis_data_fifo_0_xpm_memory_base : entity is "auto";
   attribute P_MIN_WIDTH_DATA : integer;
-  attribute P_MIN_WIDTH_DATA of axis_data_fifo_0_xpm_memory_base : entity is 14;
+  attribute P_MIN_WIDTH_DATA of axis_data_fifo_0_xpm_memory_base : entity is 164;
   attribute P_MIN_WIDTH_DATA_A : integer;
-  attribute P_MIN_WIDTH_DATA_A of axis_data_fifo_0_xpm_memory_base : entity is 14;
+  attribute P_MIN_WIDTH_DATA_A of axis_data_fifo_0_xpm_memory_base : entity is 164;
   attribute P_MIN_WIDTH_DATA_B : integer;
-  attribute P_MIN_WIDTH_DATA_B of axis_data_fifo_0_xpm_memory_base : entity is 14;
+  attribute P_MIN_WIDTH_DATA_B of axis_data_fifo_0_xpm_memory_base : entity is 164;
   attribute P_MIN_WIDTH_DATA_ECC : integer;
-  attribute P_MIN_WIDTH_DATA_ECC of axis_data_fifo_0_xpm_memory_base : entity is 14;
+  attribute P_MIN_WIDTH_DATA_ECC of axis_data_fifo_0_xpm_memory_base : entity is 164;
   attribute P_MIN_WIDTH_DATA_LDW : integer;
   attribute P_MIN_WIDTH_DATA_LDW of axis_data_fifo_0_xpm_memory_base : entity is 4;
   attribute P_MIN_WIDTH_DATA_SHFT : integer;
-  attribute P_MIN_WIDTH_DATA_SHFT of axis_data_fifo_0_xpm_memory_base : entity is 14;
+  attribute P_MIN_WIDTH_DATA_SHFT of axis_data_fifo_0_xpm_memory_base : entity is 164;
   attribute P_NUM_COLS_WRITE_A : integer;
   attribute P_NUM_COLS_WRITE_A of axis_data_fifo_0_xpm_memory_base : entity is 1;
   attribute P_NUM_COLS_WRITE_B : integer;
@@ -1284,15 +1284,15 @@ entity axis_data_fifo_0_xpm_memory_base is
   attribute P_WIDTH_ADDR_WRITE_B : integer;
   attribute P_WIDTH_ADDR_WRITE_B of axis_data_fifo_0_xpm_memory_base : entity is 6;
   attribute P_WIDTH_COL_WRITE_A : integer;
-  attribute P_WIDTH_COL_WRITE_A of axis_data_fifo_0_xpm_memory_base : entity is 14;
+  attribute P_WIDTH_COL_WRITE_A of axis_data_fifo_0_xpm_memory_base : entity is 164;
   attribute P_WIDTH_COL_WRITE_B : integer;
-  attribute P_WIDTH_COL_WRITE_B of axis_data_fifo_0_xpm_memory_base : entity is 14;
+  attribute P_WIDTH_COL_WRITE_B of axis_data_fifo_0_xpm_memory_base : entity is 164;
   attribute RAM_DECOMP : string;
   attribute RAM_DECOMP of axis_data_fifo_0_xpm_memory_base : entity is "auto";
   attribute READ_DATA_WIDTH_A : integer;
-  attribute READ_DATA_WIDTH_A of axis_data_fifo_0_xpm_memory_base : entity is 14;
+  attribute READ_DATA_WIDTH_A of axis_data_fifo_0_xpm_memory_base : entity is 164;
   attribute READ_DATA_WIDTH_B : integer;
-  attribute READ_DATA_WIDTH_B of axis_data_fifo_0_xpm_memory_base : entity is 14;
+  attribute READ_DATA_WIDTH_B of axis_data_fifo_0_xpm_memory_base : entity is 164;
   attribute READ_LATENCY_A : integer;
   attribute READ_LATENCY_A of axis_data_fifo_0_xpm_memory_base : entity is 2;
   attribute READ_LATENCY_B : integer;
@@ -1318,9 +1318,9 @@ entity axis_data_fifo_0_xpm_memory_base is
   attribute WAKEUP_TIME : integer;
   attribute WAKEUP_TIME of axis_data_fifo_0_xpm_memory_base : entity is 0;
   attribute WRITE_DATA_WIDTH_A : integer;
-  attribute WRITE_DATA_WIDTH_A of axis_data_fifo_0_xpm_memory_base : entity is 14;
+  attribute WRITE_DATA_WIDTH_A of axis_data_fifo_0_xpm_memory_base : entity is 164;
   attribute WRITE_DATA_WIDTH_B : integer;
-  attribute WRITE_DATA_WIDTH_B of axis_data_fifo_0_xpm_memory_base : entity is 14;
+  attribute WRITE_DATA_WIDTH_B of axis_data_fifo_0_xpm_memory_base : entity is 164;
   attribute WRITE_MODE_A : integer;
   attribute WRITE_MODE_A of axis_data_fifo_0_xpm_memory_base : entity is 2;
   attribute WRITE_MODE_B : integer;
@@ -1332,99 +1332,261 @@ entity axis_data_fifo_0_xpm_memory_base is
   attribute keep_hierarchy : string;
   attribute keep_hierarchy of axis_data_fifo_0_xpm_memory_base : entity is "soft";
   attribute rsta_loop_iter : integer;
-  attribute rsta_loop_iter of axis_data_fifo_0_xpm_memory_base : entity is 16;
+  attribute rsta_loop_iter of axis_data_fifo_0_xpm_memory_base : entity is 164;
   attribute rstb_loop_iter : integer;
-  attribute rstb_loop_iter of axis_data_fifo_0_xpm_memory_base : entity is 16;
+  attribute rstb_loop_iter of axis_data_fifo_0_xpm_memory_base : entity is 164;
 end axis_data_fifo_0_xpm_memory_base;
 
 architecture STRUCTURE of axis_data_fifo_0_xpm_memory_base is
   signal \<const0>\ : STD_LOGIC;
-  signal \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg\ : STD_LOGIC_VECTOR ( 13 downto 0 );
-  signal \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg0\ : STD_LOGIC_VECTOR ( 13 downto 0 );
-  signal \NLW_gen_wr_a.gen_word_narrow.mem_reg_0_63_0_2_DOD_UNCONNECTED\ : STD_LOGIC;
-  signal \NLW_gen_wr_a.gen_word_narrow.mem_reg_0_63_12_13_DOC_UNCONNECTED\ : STD_LOGIC;
-  signal \NLW_gen_wr_a.gen_word_narrow.mem_reg_0_63_12_13_DOD_UNCONNECTED\ : STD_LOGIC;
-  signal \NLW_gen_wr_a.gen_word_narrow.mem_reg_0_63_3_5_DOD_UNCONNECTED\ : STD_LOGIC;
-  signal \NLW_gen_wr_a.gen_word_narrow.mem_reg_0_63_6_8_DOD_UNCONNECTED\ : STD_LOGIC;
-  signal \NLW_gen_wr_a.gen_word_narrow.mem_reg_0_63_9_11_DOD_UNCONNECTED\ : STD_LOGIC;
-  attribute dram_emb_xdc : string;
-  attribute dram_emb_xdc of \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg[0]\ : label is "no";
-  attribute dram_emb_xdc of \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg[10]\ : label is "no";
-  attribute dram_emb_xdc of \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg[11]\ : label is "no";
-  attribute dram_emb_xdc of \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg[12]\ : label is "no";
-  attribute dram_emb_xdc of \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg[13]\ : label is "no";
-  attribute dram_emb_xdc of \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg[1]\ : label is "no";
-  attribute dram_emb_xdc of \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg[2]\ : label is "no";
-  attribute dram_emb_xdc of \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg[3]\ : label is "no";
-  attribute dram_emb_xdc of \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg[4]\ : label is "no";
-  attribute dram_emb_xdc of \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg[5]\ : label is "no";
-  attribute dram_emb_xdc of \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg[6]\ : label is "no";
-  attribute dram_emb_xdc of \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg[7]\ : label is "no";
-  attribute dram_emb_xdc of \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg[8]\ : label is "no";
-  attribute dram_emb_xdc of \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg[9]\ : label is "no";
+  signal \NLW_gen_wr_a.gen_word_narrow.mem_reg_0_CASCADEOUTA_UNCONNECTED\ : STD_LOGIC;
+  signal \NLW_gen_wr_a.gen_word_narrow.mem_reg_0_CASCADEOUTB_UNCONNECTED\ : STD_LOGIC;
+  signal \NLW_gen_wr_a.gen_word_narrow.mem_reg_0_DBITERR_UNCONNECTED\ : STD_LOGIC;
+  signal \NLW_gen_wr_a.gen_word_narrow.mem_reg_0_SBITERR_UNCONNECTED\ : STD_LOGIC;
+  signal \NLW_gen_wr_a.gen_word_narrow.mem_reg_0_ECCPARITY_UNCONNECTED\ : STD_LOGIC_VECTOR ( 7 downto 0 );
+  signal \NLW_gen_wr_a.gen_word_narrow.mem_reg_0_RDADDRECC_UNCONNECTED\ : STD_LOGIC_VECTOR ( 8 downto 0 );
+  signal \NLW_gen_wr_a.gen_word_narrow.mem_reg_1_CASCADEOUTA_UNCONNECTED\ : STD_LOGIC;
+  signal \NLW_gen_wr_a.gen_word_narrow.mem_reg_1_CASCADEOUTB_UNCONNECTED\ : STD_LOGIC;
+  signal \NLW_gen_wr_a.gen_word_narrow.mem_reg_1_DBITERR_UNCONNECTED\ : STD_LOGIC;
+  signal \NLW_gen_wr_a.gen_word_narrow.mem_reg_1_SBITERR_UNCONNECTED\ : STD_LOGIC;
+  signal \NLW_gen_wr_a.gen_word_narrow.mem_reg_1_ECCPARITY_UNCONNECTED\ : STD_LOGIC_VECTOR ( 7 downto 0 );
+  signal \NLW_gen_wr_a.gen_word_narrow.mem_reg_1_RDADDRECC_UNCONNECTED\ : STD_LOGIC_VECTOR ( 8 downto 0 );
+  signal \NLW_gen_wr_a.gen_word_narrow.mem_reg_2_DOBDO_UNCONNECTED\ : STD_LOGIC_VECTOR ( 15 downto 4 );
+  signal \NLW_gen_wr_a.gen_word_narrow.mem_reg_2_DOPADOP_UNCONNECTED\ : STD_LOGIC_VECTOR ( 1 downto 0 );
+  signal \NLW_gen_wr_a.gen_word_narrow.mem_reg_2_DOPBDOP_UNCONNECTED\ : STD_LOGIC_VECTOR ( 1 downto 0 );
+  attribute \MEM.PORTA.ADDRESS_BEGIN\ : integer;
+  attribute \MEM.PORTA.ADDRESS_BEGIN\ of \gen_wr_a.gen_word_narrow.mem_reg_0\ : label is 0;
+  attribute \MEM.PORTA.ADDRESS_END\ : integer;
+  attribute \MEM.PORTA.ADDRESS_END\ of \gen_wr_a.gen_word_narrow.mem_reg_0\ : label is 511;
+  attribute \MEM.PORTA.DATA_BIT_LAYOUT\ : string;
+  attribute \MEM.PORTA.DATA_BIT_LAYOUT\ of \gen_wr_a.gen_word_narrow.mem_reg_0\ : label is "p8_d64";
+  attribute \MEM.PORTA.DATA_LSB\ : integer;
+  attribute \MEM.PORTA.DATA_LSB\ of \gen_wr_a.gen_word_narrow.mem_reg_0\ : label is 0;
+  attribute \MEM.PORTA.DATA_MSB\ : integer;
+  attribute \MEM.PORTA.DATA_MSB\ of \gen_wr_a.gen_word_narrow.mem_reg_0\ : label is 71;
+  attribute \MEM.PORTB.ADDRESS_BEGIN\ : integer;
+  attribute \MEM.PORTB.ADDRESS_BEGIN\ of \gen_wr_a.gen_word_narrow.mem_reg_0\ : label is 0;
+  attribute \MEM.PORTB.ADDRESS_END\ : integer;
+  attribute \MEM.PORTB.ADDRESS_END\ of \gen_wr_a.gen_word_narrow.mem_reg_0\ : label is 511;
+  attribute \MEM.PORTB.DATA_BIT_LAYOUT\ : string;
+  attribute \MEM.PORTB.DATA_BIT_LAYOUT\ of \gen_wr_a.gen_word_narrow.mem_reg_0\ : label is "p8_d64";
+  attribute \MEM.PORTB.DATA_LSB\ : integer;
+  attribute \MEM.PORTB.DATA_LSB\ of \gen_wr_a.gen_word_narrow.mem_reg_0\ : label is 0;
+  attribute \MEM.PORTB.DATA_MSB\ : integer;
+  attribute \MEM.PORTB.DATA_MSB\ of \gen_wr_a.gen_word_narrow.mem_reg_0\ : label is 71;
   attribute METHODOLOGY_DRC_VIOS : string;
-  attribute METHODOLOGY_DRC_VIOS of \gen_wr_a.gen_word_narrow.mem_reg_0_63_0_2\ : label is "";
+  attribute METHODOLOGY_DRC_VIOS of \gen_wr_a.gen_word_narrow.mem_reg_0\ : label is "";
   attribute RTL_RAM_BITS : integer;
-  attribute RTL_RAM_BITS of \gen_wr_a.gen_word_narrow.mem_reg_0_63_0_2\ : label is 896;
+  attribute RTL_RAM_BITS of \gen_wr_a.gen_word_narrow.mem_reg_0\ : label is 10496;
   attribute RTL_RAM_NAME : string;
-  attribute RTL_RAM_NAME of \gen_wr_a.gen_word_narrow.mem_reg_0_63_0_2\ : label is "xpm_memory_base/gen_wr_a.gen_word_narrow.mem_reg";
+  attribute RTL_RAM_NAME of \gen_wr_a.gen_word_narrow.mem_reg_0\ : label is "xpm_memory_base/gen_wr_a.gen_word_narrow.mem_reg";
   attribute RTL_RAM_STYLE : string;
-  attribute RTL_RAM_STYLE of \gen_wr_a.gen_word_narrow.mem_reg_0_63_0_2\ : label is "auto";
+  attribute RTL_RAM_STYLE of \gen_wr_a.gen_word_narrow.mem_reg_0\ : label is "auto";
   attribute RTL_RAM_TYPE : string;
-  attribute RTL_RAM_TYPE of \gen_wr_a.gen_word_narrow.mem_reg_0_63_0_2\ : label is "RAM_SDP";
+  attribute RTL_RAM_TYPE of \gen_wr_a.gen_word_narrow.mem_reg_0\ : label is "RAM_SDP";
   attribute ram_addr_begin : integer;
-  attribute ram_addr_begin of \gen_wr_a.gen_word_narrow.mem_reg_0_63_0_2\ : label is 0;
+  attribute ram_addr_begin of \gen_wr_a.gen_word_narrow.mem_reg_0\ : label is 0;
   attribute ram_addr_end : integer;
-  attribute ram_addr_end of \gen_wr_a.gen_word_narrow.mem_reg_0_63_0_2\ : label is 63;
+  attribute ram_addr_end of \gen_wr_a.gen_word_narrow.mem_reg_0\ : label is 511;
   attribute ram_offset : integer;
-  attribute ram_offset of \gen_wr_a.gen_word_narrow.mem_reg_0_63_0_2\ : label is 0;
+  attribute ram_offset of \gen_wr_a.gen_word_narrow.mem_reg_0\ : label is 0;
   attribute ram_slice_begin : integer;
-  attribute ram_slice_begin of \gen_wr_a.gen_word_narrow.mem_reg_0_63_0_2\ : label is 0;
+  attribute ram_slice_begin of \gen_wr_a.gen_word_narrow.mem_reg_0\ : label is 0;
   attribute ram_slice_end : integer;
-  attribute ram_slice_end of \gen_wr_a.gen_word_narrow.mem_reg_0_63_0_2\ : label is 2;
-  attribute METHODOLOGY_DRC_VIOS of \gen_wr_a.gen_word_narrow.mem_reg_0_63_12_13\ : label is "";
-  attribute RTL_RAM_BITS of \gen_wr_a.gen_word_narrow.mem_reg_0_63_12_13\ : label is 896;
-  attribute RTL_RAM_NAME of \gen_wr_a.gen_word_narrow.mem_reg_0_63_12_13\ : label is "xpm_memory_base/gen_wr_a.gen_word_narrow.mem_reg";
-  attribute RTL_RAM_STYLE of \gen_wr_a.gen_word_narrow.mem_reg_0_63_12_13\ : label is "auto";
-  attribute RTL_RAM_TYPE of \gen_wr_a.gen_word_narrow.mem_reg_0_63_12_13\ : label is "RAM_SDP";
-  attribute ram_addr_begin of \gen_wr_a.gen_word_narrow.mem_reg_0_63_12_13\ : label is 0;
-  attribute ram_addr_end of \gen_wr_a.gen_word_narrow.mem_reg_0_63_12_13\ : label is 63;
-  attribute ram_offset of \gen_wr_a.gen_word_narrow.mem_reg_0_63_12_13\ : label is 0;
-  attribute ram_slice_begin of \gen_wr_a.gen_word_narrow.mem_reg_0_63_12_13\ : label is 12;
-  attribute ram_slice_end of \gen_wr_a.gen_word_narrow.mem_reg_0_63_12_13\ : label is 13;
-  attribute METHODOLOGY_DRC_VIOS of \gen_wr_a.gen_word_narrow.mem_reg_0_63_3_5\ : label is "";
-  attribute RTL_RAM_BITS of \gen_wr_a.gen_word_narrow.mem_reg_0_63_3_5\ : label is 896;
-  attribute RTL_RAM_NAME of \gen_wr_a.gen_word_narrow.mem_reg_0_63_3_5\ : label is "xpm_memory_base/gen_wr_a.gen_word_narrow.mem_reg";
-  attribute RTL_RAM_STYLE of \gen_wr_a.gen_word_narrow.mem_reg_0_63_3_5\ : label is "auto";
-  attribute RTL_RAM_TYPE of \gen_wr_a.gen_word_narrow.mem_reg_0_63_3_5\ : label is "RAM_SDP";
-  attribute ram_addr_begin of \gen_wr_a.gen_word_narrow.mem_reg_0_63_3_5\ : label is 0;
-  attribute ram_addr_end of \gen_wr_a.gen_word_narrow.mem_reg_0_63_3_5\ : label is 63;
-  attribute ram_offset of \gen_wr_a.gen_word_narrow.mem_reg_0_63_3_5\ : label is 0;
-  attribute ram_slice_begin of \gen_wr_a.gen_word_narrow.mem_reg_0_63_3_5\ : label is 3;
-  attribute ram_slice_end of \gen_wr_a.gen_word_narrow.mem_reg_0_63_3_5\ : label is 5;
-  attribute METHODOLOGY_DRC_VIOS of \gen_wr_a.gen_word_narrow.mem_reg_0_63_6_8\ : label is "";
-  attribute RTL_RAM_BITS of \gen_wr_a.gen_word_narrow.mem_reg_0_63_6_8\ : label is 896;
-  attribute RTL_RAM_NAME of \gen_wr_a.gen_word_narrow.mem_reg_0_63_6_8\ : label is "xpm_memory_base/gen_wr_a.gen_word_narrow.mem_reg";
-  attribute RTL_RAM_STYLE of \gen_wr_a.gen_word_narrow.mem_reg_0_63_6_8\ : label is "auto";
-  attribute RTL_RAM_TYPE of \gen_wr_a.gen_word_narrow.mem_reg_0_63_6_8\ : label is "RAM_SDP";
-  attribute ram_addr_begin of \gen_wr_a.gen_word_narrow.mem_reg_0_63_6_8\ : label is 0;
-  attribute ram_addr_end of \gen_wr_a.gen_word_narrow.mem_reg_0_63_6_8\ : label is 63;
-  attribute ram_offset of \gen_wr_a.gen_word_narrow.mem_reg_0_63_6_8\ : label is 0;
-  attribute ram_slice_begin of \gen_wr_a.gen_word_narrow.mem_reg_0_63_6_8\ : label is 6;
-  attribute ram_slice_end of \gen_wr_a.gen_word_narrow.mem_reg_0_63_6_8\ : label is 8;
-  attribute METHODOLOGY_DRC_VIOS of \gen_wr_a.gen_word_narrow.mem_reg_0_63_9_11\ : label is "";
-  attribute RTL_RAM_BITS of \gen_wr_a.gen_word_narrow.mem_reg_0_63_9_11\ : label is 896;
-  attribute RTL_RAM_NAME of \gen_wr_a.gen_word_narrow.mem_reg_0_63_9_11\ : label is "xpm_memory_base/gen_wr_a.gen_word_narrow.mem_reg";
-  attribute RTL_RAM_STYLE of \gen_wr_a.gen_word_narrow.mem_reg_0_63_9_11\ : label is "auto";
-  attribute RTL_RAM_TYPE of \gen_wr_a.gen_word_narrow.mem_reg_0_63_9_11\ : label is "RAM_SDP";
-  attribute ram_addr_begin of \gen_wr_a.gen_word_narrow.mem_reg_0_63_9_11\ : label is 0;
-  attribute ram_addr_end of \gen_wr_a.gen_word_narrow.mem_reg_0_63_9_11\ : label is 63;
-  attribute ram_offset of \gen_wr_a.gen_word_narrow.mem_reg_0_63_9_11\ : label is 0;
-  attribute ram_slice_begin of \gen_wr_a.gen_word_narrow.mem_reg_0_63_9_11\ : label is 9;
-  attribute ram_slice_end of \gen_wr_a.gen_word_narrow.mem_reg_0_63_9_11\ : label is 11;
+  attribute ram_slice_end of \gen_wr_a.gen_word_narrow.mem_reg_0\ : label is 71;
+  attribute \MEM.PORTA.ADDRESS_BEGIN\ of \gen_wr_a.gen_word_narrow.mem_reg_1\ : label is 0;
+  attribute \MEM.PORTA.ADDRESS_END\ of \gen_wr_a.gen_word_narrow.mem_reg_1\ : label is 511;
+  attribute \MEM.PORTA.DATA_BIT_LAYOUT\ of \gen_wr_a.gen_word_narrow.mem_reg_1\ : label is "p8_d64";
+  attribute \MEM.PORTA.DATA_LSB\ of \gen_wr_a.gen_word_narrow.mem_reg_1\ : label is 72;
+  attribute \MEM.PORTA.DATA_MSB\ of \gen_wr_a.gen_word_narrow.mem_reg_1\ : label is 143;
+  attribute \MEM.PORTB.ADDRESS_BEGIN\ of \gen_wr_a.gen_word_narrow.mem_reg_1\ : label is 0;
+  attribute \MEM.PORTB.ADDRESS_END\ of \gen_wr_a.gen_word_narrow.mem_reg_1\ : label is 511;
+  attribute \MEM.PORTB.DATA_BIT_LAYOUT\ of \gen_wr_a.gen_word_narrow.mem_reg_1\ : label is "p8_d64";
+  attribute \MEM.PORTB.DATA_LSB\ of \gen_wr_a.gen_word_narrow.mem_reg_1\ : label is 72;
+  attribute \MEM.PORTB.DATA_MSB\ of \gen_wr_a.gen_word_narrow.mem_reg_1\ : label is 143;
+  attribute METHODOLOGY_DRC_VIOS of \gen_wr_a.gen_word_narrow.mem_reg_1\ : label is "";
+  attribute RTL_RAM_BITS of \gen_wr_a.gen_word_narrow.mem_reg_1\ : label is 10496;
+  attribute RTL_RAM_NAME of \gen_wr_a.gen_word_narrow.mem_reg_1\ : label is "xpm_memory_base/gen_wr_a.gen_word_narrow.mem_reg";
+  attribute RTL_RAM_STYLE of \gen_wr_a.gen_word_narrow.mem_reg_1\ : label is "auto";
+  attribute RTL_RAM_TYPE of \gen_wr_a.gen_word_narrow.mem_reg_1\ : label is "RAM_SDP";
+  attribute ram_addr_begin of \gen_wr_a.gen_word_narrow.mem_reg_1\ : label is 0;
+  attribute ram_addr_end of \gen_wr_a.gen_word_narrow.mem_reg_1\ : label is 511;
+  attribute ram_offset of \gen_wr_a.gen_word_narrow.mem_reg_1\ : label is 0;
+  attribute ram_slice_begin of \gen_wr_a.gen_word_narrow.mem_reg_1\ : label is 72;
+  attribute ram_slice_end of \gen_wr_a.gen_word_narrow.mem_reg_1\ : label is 143;
+  attribute \MEM.PORTA.ADDRESS_BEGIN\ of \gen_wr_a.gen_word_narrow.mem_reg_2\ : label is 0;
+  attribute \MEM.PORTA.ADDRESS_END\ of \gen_wr_a.gen_word_narrow.mem_reg_2\ : label is 511;
+  attribute \MEM.PORTA.DATA_BIT_LAYOUT\ of \gen_wr_a.gen_word_narrow.mem_reg_2\ : label is "p0_d20";
+  attribute \MEM.PORTA.DATA_LSB\ of \gen_wr_a.gen_word_narrow.mem_reg_2\ : label is 144;
+  attribute \MEM.PORTA.DATA_MSB\ of \gen_wr_a.gen_word_narrow.mem_reg_2\ : label is 163;
+  attribute \MEM.PORTB.ADDRESS_BEGIN\ of \gen_wr_a.gen_word_narrow.mem_reg_2\ : label is 0;
+  attribute \MEM.PORTB.ADDRESS_END\ of \gen_wr_a.gen_word_narrow.mem_reg_2\ : label is 511;
+  attribute \MEM.PORTB.DATA_BIT_LAYOUT\ of \gen_wr_a.gen_word_narrow.mem_reg_2\ : label is "p0_d20";
+  attribute \MEM.PORTB.DATA_LSB\ of \gen_wr_a.gen_word_narrow.mem_reg_2\ : label is 144;
+  attribute \MEM.PORTB.DATA_MSB\ of \gen_wr_a.gen_word_narrow.mem_reg_2\ : label is 163;
+  attribute METHODOLOGY_DRC_VIOS of \gen_wr_a.gen_word_narrow.mem_reg_2\ : label is "";
+  attribute RTL_RAM_BITS of \gen_wr_a.gen_word_narrow.mem_reg_2\ : label is 10496;
+  attribute RTL_RAM_NAME of \gen_wr_a.gen_word_narrow.mem_reg_2\ : label is "xpm_memory_base/gen_wr_a.gen_word_narrow.mem_reg";
+  attribute RTL_RAM_STYLE of \gen_wr_a.gen_word_narrow.mem_reg_2\ : label is "auto";
+  attribute RTL_RAM_TYPE of \gen_wr_a.gen_word_narrow.mem_reg_2\ : label is "RAM_SDP";
+  attribute ram_addr_begin of \gen_wr_a.gen_word_narrow.mem_reg_2\ : label is 0;
+  attribute ram_addr_end of \gen_wr_a.gen_word_narrow.mem_reg_2\ : label is 511;
+  attribute ram_offset of \gen_wr_a.gen_word_narrow.mem_reg_2\ : label is 0;
+  attribute ram_slice_begin of \gen_wr_a.gen_word_narrow.mem_reg_2\ : label is 144;
+  attribute ram_slice_end of \gen_wr_a.gen_word_narrow.mem_reg_2\ : label is 163;
 begin
   dbiterra <= \<const0>\;
   dbiterrb <= \<const0>\;
+  douta(163) <= \<const0>\;
+  douta(162) <= \<const0>\;
+  douta(161) <= \<const0>\;
+  douta(160) <= \<const0>\;
+  douta(159) <= \<const0>\;
+  douta(158) <= \<const0>\;
+  douta(157) <= \<const0>\;
+  douta(156) <= \<const0>\;
+  douta(155) <= \<const0>\;
+  douta(154) <= \<const0>\;
+  douta(153) <= \<const0>\;
+  douta(152) <= \<const0>\;
+  douta(151) <= \<const0>\;
+  douta(150) <= \<const0>\;
+  douta(149) <= \<const0>\;
+  douta(148) <= \<const0>\;
+  douta(147) <= \<const0>\;
+  douta(146) <= \<const0>\;
+  douta(145) <= \<const0>\;
+  douta(144) <= \<const0>\;
+  douta(143) <= \<const0>\;
+  douta(142) <= \<const0>\;
+  douta(141) <= \<const0>\;
+  douta(140) <= \<const0>\;
+  douta(139) <= \<const0>\;
+  douta(138) <= \<const0>\;
+  douta(137) <= \<const0>\;
+  douta(136) <= \<const0>\;
+  douta(135) <= \<const0>\;
+  douta(134) <= \<const0>\;
+  douta(133) <= \<const0>\;
+  douta(132) <= \<const0>\;
+  douta(131) <= \<const0>\;
+  douta(130) <= \<const0>\;
+  douta(129) <= \<const0>\;
+  douta(128) <= \<const0>\;
+  douta(127) <= \<const0>\;
+  douta(126) <= \<const0>\;
+  douta(125) <= \<const0>\;
+  douta(124) <= \<const0>\;
+  douta(123) <= \<const0>\;
+  douta(122) <= \<const0>\;
+  douta(121) <= \<const0>\;
+  douta(120) <= \<const0>\;
+  douta(119) <= \<const0>\;
+  douta(118) <= \<const0>\;
+  douta(117) <= \<const0>\;
+  douta(116) <= \<const0>\;
+  douta(115) <= \<const0>\;
+  douta(114) <= \<const0>\;
+  douta(113) <= \<const0>\;
+  douta(112) <= \<const0>\;
+  douta(111) <= \<const0>\;
+  douta(110) <= \<const0>\;
+  douta(109) <= \<const0>\;
+  douta(108) <= \<const0>\;
+  douta(107) <= \<const0>\;
+  douta(106) <= \<const0>\;
+  douta(105) <= \<const0>\;
+  douta(104) <= \<const0>\;
+  douta(103) <= \<const0>\;
+  douta(102) <= \<const0>\;
+  douta(101) <= \<const0>\;
+  douta(100) <= \<const0>\;
+  douta(99) <= \<const0>\;
+  douta(98) <= \<const0>\;
+  douta(97) <= \<const0>\;
+  douta(96) <= \<const0>\;
+  douta(95) <= \<const0>\;
+  douta(94) <= \<const0>\;
+  douta(93) <= \<const0>\;
+  douta(92) <= \<const0>\;
+  douta(91) <= \<const0>\;
+  douta(90) <= \<const0>\;
+  douta(89) <= \<const0>\;
+  douta(88) <= \<const0>\;
+  douta(87) <= \<const0>\;
+  douta(86) <= \<const0>\;
+  douta(85) <= \<const0>\;
+  douta(84) <= \<const0>\;
+  douta(83) <= \<const0>\;
+  douta(82) <= \<const0>\;
+  douta(81) <= \<const0>\;
+  douta(80) <= \<const0>\;
+  douta(79) <= \<const0>\;
+  douta(78) <= \<const0>\;
+  douta(77) <= \<const0>\;
+  douta(76) <= \<const0>\;
+  douta(75) <= \<const0>\;
+  douta(74) <= \<const0>\;
+  douta(73) <= \<const0>\;
+  douta(72) <= \<const0>\;
+  douta(71) <= \<const0>\;
+  douta(70) <= \<const0>\;
+  douta(69) <= \<const0>\;
+  douta(68) <= \<const0>\;
+  douta(67) <= \<const0>\;
+  douta(66) <= \<const0>\;
+  douta(65) <= \<const0>\;
+  douta(64) <= \<const0>\;
+  douta(63) <= \<const0>\;
+  douta(62) <= \<const0>\;
+  douta(61) <= \<const0>\;
+  douta(60) <= \<const0>\;
+  douta(59) <= \<const0>\;
+  douta(58) <= \<const0>\;
+  douta(57) <= \<const0>\;
+  douta(56) <= \<const0>\;
+  douta(55) <= \<const0>\;
+  douta(54) <= \<const0>\;
+  douta(53) <= \<const0>\;
+  douta(52) <= \<const0>\;
+  douta(51) <= \<const0>\;
+  douta(50) <= \<const0>\;
+  douta(49) <= \<const0>\;
+  douta(48) <= \<const0>\;
+  douta(47) <= \<const0>\;
+  douta(46) <= \<const0>\;
+  douta(45) <= \<const0>\;
+  douta(44) <= \<const0>\;
+  douta(43) <= \<const0>\;
+  douta(42) <= \<const0>\;
+  douta(41) <= \<const0>\;
+  douta(40) <= \<const0>\;
+  douta(39) <= \<const0>\;
+  douta(38) <= \<const0>\;
+  douta(37) <= \<const0>\;
+  douta(36) <= \<const0>\;
+  douta(35) <= \<const0>\;
+  douta(34) <= \<const0>\;
+  douta(33) <= \<const0>\;
+  douta(32) <= \<const0>\;
+  douta(31) <= \<const0>\;
+  douta(30) <= \<const0>\;
+  douta(29) <= \<const0>\;
+  douta(28) <= \<const0>\;
+  douta(27) <= \<const0>\;
+  douta(26) <= \<const0>\;
+  douta(25) <= \<const0>\;
+  douta(24) <= \<const0>\;
+  douta(23) <= \<const0>\;
+  douta(22) <= \<const0>\;
+  douta(21) <= \<const0>\;
+  douta(20) <= \<const0>\;
+  douta(19) <= \<const0>\;
+  douta(18) <= \<const0>\;
+  douta(17) <= \<const0>\;
+  douta(16) <= \<const0>\;
+  douta(15) <= \<const0>\;
+  douta(14) <= \<const0>\;
   douta(13) <= \<const0>\;
   douta(12) <= \<const0>\;
   douta(11) <= \<const0>\;
@@ -1445,428 +1607,559 @@ GND: unisim.vcomponents.GND
      port map (
       G => \<const0>\
     );
-\gen_rd_b.gen_doutb_pipe.gen_stage.doutb_pipe_reg[0][0]\: unisim.vcomponents.FDRE
+\gen_wr_a.gen_word_narrow.mem_reg_0\: unisim.vcomponents.RAMB36E1
     generic map(
-      INIT => '0'
+      DOA_REG => 1,
+      DOB_REG => 1,
+      EN_ECC_READ => false,
+      EN_ECC_WRITE => false,
+      INITP_00 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_01 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_02 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_03 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_04 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_05 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_06 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_07 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_08 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_09 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_0A => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_0B => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_0C => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_0D => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_0E => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_0F => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_00 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_01 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_02 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_03 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_04 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_05 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_06 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_07 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_08 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_09 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_0A => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_0B => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_0C => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_0D => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_0E => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_0F => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_10 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_11 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_12 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_13 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_14 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_15 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_16 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_17 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_18 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_19 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_1A => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_1B => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_1C => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_1D => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_1E => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_1F => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_20 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_21 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_22 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_23 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_24 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_25 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_26 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_27 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_28 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_29 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_2A => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_2B => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_2C => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_2D => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_2E => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_2F => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_30 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_31 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_32 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_33 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_34 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_35 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_36 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_37 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_38 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_39 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_3A => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_3B => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_3C => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_3D => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_3E => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_3F => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_40 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_41 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_42 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_43 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_44 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_45 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_46 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_47 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_48 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_49 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_4A => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_4B => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_4C => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_4D => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_4E => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_4F => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_50 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_51 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_52 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_53 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_54 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_55 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_56 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_57 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_58 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_59 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_5A => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_5B => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_5C => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_5D => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_5E => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_5F => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_60 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_61 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_62 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_63 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_64 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_65 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_66 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_67 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_68 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_69 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_6A => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_6B => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_6C => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_6D => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_6E => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_6F => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_70 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_71 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_72 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_73 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_74 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_75 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_76 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_77 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_78 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_79 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_7A => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_7B => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_7C => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_7D => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_7E => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_7F => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_A => X"000000000",
+      INIT_B => X"000000000",
+      RAM_EXTENSION_A => "NONE",
+      RAM_EXTENSION_B => "NONE",
+      RAM_MODE => "SDP",
+      RDADDR_COLLISION_HWCONFIG => "DELAYED_WRITE",
+      READ_WIDTH_A => 72,
+      READ_WIDTH_B => 0,
+      RSTREG_PRIORITY_A => "RSTREG",
+      RSTREG_PRIORITY_B => "RSTREG",
+      SIM_COLLISION_CHECK => "ALL",
+      SIM_DEVICE => "7SERIES",
+      SRVAL_A => X"000000000",
+      SRVAL_B => X"000000000",
+      WRITE_MODE_A => "READ_FIRST",
+      WRITE_MODE_B => "READ_FIRST",
+      WRITE_WIDTH_A => 0,
+      WRITE_WIDTH_B => 72
     )
         port map (
-      C => clka,
-      CE => regceb,
-      D => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg\(0),
-      Q => doutb(0),
-      R => rstb
+      ADDRARDADDR(15 downto 12) => B"1000",
+      ADDRARDADDR(11 downto 6) => addrb(5 downto 0),
+      ADDRARDADDR(5 downto 0) => B"111111",
+      ADDRBWRADDR(15 downto 12) => B"1000",
+      ADDRBWRADDR(11 downto 6) => addra(5 downto 0),
+      ADDRBWRADDR(5 downto 0) => B"111111",
+      CASCADEINA => '0',
+      CASCADEINB => '0',
+      CASCADEOUTA => \NLW_gen_wr_a.gen_word_narrow.mem_reg_0_CASCADEOUTA_UNCONNECTED\,
+      CASCADEOUTB => \NLW_gen_wr_a.gen_word_narrow.mem_reg_0_CASCADEOUTB_UNCONNECTED\,
+      CLKARDCLK => clka,
+      CLKBWRCLK => clka,
+      DBITERR => \NLW_gen_wr_a.gen_word_narrow.mem_reg_0_DBITERR_UNCONNECTED\,
+      DIADI(31 downto 0) => dina(31 downto 0),
+      DIBDI(31 downto 0) => dina(63 downto 32),
+      DIPADIP(3 downto 0) => dina(67 downto 64),
+      DIPBDIP(3 downto 0) => dina(71 downto 68),
+      DOADO(31 downto 0) => doutb(31 downto 0),
+      DOBDO(31 downto 0) => doutb(63 downto 32),
+      DOPADOP(3 downto 0) => doutb(67 downto 64),
+      DOPBDOP(3 downto 0) => doutb(71 downto 68),
+      ECCPARITY(7 downto 0) => \NLW_gen_wr_a.gen_word_narrow.mem_reg_0_ECCPARITY_UNCONNECTED\(7 downto 0),
+      ENARDEN => enb,
+      ENBWREN => '1',
+      INJECTDBITERR => '0',
+      INJECTSBITERR => '0',
+      RDADDRECC(8 downto 0) => \NLW_gen_wr_a.gen_word_narrow.mem_reg_0_RDADDRECC_UNCONNECTED\(8 downto 0),
+      REGCEAREGCE => regceb,
+      REGCEB => '0',
+      RSTRAMARSTRAM => '0',
+      RSTRAMB => '0',
+      RSTREGARSTREG => rstb,
+      RSTREGB => '0',
+      SBITERR => \NLW_gen_wr_a.gen_word_narrow.mem_reg_0_SBITERR_UNCONNECTED\,
+      WEA(3 downto 0) => B"0000",
+      WEBWE(7) => wea(0),
+      WEBWE(6) => wea(0),
+      WEBWE(5) => wea(0),
+      WEBWE(4) => wea(0),
+      WEBWE(3) => wea(0),
+      WEBWE(2) => wea(0),
+      WEBWE(1) => wea(0),
+      WEBWE(0) => wea(0)
     );
-\gen_rd_b.gen_doutb_pipe.gen_stage.doutb_pipe_reg[0][10]\: unisim.vcomponents.FDRE
+\gen_wr_a.gen_word_narrow.mem_reg_1\: unisim.vcomponents.RAMB36E1
     generic map(
-      INIT => '0'
+      DOA_REG => 1,
+      DOB_REG => 1,
+      EN_ECC_READ => false,
+      EN_ECC_WRITE => false,
+      INITP_00 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_01 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_02 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_03 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_04 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_05 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_06 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_07 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_08 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_09 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_0A => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_0B => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_0C => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_0D => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_0E => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_0F => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_00 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_01 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_02 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_03 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_04 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_05 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_06 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_07 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_08 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_09 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_0A => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_0B => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_0C => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_0D => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_0E => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_0F => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_10 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_11 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_12 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_13 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_14 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_15 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_16 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_17 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_18 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_19 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_1A => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_1B => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_1C => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_1D => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_1E => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_1F => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_20 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_21 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_22 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_23 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_24 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_25 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_26 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_27 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_28 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_29 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_2A => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_2B => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_2C => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_2D => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_2E => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_2F => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_30 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_31 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_32 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_33 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_34 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_35 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_36 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_37 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_38 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_39 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_3A => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_3B => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_3C => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_3D => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_3E => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_3F => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_40 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_41 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_42 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_43 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_44 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_45 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_46 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_47 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_48 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_49 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_4A => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_4B => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_4C => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_4D => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_4E => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_4F => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_50 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_51 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_52 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_53 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_54 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_55 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_56 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_57 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_58 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_59 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_5A => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_5B => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_5C => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_5D => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_5E => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_5F => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_60 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_61 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_62 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_63 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_64 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_65 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_66 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_67 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_68 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_69 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_6A => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_6B => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_6C => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_6D => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_6E => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_6F => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_70 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_71 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_72 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_73 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_74 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_75 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_76 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_77 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_78 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_79 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_7A => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_7B => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_7C => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_7D => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_7E => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_7F => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_A => X"000000000",
+      INIT_B => X"000000000",
+      RAM_EXTENSION_A => "NONE",
+      RAM_EXTENSION_B => "NONE",
+      RAM_MODE => "SDP",
+      RDADDR_COLLISION_HWCONFIG => "DELAYED_WRITE",
+      READ_WIDTH_A => 72,
+      READ_WIDTH_B => 0,
+      RSTREG_PRIORITY_A => "RSTREG",
+      RSTREG_PRIORITY_B => "RSTREG",
+      SIM_COLLISION_CHECK => "ALL",
+      SIM_DEVICE => "7SERIES",
+      SRVAL_A => X"000000000",
+      SRVAL_B => X"000000000",
+      WRITE_MODE_A => "READ_FIRST",
+      WRITE_MODE_B => "READ_FIRST",
+      WRITE_WIDTH_A => 0,
+      WRITE_WIDTH_B => 72
     )
         port map (
-      C => clka,
-      CE => regceb,
-      D => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg\(10),
-      Q => doutb(10),
-      R => rstb
+      ADDRARDADDR(15 downto 12) => B"1000",
+      ADDRARDADDR(11 downto 6) => addrb(5 downto 0),
+      ADDRARDADDR(5 downto 0) => B"111111",
+      ADDRBWRADDR(15 downto 12) => B"1000",
+      ADDRBWRADDR(11 downto 6) => addra(5 downto 0),
+      ADDRBWRADDR(5 downto 0) => B"111111",
+      CASCADEINA => '0',
+      CASCADEINB => '0',
+      CASCADEOUTA => \NLW_gen_wr_a.gen_word_narrow.mem_reg_1_CASCADEOUTA_UNCONNECTED\,
+      CASCADEOUTB => \NLW_gen_wr_a.gen_word_narrow.mem_reg_1_CASCADEOUTB_UNCONNECTED\,
+      CLKARDCLK => clka,
+      CLKBWRCLK => clka,
+      DBITERR => \NLW_gen_wr_a.gen_word_narrow.mem_reg_1_DBITERR_UNCONNECTED\,
+      DIADI(31 downto 0) => dina(103 downto 72),
+      DIBDI(31 downto 0) => dina(135 downto 104),
+      DIPADIP(3 downto 0) => dina(139 downto 136),
+      DIPBDIP(3 downto 0) => dina(143 downto 140),
+      DOADO(31 downto 0) => doutb(103 downto 72),
+      DOBDO(31 downto 0) => doutb(135 downto 104),
+      DOPADOP(3 downto 0) => doutb(139 downto 136),
+      DOPBDOP(3 downto 0) => doutb(143 downto 140),
+      ECCPARITY(7 downto 0) => \NLW_gen_wr_a.gen_word_narrow.mem_reg_1_ECCPARITY_UNCONNECTED\(7 downto 0),
+      ENARDEN => enb,
+      ENBWREN => '1',
+      INJECTDBITERR => '0',
+      INJECTSBITERR => '0',
+      RDADDRECC(8 downto 0) => \NLW_gen_wr_a.gen_word_narrow.mem_reg_1_RDADDRECC_UNCONNECTED\(8 downto 0),
+      REGCEAREGCE => regceb,
+      REGCEB => '0',
+      RSTRAMARSTRAM => '0',
+      RSTRAMB => '0',
+      RSTREGARSTREG => rstb,
+      RSTREGB => '0',
+      SBITERR => \NLW_gen_wr_a.gen_word_narrow.mem_reg_1_SBITERR_UNCONNECTED\,
+      WEA(3 downto 0) => B"0000",
+      WEBWE(7) => wea(0),
+      WEBWE(6) => wea(0),
+      WEBWE(5) => wea(0),
+      WEBWE(4) => wea(0),
+      WEBWE(3) => wea(0),
+      WEBWE(2) => wea(0),
+      WEBWE(1) => wea(0),
+      WEBWE(0) => wea(0)
     );
-\gen_rd_b.gen_doutb_pipe.gen_stage.doutb_pipe_reg[0][11]\: unisim.vcomponents.FDRE
+\gen_wr_a.gen_word_narrow.mem_reg_2\: unisim.vcomponents.RAMB18E1
     generic map(
-      INIT => '0'
+      DOA_REG => 1,
+      DOB_REG => 1,
+      INITP_00 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_01 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_02 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_03 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_04 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_05 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_06 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INITP_07 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_00 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_01 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_02 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_03 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_04 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_05 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_06 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_07 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_08 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_09 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_0A => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_0B => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_0C => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_0D => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_0E => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_0F => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_10 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_11 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_12 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_13 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_14 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_15 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_16 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_17 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_18 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_19 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_1A => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_1B => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_1C => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_1D => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_1E => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_1F => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_20 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_21 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_22 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_23 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_24 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_25 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_26 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_27 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_28 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_29 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_2A => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_2B => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_2C => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_2D => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_2E => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_2F => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_30 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_31 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_32 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_33 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_34 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_35 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_36 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_37 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_38 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_39 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_3A => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_3B => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_3C => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_3D => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_3E => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_3F => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_A => X"00000",
+      INIT_B => X"00000",
+      RAM_MODE => "SDP",
+      RDADDR_COLLISION_HWCONFIG => "DELAYED_WRITE",
+      READ_WIDTH_A => 36,
+      READ_WIDTH_B => 0,
+      RSTREG_PRIORITY_A => "RSTREG",
+      RSTREG_PRIORITY_B => "RSTREG",
+      SIM_COLLISION_CHECK => "ALL",
+      SIM_DEVICE => "7SERIES",
+      SRVAL_A => X"00000",
+      SRVAL_B => X"00000",
+      WRITE_MODE_A => "READ_FIRST",
+      WRITE_MODE_B => "READ_FIRST",
+      WRITE_WIDTH_A => 0,
+      WRITE_WIDTH_B => 36
     )
         port map (
-      C => clka,
-      CE => regceb,
-      D => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg\(11),
-      Q => doutb(11),
-      R => rstb
-    );
-\gen_rd_b.gen_doutb_pipe.gen_stage.doutb_pipe_reg[0][12]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => clka,
-      CE => regceb,
-      D => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg\(12),
-      Q => doutb(12),
-      R => rstb
-    );
-\gen_rd_b.gen_doutb_pipe.gen_stage.doutb_pipe_reg[0][13]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => clka,
-      CE => regceb,
-      D => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg\(13),
-      Q => doutb(13),
-      R => rstb
-    );
-\gen_rd_b.gen_doutb_pipe.gen_stage.doutb_pipe_reg[0][1]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => clka,
-      CE => regceb,
-      D => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg\(1),
-      Q => doutb(1),
-      R => rstb
-    );
-\gen_rd_b.gen_doutb_pipe.gen_stage.doutb_pipe_reg[0][2]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => clka,
-      CE => regceb,
-      D => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg\(2),
-      Q => doutb(2),
-      R => rstb
-    );
-\gen_rd_b.gen_doutb_pipe.gen_stage.doutb_pipe_reg[0][3]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => clka,
-      CE => regceb,
-      D => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg\(3),
-      Q => doutb(3),
-      R => rstb
-    );
-\gen_rd_b.gen_doutb_pipe.gen_stage.doutb_pipe_reg[0][4]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => clka,
-      CE => regceb,
-      D => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg\(4),
-      Q => doutb(4),
-      R => rstb
-    );
-\gen_rd_b.gen_doutb_pipe.gen_stage.doutb_pipe_reg[0][5]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => clka,
-      CE => regceb,
-      D => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg\(5),
-      Q => doutb(5),
-      R => rstb
-    );
-\gen_rd_b.gen_doutb_pipe.gen_stage.doutb_pipe_reg[0][6]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => clka,
-      CE => regceb,
-      D => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg\(6),
-      Q => doutb(6),
-      R => rstb
-    );
-\gen_rd_b.gen_doutb_pipe.gen_stage.doutb_pipe_reg[0][7]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => clka,
-      CE => regceb,
-      D => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg\(7),
-      Q => doutb(7),
-      R => rstb
-    );
-\gen_rd_b.gen_doutb_pipe.gen_stage.doutb_pipe_reg[0][8]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => clka,
-      CE => regceb,
-      D => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg\(8),
-      Q => doutb(8),
-      R => rstb
-    );
-\gen_rd_b.gen_doutb_pipe.gen_stage.doutb_pipe_reg[0][9]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => clka,
-      CE => regceb,
-      D => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg\(9),
-      Q => doutb(9),
-      R => rstb
-    );
-\gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg[0]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => clka,
-      CE => enb,
-      D => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg0\(0),
-      Q => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg\(0),
-      R => '0'
-    );
-\gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg[10]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => clka,
-      CE => enb,
-      D => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg0\(10),
-      Q => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg\(10),
-      R => '0'
-    );
-\gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg[11]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => clka,
-      CE => enb,
-      D => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg0\(11),
-      Q => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg\(11),
-      R => '0'
-    );
-\gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg[12]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => clka,
-      CE => enb,
-      D => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg0\(12),
-      Q => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg\(12),
-      R => '0'
-    );
-\gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg[13]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => clka,
-      CE => enb,
-      D => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg0\(13),
-      Q => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg\(13),
-      R => '0'
-    );
-\gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg[1]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => clka,
-      CE => enb,
-      D => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg0\(1),
-      Q => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg\(1),
-      R => '0'
-    );
-\gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg[2]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => clka,
-      CE => enb,
-      D => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg0\(2),
-      Q => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg\(2),
-      R => '0'
-    );
-\gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg[3]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => clka,
-      CE => enb,
-      D => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg0\(3),
-      Q => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg\(3),
-      R => '0'
-    );
-\gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg[4]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => clka,
-      CE => enb,
-      D => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg0\(4),
-      Q => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg\(4),
-      R => '0'
-    );
-\gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg[5]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => clka,
-      CE => enb,
-      D => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg0\(5),
-      Q => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg\(5),
-      R => '0'
-    );
-\gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg[6]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => clka,
-      CE => enb,
-      D => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg0\(6),
-      Q => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg\(6),
-      R => '0'
-    );
-\gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg[7]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => clka,
-      CE => enb,
-      D => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg0\(7),
-      Q => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg\(7),
-      R => '0'
-    );
-\gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg[8]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => clka,
-      CE => enb,
-      D => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg0\(8),
-      Q => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg\(8),
-      R => '0'
-    );
-\gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg[9]\: unisim.vcomponents.FDRE
-    generic map(
-      INIT => '0'
-    )
-        port map (
-      C => clka,
-      CE => enb,
-      D => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg0\(9),
-      Q => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg\(9),
-      R => '0'
-    );
-\gen_wr_a.gen_word_narrow.mem_reg_0_63_0_2\: unisim.vcomponents.RAM64M
-    generic map(
-      INIT_A => X"0000000000000000",
-      INIT_B => X"0000000000000000",
-      INIT_C => X"0000000000000000",
-      INIT_D => X"0000000000000000"
-    )
-        port map (
-      ADDRA(5 downto 0) => addrb(5 downto 0),
-      ADDRB(5 downto 0) => addrb(5 downto 0),
-      ADDRC(5 downto 0) => addrb(5 downto 0),
-      ADDRD(5 downto 0) => addra(5 downto 0),
-      DIA => dina(0),
-      DIB => dina(1),
-      DIC => dina(2),
-      DID => '0',
-      DOA => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg0\(0),
-      DOB => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg0\(1),
-      DOC => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg0\(2),
-      DOD => \NLW_gen_wr_a.gen_word_narrow.mem_reg_0_63_0_2_DOD_UNCONNECTED\,
-      WCLK => clka,
-      WE => wea(0)
-    );
-\gen_wr_a.gen_word_narrow.mem_reg_0_63_12_13\: unisim.vcomponents.RAM64M
-    generic map(
-      INIT_A => X"0000000000000000",
-      INIT_B => X"0000000000000000",
-      INIT_C => X"0000000000000000",
-      INIT_D => X"0000000000000000"
-    )
-        port map (
-      ADDRA(5 downto 0) => addrb(5 downto 0),
-      ADDRB(5 downto 0) => addrb(5 downto 0),
-      ADDRC(5 downto 0) => addrb(5 downto 0),
-      ADDRD(5 downto 0) => addra(5 downto 0),
-      DIA => dina(12),
-      DIB => dina(13),
-      DIC => '0',
-      DID => '0',
-      DOA => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg0\(12),
-      DOB => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg0\(13),
-      DOC => \NLW_gen_wr_a.gen_word_narrow.mem_reg_0_63_12_13_DOC_UNCONNECTED\,
-      DOD => \NLW_gen_wr_a.gen_word_narrow.mem_reg_0_63_12_13_DOD_UNCONNECTED\,
-      WCLK => clka,
-      WE => wea(0)
-    );
-\gen_wr_a.gen_word_narrow.mem_reg_0_63_3_5\: unisim.vcomponents.RAM64M
-    generic map(
-      INIT_A => X"0000000000000000",
-      INIT_B => X"0000000000000000",
-      INIT_C => X"0000000000000000",
-      INIT_D => X"0000000000000000"
-    )
-        port map (
-      ADDRA(5 downto 0) => addrb(5 downto 0),
-      ADDRB(5 downto 0) => addrb(5 downto 0),
-      ADDRC(5 downto 0) => addrb(5 downto 0),
-      ADDRD(5 downto 0) => addra(5 downto 0),
-      DIA => dina(3),
-      DIB => dina(4),
-      DIC => dina(5),
-      DID => '0',
-      DOA => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg0\(3),
-      DOB => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg0\(4),
-      DOC => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg0\(5),
-      DOD => \NLW_gen_wr_a.gen_word_narrow.mem_reg_0_63_3_5_DOD_UNCONNECTED\,
-      WCLK => clka,
-      WE => wea(0)
-    );
-\gen_wr_a.gen_word_narrow.mem_reg_0_63_6_8\: unisim.vcomponents.RAM64M
-    generic map(
-      INIT_A => X"0000000000000000",
-      INIT_B => X"0000000000000000",
-      INIT_C => X"0000000000000000",
-      INIT_D => X"0000000000000000"
-    )
-        port map (
-      ADDRA(5 downto 0) => addrb(5 downto 0),
-      ADDRB(5 downto 0) => addrb(5 downto 0),
-      ADDRC(5 downto 0) => addrb(5 downto 0),
-      ADDRD(5 downto 0) => addra(5 downto 0),
-      DIA => dina(6),
-      DIB => dina(7),
-      DIC => dina(8),
-      DID => '0',
-      DOA => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg0\(6),
-      DOB => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg0\(7),
-      DOC => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg0\(8),
-      DOD => \NLW_gen_wr_a.gen_word_narrow.mem_reg_0_63_6_8_DOD_UNCONNECTED\,
-      WCLK => clka,
-      WE => wea(0)
-    );
-\gen_wr_a.gen_word_narrow.mem_reg_0_63_9_11\: unisim.vcomponents.RAM64M
-    generic map(
-      INIT_A => X"0000000000000000",
-      INIT_B => X"0000000000000000",
-      INIT_C => X"0000000000000000",
-      INIT_D => X"0000000000000000"
-    )
-        port map (
-      ADDRA(5 downto 0) => addrb(5 downto 0),
-      ADDRB(5 downto 0) => addrb(5 downto 0),
-      ADDRC(5 downto 0) => addrb(5 downto 0),
-      ADDRD(5 downto 0) => addra(5 downto 0),
-      DIA => dina(9),
-      DIB => dina(10),
-      DIC => dina(11),
-      DID => '0',
-      DOA => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg0\(9),
-      DOB => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg0\(10),
-      DOC => \gen_rd_b.gen_rd_b_synth_template.gen_nc_narrow_pipe.doutb_reg_reg0\(11),
-      DOD => \NLW_gen_wr_a.gen_word_narrow.mem_reg_0_63_9_11_DOD_UNCONNECTED\,
-      WCLK => clka,
-      WE => wea(0)
+      ADDRARDADDR(13 downto 11) => B"000",
+      ADDRARDADDR(10 downto 5) => addrb(5 downto 0),
+      ADDRARDADDR(4 downto 0) => B"11111",
+      ADDRBWRADDR(13 downto 11) => B"000",
+      ADDRBWRADDR(10 downto 5) => addra(5 downto 0),
+      ADDRBWRADDR(4 downto 0) => B"11111",
+      CLKARDCLK => clka,
+      CLKBWRCLK => clka,
+      DIADI(15 downto 0) => dina(159 downto 144),
+      DIBDI(15 downto 4) => B"111111111111",
+      DIBDI(3 downto 0) => dina(163 downto 160),
+      DIPADIP(1 downto 0) => B"11",
+      DIPBDIP(1 downto 0) => B"11",
+      DOADO(15 downto 0) => doutb(159 downto 144),
+      DOBDO(15 downto 4) => \NLW_gen_wr_a.gen_word_narrow.mem_reg_2_DOBDO_UNCONNECTED\(15 downto 4),
+      DOBDO(3 downto 0) => doutb(163 downto 160),
+      DOPADOP(1 downto 0) => \NLW_gen_wr_a.gen_word_narrow.mem_reg_2_DOPADOP_UNCONNECTED\(1 downto 0),
+      DOPBDOP(1 downto 0) => \NLW_gen_wr_a.gen_word_narrow.mem_reg_2_DOPBDOP_UNCONNECTED\(1 downto 0),
+      ENARDEN => enb,
+      ENBWREN => '1',
+      REGCEAREGCE => regceb,
+      REGCEB => '0',
+      RSTRAMARSTRAM => '0',
+      RSTRAMB => '0',
+      RSTREGARSTREG => rstb,
+      RSTREGB => '0',
+      WEA(1 downto 0) => B"00",
+      WEBWE(3) => wea(0),
+      WEBWE(2) => wea(0),
+      WEBWE(1) => wea(0),
+      WEBWE(0) => wea(0)
     );
 end STRUCTURE;
 library IEEE;
@@ -1879,7 +2172,7 @@ entity axis_data_fifo_0_xpm_fifo_base is
     rst : in STD_LOGIC;
     wr_clk : in STD_LOGIC;
     wr_en : in STD_LOGIC;
-    din : in STD_LOGIC_VECTOR ( 13 downto 0 );
+    din : in STD_LOGIC_VECTOR ( 163 downto 0 );
     full : out STD_LOGIC;
     full_n : out STD_LOGIC;
     prog_full : out STD_LOGIC;
@@ -1890,7 +2183,7 @@ entity axis_data_fifo_0_xpm_fifo_base is
     wr_ack : out STD_LOGIC;
     rd_clk : in STD_LOGIC;
     rd_en : in STD_LOGIC;
-    dout : out STD_LOGIC_VECTOR ( 13 downto 0 );
+    dout : out STD_LOGIC_VECTOR ( 163 downto 0 );
     empty : out STD_LOGIC;
     prog_empty : out STD_LOGIC;
     rd_data_count : out STD_LOGIC_VECTOR ( 6 downto 0 );
@@ -1950,7 +2243,7 @@ entity axis_data_fifo_0_xpm_fifo_base is
   attribute FIFO_READ_LATENCY : integer;
   attribute FIFO_READ_LATENCY of axis_data_fifo_0_xpm_fifo_base : entity is 0;
   attribute FIFO_SIZE : integer;
-  attribute FIFO_SIZE of axis_data_fifo_0_xpm_fifo_base : entity is 896;
+  attribute FIFO_SIZE of axis_data_fifo_0_xpm_fifo_base : entity is 10496;
   attribute FIFO_WRITE_DEPTH : integer;
   attribute FIFO_WRITE_DEPTH of axis_data_fifo_0_xpm_fifo_base : entity is 64;
   attribute FULL_RESET_VALUE : integer;
@@ -1986,7 +2279,7 @@ entity axis_data_fifo_0_xpm_fifo_base is
   attribute RD_PNTR_WIDTH : integer;
   attribute RD_PNTR_WIDTH of axis_data_fifo_0_xpm_fifo_base : entity is 6;
   attribute READ_DATA_WIDTH : integer;
-  attribute READ_DATA_WIDTH of axis_data_fifo_0_xpm_fifo_base : entity is 14;
+  attribute READ_DATA_WIDTH of axis_data_fifo_0_xpm_fifo_base : entity is 164;
   attribute READ_MODE : integer;
   attribute READ_MODE of axis_data_fifo_0_xpm_fifo_base : entity is 1;
   attribute READ_MODE_LL : integer;
@@ -2006,7 +2299,7 @@ entity axis_data_fifo_0_xpm_fifo_base is
   attribute WIDTH_RATIO : integer;
   attribute WIDTH_RATIO of axis_data_fifo_0_xpm_fifo_base : entity is 1;
   attribute WRITE_DATA_WIDTH : integer;
-  attribute WRITE_DATA_WIDTH of axis_data_fifo_0_xpm_fifo_base : entity is 14;
+  attribute WRITE_DATA_WIDTH of axis_data_fifo_0_xpm_fifo_base : entity is 164;
   attribute WR_DATA_COUNT_WIDTH : integer;
   attribute WR_DATA_COUNT_WIDTH of axis_data_fifo_0_xpm_fifo_base : entity is 7;
   attribute WR_DC_WIDTH_EXT : integer;
@@ -2018,7 +2311,7 @@ entity axis_data_fifo_0_xpm_fifo_base is
   attribute WR_RD_RATIO : integer;
   attribute WR_RD_RATIO of axis_data_fifo_0_xpm_fifo_base : entity is 0;
   attribute WR_WIDTH_LOG : integer;
-  attribute WR_WIDTH_LOG of axis_data_fifo_0_xpm_fifo_base : entity is 4;
+  attribute WR_WIDTH_LOG of axis_data_fifo_0_xpm_fifo_base : entity is 8;
   attribute XPM_MODULE : string;
   attribute XPM_MODULE of axis_data_fifo_0_xpm_fifo_base : entity is "TRUE";
   attribute both_stages_valid : integer;
@@ -2065,14 +2358,13 @@ architecture STRUCTURE of axis_data_fifo_0_xpm_fifo_base is
   signal \NLW_gen_sdpram.xpm_memory_base_inst_dbiterrb_UNCONNECTED\ : STD_LOGIC;
   signal \NLW_gen_sdpram.xpm_memory_base_inst_sbiterra_UNCONNECTED\ : STD_LOGIC;
   signal \NLW_gen_sdpram.xpm_memory_base_inst_sbiterrb_UNCONNECTED\ : STD_LOGIC;
-  signal \NLW_gen_sdpram.xpm_memory_base_inst_douta_UNCONNECTED\ : STD_LOGIC_VECTOR ( 13 downto 0 );
+  signal \NLW_gen_sdpram.xpm_memory_base_inst_douta_UNCONNECTED\ : STD_LOGIC_VECTOR ( 163 downto 0 );
   attribute SOFT_HLUTNM : string;
   attribute SOFT_HLUTNM of \FSM_sequential_gen_fwft.curr_fwft_state[0]_i_1\ : label is "soft_lutpair7";
   attribute SOFT_HLUTNM of \FSM_sequential_gen_fwft.curr_fwft_state[1]_i_1\ : label is "soft_lutpair7";
   attribute FSM_ENCODED_STATES : string;
   attribute FSM_ENCODED_STATES of \FSM_sequential_gen_fwft.curr_fwft_state_reg[0]\ : label is "invalid:00,stage1_valid:01,both_stages_valid:10,stage2_valid:11";
   attribute FSM_ENCODED_STATES of \FSM_sequential_gen_fwft.curr_fwft_state_reg[1]\ : label is "invalid:00,stage1_valid:01,both_stages_valid:10,stage2_valid:11";
-  attribute SOFT_HLUTNM of \gen_fwft.gdvld_fwft.data_valid_fwft_i_1\ : label is "soft_lutpair8";
   attribute ADDR_WIDTH_A : integer;
   attribute ADDR_WIDTH_A of \gen_sdpram.xpm_memory_base_inst\ : label is 6;
   attribute ADDR_WIDTH_B : integer;
@@ -2080,9 +2372,9 @@ architecture STRUCTURE of axis_data_fifo_0_xpm_fifo_base is
   attribute AUTO_SLEEP_TIME : integer;
   attribute AUTO_SLEEP_TIME of \gen_sdpram.xpm_memory_base_inst\ : label is 0;
   attribute BYTE_WRITE_WIDTH_A : integer;
-  attribute BYTE_WRITE_WIDTH_A of \gen_sdpram.xpm_memory_base_inst\ : label is 14;
+  attribute BYTE_WRITE_WIDTH_A of \gen_sdpram.xpm_memory_base_inst\ : label is 164;
   attribute BYTE_WRITE_WIDTH_B : integer;
-  attribute BYTE_WRITE_WIDTH_B of \gen_sdpram.xpm_memory_base_inst\ : label is 14;
+  attribute BYTE_WRITE_WIDTH_B of \gen_sdpram.xpm_memory_base_inst\ : label is 164;
   attribute CASCADE_HEIGHT of \gen_sdpram.xpm_memory_base_inst\ : label is 0;
   attribute CLOCKING_MODE : integer;
   attribute CLOCKING_MODE of \gen_sdpram.xpm_memory_base_inst\ : label is 0;
@@ -2096,6 +2388,18 @@ architecture STRUCTURE of axis_data_fifo_0_xpm_fifo_base is
   attribute KEEP_HIERARCHY of \gen_sdpram.xpm_memory_base_inst\ : label is "soft";
   attribute MAX_NUM_CHAR : integer;
   attribute MAX_NUM_CHAR of \gen_sdpram.xpm_memory_base_inst\ : label is 0;
+  attribute \MEM.ADDRESS_SPACE\ : boolean;
+  attribute \MEM.ADDRESS_SPACE\ of \gen_sdpram.xpm_memory_base_inst\ : label is std.standard.true;
+  attribute \MEM.ADDRESS_SPACE_BEGIN\ : integer;
+  attribute \MEM.ADDRESS_SPACE_BEGIN\ of \gen_sdpram.xpm_memory_base_inst\ : label is 0;
+  attribute \MEM.ADDRESS_SPACE_DATA_LSB\ : integer;
+  attribute \MEM.ADDRESS_SPACE_DATA_LSB\ of \gen_sdpram.xpm_memory_base_inst\ : label is 0;
+  attribute \MEM.ADDRESS_SPACE_DATA_MSB\ : integer;
+  attribute \MEM.ADDRESS_SPACE_DATA_MSB\ of \gen_sdpram.xpm_memory_base_inst\ : label is 163;
+  attribute \MEM.ADDRESS_SPACE_END\ : integer;
+  attribute \MEM.ADDRESS_SPACE_END\ of \gen_sdpram.xpm_memory_base_inst\ : label is 511;
+  attribute \MEM.CORE_MEMORY_WIDTH\ : integer;
+  attribute \MEM.CORE_MEMORY_WIDTH\ of \gen_sdpram.xpm_memory_base_inst\ : label is 164;
   attribute MEMORY_INIT_FILE : string;
   attribute MEMORY_INIT_FILE of \gen_sdpram.xpm_memory_base_inst\ : label is "none";
   attribute MEMORY_INIT_PARAM : string;
@@ -2105,7 +2409,7 @@ architecture STRUCTURE of axis_data_fifo_0_xpm_fifo_base is
   attribute MEMORY_PRIMITIVE : integer;
   attribute MEMORY_PRIMITIVE of \gen_sdpram.xpm_memory_base_inst\ : label is 0;
   attribute MEMORY_SIZE : integer;
-  attribute MEMORY_SIZE of \gen_sdpram.xpm_memory_base_inst\ : label is 896;
+  attribute MEMORY_SIZE of \gen_sdpram.xpm_memory_base_inst\ : label is 10496;
   attribute MEMORY_TYPE : integer;
   attribute MEMORY_TYPE of \gen_sdpram.xpm_memory_base_inst\ : label is 1;
   attribute MESSAGE_CONTROL : integer;
@@ -2125,17 +2429,17 @@ architecture STRUCTURE of axis_data_fifo_0_xpm_fifo_base is
   attribute P_MEMORY_PRIMITIVE : string;
   attribute P_MEMORY_PRIMITIVE of \gen_sdpram.xpm_memory_base_inst\ : label is "auto";
   attribute P_MIN_WIDTH_DATA : integer;
-  attribute P_MIN_WIDTH_DATA of \gen_sdpram.xpm_memory_base_inst\ : label is 14;
+  attribute P_MIN_WIDTH_DATA of \gen_sdpram.xpm_memory_base_inst\ : label is 164;
   attribute P_MIN_WIDTH_DATA_A : integer;
-  attribute P_MIN_WIDTH_DATA_A of \gen_sdpram.xpm_memory_base_inst\ : label is 14;
+  attribute P_MIN_WIDTH_DATA_A of \gen_sdpram.xpm_memory_base_inst\ : label is 164;
   attribute P_MIN_WIDTH_DATA_B : integer;
-  attribute P_MIN_WIDTH_DATA_B of \gen_sdpram.xpm_memory_base_inst\ : label is 14;
+  attribute P_MIN_WIDTH_DATA_B of \gen_sdpram.xpm_memory_base_inst\ : label is 164;
   attribute P_MIN_WIDTH_DATA_ECC : integer;
-  attribute P_MIN_WIDTH_DATA_ECC of \gen_sdpram.xpm_memory_base_inst\ : label is 14;
+  attribute P_MIN_WIDTH_DATA_ECC of \gen_sdpram.xpm_memory_base_inst\ : label is 164;
   attribute P_MIN_WIDTH_DATA_LDW : integer;
   attribute P_MIN_WIDTH_DATA_LDW of \gen_sdpram.xpm_memory_base_inst\ : label is 4;
   attribute P_MIN_WIDTH_DATA_SHFT : integer;
-  attribute P_MIN_WIDTH_DATA_SHFT of \gen_sdpram.xpm_memory_base_inst\ : label is 14;
+  attribute P_MIN_WIDTH_DATA_SHFT of \gen_sdpram.xpm_memory_base_inst\ : label is 164;
   attribute P_NUM_COLS_WRITE_A : integer;
   attribute P_NUM_COLS_WRITE_A of \gen_sdpram.xpm_memory_base_inst\ : label is 1;
   attribute P_NUM_COLS_WRITE_B : integer;
@@ -2183,15 +2487,15 @@ architecture STRUCTURE of axis_data_fifo_0_xpm_fifo_base is
   attribute P_WIDTH_ADDR_WRITE_B : integer;
   attribute P_WIDTH_ADDR_WRITE_B of \gen_sdpram.xpm_memory_base_inst\ : label is 6;
   attribute P_WIDTH_COL_WRITE_A : integer;
-  attribute P_WIDTH_COL_WRITE_A of \gen_sdpram.xpm_memory_base_inst\ : label is 14;
+  attribute P_WIDTH_COL_WRITE_A of \gen_sdpram.xpm_memory_base_inst\ : label is 164;
   attribute P_WIDTH_COL_WRITE_B : integer;
-  attribute P_WIDTH_COL_WRITE_B of \gen_sdpram.xpm_memory_base_inst\ : label is 14;
+  attribute P_WIDTH_COL_WRITE_B of \gen_sdpram.xpm_memory_base_inst\ : label is 164;
   attribute RAM_DECOMP : string;
   attribute RAM_DECOMP of \gen_sdpram.xpm_memory_base_inst\ : label is "auto";
   attribute READ_DATA_WIDTH_A : integer;
-  attribute READ_DATA_WIDTH_A of \gen_sdpram.xpm_memory_base_inst\ : label is 14;
+  attribute READ_DATA_WIDTH_A of \gen_sdpram.xpm_memory_base_inst\ : label is 164;
   attribute READ_DATA_WIDTH_B : integer;
-  attribute READ_DATA_WIDTH_B of \gen_sdpram.xpm_memory_base_inst\ : label is 14;
+  attribute READ_DATA_WIDTH_B of \gen_sdpram.xpm_memory_base_inst\ : label is 164;
   attribute READ_LATENCY_A : integer;
   attribute READ_LATENCY_A of \gen_sdpram.xpm_memory_base_inst\ : label is 2;
   attribute READ_LATENCY_B : integer;
@@ -2214,9 +2518,9 @@ architecture STRUCTURE of axis_data_fifo_0_xpm_fifo_base is
   attribute VERSION of \gen_sdpram.xpm_memory_base_inst\ : label is 0;
   attribute WAKEUP_TIME of \gen_sdpram.xpm_memory_base_inst\ : label is 0;
   attribute WRITE_DATA_WIDTH_A : integer;
-  attribute WRITE_DATA_WIDTH_A of \gen_sdpram.xpm_memory_base_inst\ : label is 14;
+  attribute WRITE_DATA_WIDTH_A of \gen_sdpram.xpm_memory_base_inst\ : label is 164;
   attribute WRITE_DATA_WIDTH_B : integer;
-  attribute WRITE_DATA_WIDTH_B of \gen_sdpram.xpm_memory_base_inst\ : label is 14;
+  attribute WRITE_DATA_WIDTH_B of \gen_sdpram.xpm_memory_base_inst\ : label is 164;
   attribute WRITE_MODE_A : integer;
   attribute WRITE_MODE_A of \gen_sdpram.xpm_memory_base_inst\ : label is 2;
   attribute WRITE_MODE_B : integer;
@@ -2225,10 +2529,9 @@ architecture STRUCTURE of axis_data_fifo_0_xpm_fifo_base is
   attribute WRITE_PROTECT of \gen_sdpram.xpm_memory_base_inst\ : label is 1;
   attribute XPM_MODULE of \gen_sdpram.xpm_memory_base_inst\ : label is "TRUE";
   attribute rsta_loop_iter : integer;
-  attribute rsta_loop_iter of \gen_sdpram.xpm_memory_base_inst\ : label is 16;
+  attribute rsta_loop_iter of \gen_sdpram.xpm_memory_base_inst\ : label is 164;
   attribute rstb_loop_iter : integer;
-  attribute rstb_loop_iter of \gen_sdpram.xpm_memory_base_inst\ : label is 16;
-  attribute SOFT_HLUTNM of \gen_sdpram.xpm_memory_base_inst_i_3\ : label is "soft_lutpair8";
+  attribute rstb_loop_iter of \gen_sdpram.xpm_memory_base_inst\ : label is 164;
 begin
   almost_empty <= \<const0>\;
   almost_full <= \<const0>\;
@@ -2390,10 +2693,10 @@ GND: unisim.vcomponents.GND
       clkb => '0',
       dbiterra => \NLW_gen_sdpram.xpm_memory_base_inst_dbiterra_UNCONNECTED\,
       dbiterrb => \NLW_gen_sdpram.xpm_memory_base_inst_dbiterrb_UNCONNECTED\,
-      dina(13 downto 0) => din(13 downto 0),
-      dinb(13 downto 0) => B"00000000000000",
-      douta(13 downto 0) => \NLW_gen_sdpram.xpm_memory_base_inst_douta_UNCONNECTED\(13 downto 0),
-      doutb(13 downto 0) => dout(13 downto 0),
+      dina(163 downto 0) => din(163 downto 0),
+      dinb(163 downto 0) => B"00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      douta(163 downto 0) => \NLW_gen_sdpram.xpm_memory_base_inst_douta_UNCONNECTED\(163 downto 0),
+      doutb(163 downto 0) => dout(163 downto 0),
       ena => '0',
       enb => rdp_inst_n_8,
       injectdbiterra => '0',
@@ -2513,18 +2816,18 @@ entity axis_data_fifo_0_xpm_fifo_axis is
     m_aclk : in STD_LOGIC;
     s_axis_tvalid : in STD_LOGIC;
     s_axis_tready : out STD_LOGIC;
-    s_axis_tdata : in STD_LOGIC_VECTOR ( 7 downto 0 );
-    s_axis_tstrb : in STD_LOGIC_VECTOR ( 0 to 0 );
-    s_axis_tkeep : in STD_LOGIC_VECTOR ( 0 to 0 );
+    s_axis_tdata : in STD_LOGIC_VECTOR ( 127 downto 0 );
+    s_axis_tstrb : in STD_LOGIC_VECTOR ( 15 downto 0 );
+    s_axis_tkeep : in STD_LOGIC_VECTOR ( 15 downto 0 );
     s_axis_tlast : in STD_LOGIC;
     s_axis_tid : in STD_LOGIC_VECTOR ( 0 to 0 );
     s_axis_tdest : in STD_LOGIC_VECTOR ( 0 to 0 );
     s_axis_tuser : in STD_LOGIC_VECTOR ( 0 to 0 );
     m_axis_tvalid : out STD_LOGIC;
     m_axis_tready : in STD_LOGIC;
-    m_axis_tdata : out STD_LOGIC_VECTOR ( 7 downto 0 );
-    m_axis_tstrb : out STD_LOGIC_VECTOR ( 0 to 0 );
-    m_axis_tkeep : out STD_LOGIC_VECTOR ( 0 to 0 );
+    m_axis_tdata : out STD_LOGIC_VECTOR ( 127 downto 0 );
+    m_axis_tstrb : out STD_LOGIC_VECTOR ( 15 downto 0 );
+    m_axis_tkeep : out STD_LOGIC_VECTOR ( 15 downto 0 );
     m_axis_tlast : out STD_LOGIC;
     m_axis_tid : out STD_LOGIC_VECTOR ( 0 to 0 );
     m_axis_tdest : out STD_LOGIC_VECTOR ( 0 to 0 );
@@ -2541,9 +2844,9 @@ entity axis_data_fifo_0_xpm_fifo_axis is
     dbiterr_axis : out STD_LOGIC
   );
   attribute AXIS_DATA_WIDTH : integer;
-  attribute AXIS_DATA_WIDTH of axis_data_fifo_0_xpm_fifo_axis : entity is 14;
+  attribute AXIS_DATA_WIDTH of axis_data_fifo_0_xpm_fifo_axis : entity is 164;
   attribute AXIS_FINAL_DATA_WIDTH : integer;
-  attribute AXIS_FINAL_DATA_WIDTH of axis_data_fifo_0_xpm_fifo_axis : entity is 14;
+  attribute AXIS_FINAL_DATA_WIDTH of axis_data_fifo_0_xpm_fifo_axis : entity is 164;
   attribute CASCADE_HEIGHT : integer;
   attribute CASCADE_HEIGHT of axis_data_fifo_0_xpm_fifo_axis : entity is 0;
   attribute CDC_SYNC_STAGES : integer;
@@ -2595,25 +2898,25 @@ entity axis_data_fifo_0_xpm_fifo_axis is
   attribute SIM_ASSERT_CHK : integer;
   attribute SIM_ASSERT_CHK of axis_data_fifo_0_xpm_fifo_axis : entity is 0;
   attribute TDATA_OFFSET : integer;
-  attribute TDATA_OFFSET of axis_data_fifo_0_xpm_fifo_axis : entity is 8;
+  attribute TDATA_OFFSET of axis_data_fifo_0_xpm_fifo_axis : entity is 128;
   attribute TDATA_WIDTH : integer;
-  attribute TDATA_WIDTH of axis_data_fifo_0_xpm_fifo_axis : entity is 8;
+  attribute TDATA_WIDTH of axis_data_fifo_0_xpm_fifo_axis : entity is 128;
   attribute TDEST_OFFSET : integer;
-  attribute TDEST_OFFSET of axis_data_fifo_0_xpm_fifo_axis : entity is 12;
+  attribute TDEST_OFFSET of axis_data_fifo_0_xpm_fifo_axis : entity is 162;
   attribute TDEST_WIDTH : integer;
   attribute TDEST_WIDTH of axis_data_fifo_0_xpm_fifo_axis : entity is 1;
   attribute TID_OFFSET : integer;
-  attribute TID_OFFSET of axis_data_fifo_0_xpm_fifo_axis : entity is 11;
+  attribute TID_OFFSET of axis_data_fifo_0_xpm_fifo_axis : entity is 161;
   attribute TID_WIDTH : integer;
   attribute TID_WIDTH of axis_data_fifo_0_xpm_fifo_axis : entity is 1;
   attribute TKEEP_OFFSET : integer;
-  attribute TKEEP_OFFSET of axis_data_fifo_0_xpm_fifo_axis : entity is 10;
+  attribute TKEEP_OFFSET of axis_data_fifo_0_xpm_fifo_axis : entity is 160;
   attribute TSTRB_OFFSET : integer;
-  attribute TSTRB_OFFSET of axis_data_fifo_0_xpm_fifo_axis : entity is 9;
+  attribute TSTRB_OFFSET of axis_data_fifo_0_xpm_fifo_axis : entity is 144;
   attribute TUSER_MAX_WIDTH : integer;
-  attribute TUSER_MAX_WIDTH of axis_data_fifo_0_xpm_fifo_axis : entity is 4083;
+  attribute TUSER_MAX_WIDTH of axis_data_fifo_0_xpm_fifo_axis : entity is 3933;
   attribute TUSER_OFFSET : integer;
-  attribute TUSER_OFFSET of axis_data_fifo_0_xpm_fifo_axis : entity is 13;
+  attribute TUSER_OFFSET of axis_data_fifo_0_xpm_fifo_axis : entity is 163;
   attribute TUSER_WIDTH : integer;
   attribute TUSER_WIDTH of axis_data_fifo_0_xpm_fifo_axis : entity is 1;
   attribute USE_ADV_FEATURES : integer;
@@ -2708,7 +3011,7 @@ architecture STRUCTURE of axis_data_fifo_0_xpm_fifo_axis is
   attribute FIFO_READ_LATENCY : integer;
   attribute FIFO_READ_LATENCY of xpm_fifo_base_inst : label is 0;
   attribute FIFO_SIZE : integer;
-  attribute FIFO_SIZE of xpm_fifo_base_inst : label is 896;
+  attribute FIFO_SIZE of xpm_fifo_base_inst : label is 10496;
   attribute FIFO_WRITE_DEPTH : integer;
   attribute FIFO_WRITE_DEPTH of xpm_fifo_base_inst : label is 64;
   attribute FULL_RESET_VALUE : integer;
@@ -2741,7 +3044,7 @@ architecture STRUCTURE of axis_data_fifo_0_xpm_fifo_axis is
   attribute RD_PNTR_WIDTH : integer;
   attribute RD_PNTR_WIDTH of xpm_fifo_base_inst : label is 6;
   attribute READ_DATA_WIDTH : integer;
-  attribute READ_DATA_WIDTH of xpm_fifo_base_inst : label is 14;
+  attribute READ_DATA_WIDTH of xpm_fifo_base_inst : label is 164;
   attribute READ_MODE : integer;
   attribute READ_MODE of xpm_fifo_base_inst : label is 1;
   attribute READ_MODE_LL : integer;
@@ -2757,7 +3060,7 @@ architecture STRUCTURE of axis_data_fifo_0_xpm_fifo_axis is
   attribute WIDTH_RATIO : integer;
   attribute WIDTH_RATIO of xpm_fifo_base_inst : label is 1;
   attribute WRITE_DATA_WIDTH : integer;
-  attribute WRITE_DATA_WIDTH of xpm_fifo_base_inst : label is 14;
+  attribute WRITE_DATA_WIDTH of xpm_fifo_base_inst : label is 164;
   attribute WR_DATA_COUNT_WIDTH of xpm_fifo_base_inst : label is 7;
   attribute WR_DC_WIDTH_EXT : integer;
   attribute WR_DC_WIDTH_EXT of xpm_fifo_base_inst : label is 7;
@@ -2768,7 +3071,7 @@ architecture STRUCTURE of axis_data_fifo_0_xpm_fifo_axis is
   attribute WR_RD_RATIO : integer;
   attribute WR_RD_RATIO of xpm_fifo_base_inst : label is 0;
   attribute WR_WIDTH_LOG : integer;
-  attribute WR_WIDTH_LOG of xpm_fifo_base_inst : label is 4;
+  attribute WR_WIDTH_LOG of xpm_fifo_base_inst : label is 8;
   attribute XPM_MODULE of xpm_fifo_base_inst : label is "TRUE";
   attribute both_stages_valid : integer;
   attribute both_stages_valid of xpm_fifo_base_inst : label is 3;
@@ -2824,20 +3127,20 @@ xpm_fifo_base_inst: entity work.axis_data_fifo_0_xpm_fifo_base
       almost_full => NLW_xpm_fifo_base_inst_almost_full_UNCONNECTED,
       data_valid => \^m_axis_tvalid\,
       dbiterr => NLW_xpm_fifo_base_inst_dbiterr_UNCONNECTED,
-      din(13) => s_axis_tlast,
-      din(12) => s_axis_tuser(0),
-      din(11) => s_axis_tdest(0),
-      din(10) => s_axis_tid(0),
-      din(9) => s_axis_tkeep(0),
-      din(8) => s_axis_tstrb(0),
-      din(7 downto 0) => s_axis_tdata(7 downto 0),
-      dout(13) => m_axis_tlast,
-      dout(12) => m_axis_tuser(0),
-      dout(11) => m_axis_tdest(0),
-      dout(10) => m_axis_tid(0),
-      dout(9) => m_axis_tkeep(0),
-      dout(8) => m_axis_tstrb(0),
-      dout(7 downto 0) => m_axis_tdata(7 downto 0),
+      din(163) => s_axis_tlast,
+      din(162) => s_axis_tuser(0),
+      din(161) => s_axis_tdest(0),
+      din(160) => s_axis_tid(0),
+      din(159 downto 144) => s_axis_tkeep(15 downto 0),
+      din(143 downto 128) => s_axis_tstrb(15 downto 0),
+      din(127 downto 0) => s_axis_tdata(127 downto 0),
+      dout(163) => m_axis_tlast,
+      dout(162) => m_axis_tuser(0),
+      dout(161) => m_axis_tdest(0),
+      dout(160) => m_axis_tid(0),
+      dout(159 downto 144) => m_axis_tkeep(15 downto 0),
+      dout(143 downto 128) => m_axis_tstrb(15 downto 0),
+      dout(127 downto 0) => m_axis_tdata(127 downto 0),
       empty => NLW_xpm_fifo_base_inst_empty_UNCONNECTED,
       full => NLW_xpm_fifo_base_inst_full_UNCONNECTED,
       full_n => s_axis_tready,
@@ -2881,9 +3184,9 @@ entity axis_data_fifo_0_axis_data_fifo_v2_0_17_top is
     s_axis_aclken : in STD_LOGIC;
     s_axis_tvalid : in STD_LOGIC;
     s_axis_tready : out STD_LOGIC;
-    s_axis_tdata : in STD_LOGIC_VECTOR ( 7 downto 0 );
-    s_axis_tstrb : in STD_LOGIC_VECTOR ( 0 to 0 );
-    s_axis_tkeep : in STD_LOGIC_VECTOR ( 0 to 0 );
+    s_axis_tdata : in STD_LOGIC_VECTOR ( 127 downto 0 );
+    s_axis_tstrb : in STD_LOGIC_VECTOR ( 15 downto 0 );
+    s_axis_tkeep : in STD_LOGIC_VECTOR ( 15 downto 0 );
     s_axis_tlast : in STD_LOGIC;
     s_axis_tid : in STD_LOGIC_VECTOR ( 0 to 0 );
     s_axis_tdest : in STD_LOGIC_VECTOR ( 0 to 0 );
@@ -2897,9 +3200,9 @@ entity axis_data_fifo_0_axis_data_fifo_v2_0_17_top is
     m_axis_aclken : in STD_LOGIC;
     m_axis_tvalid : out STD_LOGIC;
     m_axis_tready : in STD_LOGIC;
-    m_axis_tdata : out STD_LOGIC_VECTOR ( 7 downto 0 );
-    m_axis_tstrb : out STD_LOGIC_VECTOR ( 0 to 0 );
-    m_axis_tkeep : out STD_LOGIC_VECTOR ( 0 to 0 );
+    m_axis_tdata : out STD_LOGIC_VECTOR ( 127 downto 0 );
+    m_axis_tstrb : out STD_LOGIC_VECTOR ( 15 downto 0 );
+    m_axis_tkeep : out STD_LOGIC_VECTOR ( 15 downto 0 );
     m_axis_tlast : out STD_LOGIC;
     m_axis_tid : out STD_LOGIC_VECTOR ( 0 to 0 );
     m_axis_tdest : out STD_LOGIC_VECTOR ( 0 to 0 );
@@ -2915,7 +3218,7 @@ entity axis_data_fifo_0_axis_data_fifo_v2_0_17_top is
   attribute C_AXIS_SIGNAL_SET : integer;
   attribute C_AXIS_SIGNAL_SET of axis_data_fifo_0_axis_data_fifo_v2_0_17_top : entity is 19;
   attribute C_AXIS_TDATA_WIDTH : integer;
-  attribute C_AXIS_TDATA_WIDTH of axis_data_fifo_0_axis_data_fifo_v2_0_17_top : entity is 8;
+  attribute C_AXIS_TDATA_WIDTH of axis_data_fifo_0_axis_data_fifo_v2_0_17_top : entity is 128;
   attribute C_AXIS_TDEST_WIDTH : integer;
   attribute C_AXIS_TDEST_WIDTH of axis_data_fifo_0_axis_data_fifo_v2_0_17_top : entity is 1;
   attribute C_AXIS_TID_WIDTH : integer;
@@ -3005,7 +3308,7 @@ entity axis_data_fifo_0_axis_data_fifo_v2_0_17_top is
   attribute LP_S_ACLKEN_CAN_TOGGLE : integer;
   attribute LP_S_ACLKEN_CAN_TOGGLE of axis_data_fifo_0_axis_data_fifo_v2_0_17_top : entity is 0;
   attribute LP_TDATA_WIDTH : integer;
-  attribute LP_TDATA_WIDTH of axis_data_fifo_0_axis_data_fifo_v2_0_17_top : entity is 8;
+  attribute LP_TDATA_WIDTH of axis_data_fifo_0_axis_data_fifo_v2_0_17_top : entity is 128;
   attribute LP_TDEST_WIDTH : integer;
   attribute LP_TDEST_WIDTH of axis_data_fifo_0_axis_data_fifo_v2_0_17_top : entity is 1;
   attribute LP_TID_WIDTH : integer;
@@ -3022,35 +3325,35 @@ end axis_data_fifo_0_axis_data_fifo_v2_0_17_top;
 
 architecture STRUCTURE of axis_data_fifo_0_axis_data_fifo_v2_0_17_top is
   signal \<const0>\ : STD_LOGIC;
-  signal \gen_fifo.xpm_fifo_axis_inst_n_16\ : STD_LOGIC;
-  signal \gen_fifo.xpm_fifo_axis_inst_n_17\ : STD_LOGIC;
-  signal \gen_fifo.xpm_fifo_axis_inst_n_18\ : STD_LOGIC;
-  signal \gen_fifo.xpm_fifo_axis_inst_n_19\ : STD_LOGIC;
-  signal \gen_fifo.xpm_fifo_axis_inst_n_20\ : STD_LOGIC;
-  signal \gen_fifo.xpm_fifo_axis_inst_n_21\ : STD_LOGIC;
-  signal \gen_fifo.xpm_fifo_axis_inst_n_22\ : STD_LOGIC;
-  signal \gen_fifo.xpm_fifo_axis_inst_n_23\ : STD_LOGIC;
-  signal \gen_fifo.xpm_fifo_axis_inst_n_24\ : STD_LOGIC;
-  signal \gen_fifo.xpm_fifo_axis_inst_n_25\ : STD_LOGIC;
-  signal \gen_fifo.xpm_fifo_axis_inst_n_26\ : STD_LOGIC;
-  signal \gen_fifo.xpm_fifo_axis_inst_n_27\ : STD_LOGIC;
-  signal \gen_fifo.xpm_fifo_axis_inst_n_28\ : STD_LOGIC;
-  signal \gen_fifo.xpm_fifo_axis_inst_n_29\ : STD_LOGIC;
-  signal \gen_fifo.xpm_fifo_axis_inst_n_30\ : STD_LOGIC;
-  signal \gen_fifo.xpm_fifo_axis_inst_n_31\ : STD_LOGIC;
-  signal \gen_fifo.xpm_fifo_axis_inst_n_32\ : STD_LOGIC;
-  signal \gen_fifo.xpm_fifo_axis_inst_n_33\ : STD_LOGIC;
-  signal \gen_fifo.xpm_fifo_axis_inst_n_34\ : STD_LOGIC;
-  signal \gen_fifo.xpm_fifo_axis_inst_n_35\ : STD_LOGIC;
+  signal \gen_fifo.xpm_fifo_axis_inst_n_166\ : STD_LOGIC;
+  signal \gen_fifo.xpm_fifo_axis_inst_n_167\ : STD_LOGIC;
+  signal \gen_fifo.xpm_fifo_axis_inst_n_168\ : STD_LOGIC;
+  signal \gen_fifo.xpm_fifo_axis_inst_n_169\ : STD_LOGIC;
+  signal \gen_fifo.xpm_fifo_axis_inst_n_170\ : STD_LOGIC;
+  signal \gen_fifo.xpm_fifo_axis_inst_n_171\ : STD_LOGIC;
+  signal \gen_fifo.xpm_fifo_axis_inst_n_172\ : STD_LOGIC;
+  signal \gen_fifo.xpm_fifo_axis_inst_n_173\ : STD_LOGIC;
+  signal \gen_fifo.xpm_fifo_axis_inst_n_174\ : STD_LOGIC;
+  signal \gen_fifo.xpm_fifo_axis_inst_n_175\ : STD_LOGIC;
+  signal \gen_fifo.xpm_fifo_axis_inst_n_176\ : STD_LOGIC;
+  signal \gen_fifo.xpm_fifo_axis_inst_n_177\ : STD_LOGIC;
+  signal \gen_fifo.xpm_fifo_axis_inst_n_178\ : STD_LOGIC;
+  signal \gen_fifo.xpm_fifo_axis_inst_n_179\ : STD_LOGIC;
+  signal \gen_fifo.xpm_fifo_axis_inst_n_180\ : STD_LOGIC;
+  signal \gen_fifo.xpm_fifo_axis_inst_n_181\ : STD_LOGIC;
+  signal \gen_fifo.xpm_fifo_axis_inst_n_182\ : STD_LOGIC;
+  signal \gen_fifo.xpm_fifo_axis_inst_n_183\ : STD_LOGIC;
+  signal \gen_fifo.xpm_fifo_axis_inst_n_184\ : STD_LOGIC;
+  signal \gen_fifo.xpm_fifo_axis_inst_n_185\ : STD_LOGIC;
   signal \NLW_gen_fifo.xpm_fifo_axis_inst_m_axis_tdest_UNCONNECTED\ : STD_LOGIC_VECTOR ( 0 to 0 );
   signal \NLW_gen_fifo.xpm_fifo_axis_inst_m_axis_tid_UNCONNECTED\ : STD_LOGIC_VECTOR ( 0 to 0 );
-  signal \NLW_gen_fifo.xpm_fifo_axis_inst_m_axis_tkeep_UNCONNECTED\ : STD_LOGIC_VECTOR ( 0 to 0 );
-  signal \NLW_gen_fifo.xpm_fifo_axis_inst_m_axis_tstrb_UNCONNECTED\ : STD_LOGIC_VECTOR ( 0 to 0 );
+  signal \NLW_gen_fifo.xpm_fifo_axis_inst_m_axis_tkeep_UNCONNECTED\ : STD_LOGIC_VECTOR ( 15 downto 0 );
+  signal \NLW_gen_fifo.xpm_fifo_axis_inst_m_axis_tstrb_UNCONNECTED\ : STD_LOGIC_VECTOR ( 15 downto 0 );
   signal \NLW_gen_fifo.xpm_fifo_axis_inst_m_axis_tuser_UNCONNECTED\ : STD_LOGIC_VECTOR ( 0 to 0 );
   attribute AXIS_DATA_WIDTH : integer;
-  attribute AXIS_DATA_WIDTH of \gen_fifo.xpm_fifo_axis_inst\ : label is 14;
+  attribute AXIS_DATA_WIDTH of \gen_fifo.xpm_fifo_axis_inst\ : label is 164;
   attribute AXIS_FINAL_DATA_WIDTH : integer;
-  attribute AXIS_FINAL_DATA_WIDTH of \gen_fifo.xpm_fifo_axis_inst\ : label is 14;
+  attribute AXIS_FINAL_DATA_WIDTH of \gen_fifo.xpm_fifo_axis_inst\ : label is 164;
   attribute CASCADE_HEIGHT : integer;
   attribute CASCADE_HEIGHT of \gen_fifo.xpm_fifo_axis_inst\ : label is 0;
   attribute CDC_SYNC_STAGES : integer;
@@ -3102,25 +3405,25 @@ architecture STRUCTURE of axis_data_fifo_0_axis_data_fifo_v2_0_17_top is
   attribute SIM_ASSERT_CHK : integer;
   attribute SIM_ASSERT_CHK of \gen_fifo.xpm_fifo_axis_inst\ : label is 0;
   attribute TDATA_OFFSET : integer;
-  attribute TDATA_OFFSET of \gen_fifo.xpm_fifo_axis_inst\ : label is 8;
+  attribute TDATA_OFFSET of \gen_fifo.xpm_fifo_axis_inst\ : label is 128;
   attribute TDATA_WIDTH : integer;
-  attribute TDATA_WIDTH of \gen_fifo.xpm_fifo_axis_inst\ : label is 8;
+  attribute TDATA_WIDTH of \gen_fifo.xpm_fifo_axis_inst\ : label is 128;
   attribute TDEST_OFFSET : integer;
-  attribute TDEST_OFFSET of \gen_fifo.xpm_fifo_axis_inst\ : label is 12;
+  attribute TDEST_OFFSET of \gen_fifo.xpm_fifo_axis_inst\ : label is 162;
   attribute TDEST_WIDTH : integer;
   attribute TDEST_WIDTH of \gen_fifo.xpm_fifo_axis_inst\ : label is 1;
   attribute TID_OFFSET : integer;
-  attribute TID_OFFSET of \gen_fifo.xpm_fifo_axis_inst\ : label is 11;
+  attribute TID_OFFSET of \gen_fifo.xpm_fifo_axis_inst\ : label is 161;
   attribute TID_WIDTH : integer;
   attribute TID_WIDTH of \gen_fifo.xpm_fifo_axis_inst\ : label is 1;
   attribute TKEEP_OFFSET : integer;
-  attribute TKEEP_OFFSET of \gen_fifo.xpm_fifo_axis_inst\ : label is 10;
+  attribute TKEEP_OFFSET of \gen_fifo.xpm_fifo_axis_inst\ : label is 160;
   attribute TSTRB_OFFSET : integer;
-  attribute TSTRB_OFFSET of \gen_fifo.xpm_fifo_axis_inst\ : label is 9;
+  attribute TSTRB_OFFSET of \gen_fifo.xpm_fifo_axis_inst\ : label is 144;
   attribute TUSER_MAX_WIDTH : integer;
-  attribute TUSER_MAX_WIDTH of \gen_fifo.xpm_fifo_axis_inst\ : label is 4083;
+  attribute TUSER_MAX_WIDTH of \gen_fifo.xpm_fifo_axis_inst\ : label is 3933;
   attribute TUSER_OFFSET : integer;
-  attribute TUSER_OFFSET of \gen_fifo.xpm_fifo_axis_inst\ : label is 13;
+  attribute TUSER_OFFSET of \gen_fifo.xpm_fifo_axis_inst\ : label is 163;
   attribute TUSER_WIDTH : integer;
   attribute TUSER_WIDTH of \gen_fifo.xpm_fifo_axis_inst\ : label is 1;
   attribute USE_ADV_FEATURES : integer;
@@ -3201,7 +3504,37 @@ begin
   dbiterr <= \<const0>\;
   m_axis_tdest(0) <= \<const0>\;
   m_axis_tid(0) <= \<const0>\;
+  m_axis_tkeep(15) <= \<const0>\;
+  m_axis_tkeep(14) <= \<const0>\;
+  m_axis_tkeep(13) <= \<const0>\;
+  m_axis_tkeep(12) <= \<const0>\;
+  m_axis_tkeep(11) <= \<const0>\;
+  m_axis_tkeep(10) <= \<const0>\;
+  m_axis_tkeep(9) <= \<const0>\;
+  m_axis_tkeep(8) <= \<const0>\;
+  m_axis_tkeep(7) <= \<const0>\;
+  m_axis_tkeep(6) <= \<const0>\;
+  m_axis_tkeep(5) <= \<const0>\;
+  m_axis_tkeep(4) <= \<const0>\;
+  m_axis_tkeep(3) <= \<const0>\;
+  m_axis_tkeep(2) <= \<const0>\;
+  m_axis_tkeep(1) <= \<const0>\;
   m_axis_tkeep(0) <= \<const0>\;
+  m_axis_tstrb(15) <= \<const0>\;
+  m_axis_tstrb(14) <= \<const0>\;
+  m_axis_tstrb(13) <= \<const0>\;
+  m_axis_tstrb(12) <= \<const0>\;
+  m_axis_tstrb(11) <= \<const0>\;
+  m_axis_tstrb(10) <= \<const0>\;
+  m_axis_tstrb(9) <= \<const0>\;
+  m_axis_tstrb(8) <= \<const0>\;
+  m_axis_tstrb(7) <= \<const0>\;
+  m_axis_tstrb(6) <= \<const0>\;
+  m_axis_tstrb(5) <= \<const0>\;
+  m_axis_tstrb(4) <= \<const0>\;
+  m_axis_tstrb(3) <= \<const0>\;
+  m_axis_tstrb(2) <= \<const0>\;
+  m_axis_tstrb(1) <= \<const0>\;
   m_axis_tstrb(0) <= \<const0>\;
   m_axis_tuser(0) <= \<const0>\;
   prog_empty <= \<const0>\;
@@ -3213,49 +3546,49 @@ GND: unisim.vcomponents.GND
     );
 \gen_fifo.xpm_fifo_axis_inst\: entity work.axis_data_fifo_0_xpm_fifo_axis
      port map (
-      almost_empty_axis => \gen_fifo.xpm_fifo_axis_inst_n_33\,
-      almost_full_axis => \gen_fifo.xpm_fifo_axis_inst_n_24\,
-      dbiterr_axis => \gen_fifo.xpm_fifo_axis_inst_n_35\,
+      almost_empty_axis => \gen_fifo.xpm_fifo_axis_inst_n_183\,
+      almost_full_axis => \gen_fifo.xpm_fifo_axis_inst_n_174\,
+      dbiterr_axis => \gen_fifo.xpm_fifo_axis_inst_n_185\,
       injectdbiterr_axis => '0',
       injectsbiterr_axis => '0',
       m_aclk => s_axis_aclk,
-      m_axis_tdata(7 downto 0) => m_axis_tdata(7 downto 0),
+      m_axis_tdata(127 downto 0) => m_axis_tdata(127 downto 0),
       m_axis_tdest(0) => \NLW_gen_fifo.xpm_fifo_axis_inst_m_axis_tdest_UNCONNECTED\(0),
       m_axis_tid(0) => \NLW_gen_fifo.xpm_fifo_axis_inst_m_axis_tid_UNCONNECTED\(0),
-      m_axis_tkeep(0) => \NLW_gen_fifo.xpm_fifo_axis_inst_m_axis_tkeep_UNCONNECTED\(0),
+      m_axis_tkeep(15 downto 0) => \NLW_gen_fifo.xpm_fifo_axis_inst_m_axis_tkeep_UNCONNECTED\(15 downto 0),
       m_axis_tlast => m_axis_tlast,
       m_axis_tready => m_axis_tready,
-      m_axis_tstrb(0) => \NLW_gen_fifo.xpm_fifo_axis_inst_m_axis_tstrb_UNCONNECTED\(0),
+      m_axis_tstrb(15 downto 0) => \NLW_gen_fifo.xpm_fifo_axis_inst_m_axis_tstrb_UNCONNECTED\(15 downto 0),
       m_axis_tuser(0) => \NLW_gen_fifo.xpm_fifo_axis_inst_m_axis_tuser_UNCONNECTED\(0),
       m_axis_tvalid => m_axis_tvalid,
-      prog_empty_axis => \gen_fifo.xpm_fifo_axis_inst_n_25\,
-      prog_full_axis => \gen_fifo.xpm_fifo_axis_inst_n_16\,
-      rd_data_count_axis(6) => \gen_fifo.xpm_fifo_axis_inst_n_26\,
-      rd_data_count_axis(5) => \gen_fifo.xpm_fifo_axis_inst_n_27\,
-      rd_data_count_axis(4) => \gen_fifo.xpm_fifo_axis_inst_n_28\,
-      rd_data_count_axis(3) => \gen_fifo.xpm_fifo_axis_inst_n_29\,
-      rd_data_count_axis(2) => \gen_fifo.xpm_fifo_axis_inst_n_30\,
-      rd_data_count_axis(1) => \gen_fifo.xpm_fifo_axis_inst_n_31\,
-      rd_data_count_axis(0) => \gen_fifo.xpm_fifo_axis_inst_n_32\,
+      prog_empty_axis => \gen_fifo.xpm_fifo_axis_inst_n_175\,
+      prog_full_axis => \gen_fifo.xpm_fifo_axis_inst_n_166\,
+      rd_data_count_axis(6) => \gen_fifo.xpm_fifo_axis_inst_n_176\,
+      rd_data_count_axis(5) => \gen_fifo.xpm_fifo_axis_inst_n_177\,
+      rd_data_count_axis(4) => \gen_fifo.xpm_fifo_axis_inst_n_178\,
+      rd_data_count_axis(3) => \gen_fifo.xpm_fifo_axis_inst_n_179\,
+      rd_data_count_axis(2) => \gen_fifo.xpm_fifo_axis_inst_n_180\,
+      rd_data_count_axis(1) => \gen_fifo.xpm_fifo_axis_inst_n_181\,
+      rd_data_count_axis(0) => \gen_fifo.xpm_fifo_axis_inst_n_182\,
       s_aclk => s_axis_aclk,
       s_aresetn => s_axis_aresetn,
-      s_axis_tdata(7 downto 0) => s_axis_tdata(7 downto 0),
+      s_axis_tdata(127 downto 0) => s_axis_tdata(127 downto 0),
       s_axis_tdest(0) => '0',
       s_axis_tid(0) => '0',
-      s_axis_tkeep(0) => '0',
+      s_axis_tkeep(15 downto 0) => B"0000000000000000",
       s_axis_tlast => s_axis_tlast,
       s_axis_tready => s_axis_tready,
-      s_axis_tstrb(0) => '0',
+      s_axis_tstrb(15 downto 0) => B"0000000000000000",
       s_axis_tuser(0) => '0',
       s_axis_tvalid => s_axis_tvalid,
-      sbiterr_axis => \gen_fifo.xpm_fifo_axis_inst_n_34\,
-      wr_data_count_axis(6) => \gen_fifo.xpm_fifo_axis_inst_n_17\,
-      wr_data_count_axis(5) => \gen_fifo.xpm_fifo_axis_inst_n_18\,
-      wr_data_count_axis(4) => \gen_fifo.xpm_fifo_axis_inst_n_19\,
-      wr_data_count_axis(3) => \gen_fifo.xpm_fifo_axis_inst_n_20\,
-      wr_data_count_axis(2) => \gen_fifo.xpm_fifo_axis_inst_n_21\,
-      wr_data_count_axis(1) => \gen_fifo.xpm_fifo_axis_inst_n_22\,
-      wr_data_count_axis(0) => \gen_fifo.xpm_fifo_axis_inst_n_23\
+      sbiterr_axis => \gen_fifo.xpm_fifo_axis_inst_n_184\,
+      wr_data_count_axis(6) => \gen_fifo.xpm_fifo_axis_inst_n_167\,
+      wr_data_count_axis(5) => \gen_fifo.xpm_fifo_axis_inst_n_168\,
+      wr_data_count_axis(4) => \gen_fifo.xpm_fifo_axis_inst_n_169\,
+      wr_data_count_axis(3) => \gen_fifo.xpm_fifo_axis_inst_n_170\,
+      wr_data_count_axis(2) => \gen_fifo.xpm_fifo_axis_inst_n_171\,
+      wr_data_count_axis(1) => \gen_fifo.xpm_fifo_axis_inst_n_172\,
+      wr_data_count_axis(0) => \gen_fifo.xpm_fifo_axis_inst_n_173\
     );
 end STRUCTURE;
 library IEEE;
@@ -3268,11 +3601,11 @@ entity axis_data_fifo_0 is
     s_axis_aclk : in STD_LOGIC;
     s_axis_tvalid : in STD_LOGIC;
     s_axis_tready : out STD_LOGIC;
-    s_axis_tdata : in STD_LOGIC_VECTOR ( 7 downto 0 );
+    s_axis_tdata : in STD_LOGIC_VECTOR ( 127 downto 0 );
     s_axis_tlast : in STD_LOGIC;
     m_axis_tvalid : out STD_LOGIC;
     m_axis_tready : in STD_LOGIC;
-    m_axis_tdata : out STD_LOGIC_VECTOR ( 7 downto 0 );
+    m_axis_tdata : out STD_LOGIC_VECTOR ( 127 downto 0 );
     m_axis_tlast : out STD_LOGIC
   );
   attribute NotValidForBitStream : boolean;
@@ -3296,15 +3629,15 @@ architecture STRUCTURE of axis_data_fifo_0 is
   signal NLW_inst_axis_wr_data_count_UNCONNECTED : STD_LOGIC_VECTOR ( 31 downto 0 );
   signal NLW_inst_m_axis_tdest_UNCONNECTED : STD_LOGIC_VECTOR ( 0 to 0 );
   signal NLW_inst_m_axis_tid_UNCONNECTED : STD_LOGIC_VECTOR ( 0 to 0 );
-  signal NLW_inst_m_axis_tkeep_UNCONNECTED : STD_LOGIC_VECTOR ( 0 to 0 );
-  signal NLW_inst_m_axis_tstrb_UNCONNECTED : STD_LOGIC_VECTOR ( 0 to 0 );
+  signal NLW_inst_m_axis_tkeep_UNCONNECTED : STD_LOGIC_VECTOR ( 15 downto 0 );
+  signal NLW_inst_m_axis_tstrb_UNCONNECTED : STD_LOGIC_VECTOR ( 15 downto 0 );
   signal NLW_inst_m_axis_tuser_UNCONNECTED : STD_LOGIC_VECTOR ( 0 to 0 );
   attribute C_ACLKEN_CONV_MODE : integer;
   attribute C_ACLKEN_CONV_MODE of inst : label is 0;
   attribute C_AXIS_SIGNAL_SET : integer;
   attribute C_AXIS_SIGNAL_SET of inst : label is 19;
   attribute C_AXIS_TDATA_WIDTH : integer;
-  attribute C_AXIS_TDATA_WIDTH of inst : label is 8;
+  attribute C_AXIS_TDATA_WIDTH of inst : label is 128;
   attribute C_AXIS_TDEST_WIDTH : integer;
   attribute C_AXIS_TDEST_WIDTH of inst : label is 1;
   attribute C_AXIS_TID_WIDTH : integer;
@@ -3394,7 +3727,7 @@ architecture STRUCTURE of axis_data_fifo_0 is
   attribute LP_S_ACLKEN_CAN_TOGGLE : integer;
   attribute LP_S_ACLKEN_CAN_TOGGLE of inst : label is 0;
   attribute LP_TDATA_WIDTH : integer;
-  attribute LP_TDATA_WIDTH of inst : label is 8;
+  attribute LP_TDATA_WIDTH of inst : label is 128;
   attribute LP_TDEST_WIDTH : integer;
   attribute LP_TDEST_WIDTH of inst : label is 1;
   attribute LP_TID_WIDTH : integer;
@@ -3412,7 +3745,7 @@ architecture STRUCTURE of axis_data_fifo_0 is
   attribute X_INTERFACE_MODE : string;
   attribute X_INTERFACE_MODE of m_axis_tvalid : signal is "master";
   attribute X_INTERFACE_PARAMETER : string;
-  attribute X_INTERFACE_PARAMETER of m_axis_tvalid : signal is "XIL_INTERFACENAME M_AXIS, TDATA_NUM_BYTES 1, TDEST_WIDTH 0, TID_WIDTH 0, TUSER_WIDTH 0, HAS_TREADY 1, HAS_TSTRB 0, HAS_TKEEP 0, HAS_TLAST 1, FREQ_HZ 100000000, PHASE 0.0, LAYERED_METADATA undef, INSERT_VIP 0";
+  attribute X_INTERFACE_PARAMETER of m_axis_tvalid : signal is "XIL_INTERFACENAME M_AXIS, TDATA_NUM_BYTES 16, TDEST_WIDTH 0, TID_WIDTH 0, TUSER_WIDTH 0, HAS_TREADY 1, HAS_TSTRB 0, HAS_TKEEP 0, HAS_TLAST 1, FREQ_HZ 100000000, PHASE 0.0, LAYERED_METADATA undef, INSERT_VIP 0";
   attribute X_INTERFACE_INFO of s_axis_aclk : signal is "xilinx.com:signal:clock:1.0 S_CLKIF CLK";
   attribute X_INTERFACE_MODE of s_axis_aclk : signal is "slave";
   attribute X_INTERFACE_PARAMETER of s_axis_aclk : signal is "XIL_INTERFACENAME S_CLKIF, ASSOCIATED_BUSIF S_AXIS, FREQ_HZ 100000000, FREQ_TOLERANCE_HZ 0, PHASE 0.0, INSERT_VIP 0";
@@ -3423,7 +3756,7 @@ architecture STRUCTURE of axis_data_fifo_0 is
   attribute X_INTERFACE_INFO of s_axis_tready : signal is "xilinx.com:interface:axis:1.0 S_AXIS TREADY";
   attribute X_INTERFACE_INFO of s_axis_tvalid : signal is "xilinx.com:interface:axis:1.0 S_AXIS TVALID";
   attribute X_INTERFACE_MODE of s_axis_tvalid : signal is "slave";
-  attribute X_INTERFACE_PARAMETER of s_axis_tvalid : signal is "XIL_INTERFACENAME S_AXIS, TDATA_NUM_BYTES 1, TDEST_WIDTH 0, TID_WIDTH 0, TUSER_WIDTH 0, HAS_TREADY 1, HAS_TSTRB 0, HAS_TKEEP 0, HAS_TLAST 1, FREQ_HZ 100000000, PHASE 0.0, LAYERED_METADATA undef, INSERT_VIP 0";
+  attribute X_INTERFACE_PARAMETER of s_axis_tvalid : signal is "XIL_INTERFACENAME S_AXIS, TDATA_NUM_BYTES 16, TDEST_WIDTH 0, TID_WIDTH 0, TUSER_WIDTH 0, HAS_TREADY 1, HAS_TSTRB 0, HAS_TKEEP 0, HAS_TLAST 1, FREQ_HZ 100000000, PHASE 0.0, LAYERED_METADATA undef, INSERT_VIP 0";
   attribute X_INTERFACE_INFO of m_axis_tdata : signal is "xilinx.com:interface:axis:1.0 M_AXIS TDATA";
   attribute X_INTERFACE_INFO of s_axis_tdata : signal is "xilinx.com:interface:axis:1.0 S_AXIS TDATA";
 begin
@@ -3438,13 +3771,13 @@ inst: entity work.axis_data_fifo_0_axis_data_fifo_v2_0_17_top
       injectsbiterr => '0',
       m_axis_aclk => '0',
       m_axis_aclken => '1',
-      m_axis_tdata(7 downto 0) => m_axis_tdata(7 downto 0),
+      m_axis_tdata(127 downto 0) => m_axis_tdata(127 downto 0),
       m_axis_tdest(0) => NLW_inst_m_axis_tdest_UNCONNECTED(0),
       m_axis_tid(0) => NLW_inst_m_axis_tid_UNCONNECTED(0),
-      m_axis_tkeep(0) => NLW_inst_m_axis_tkeep_UNCONNECTED(0),
+      m_axis_tkeep(15 downto 0) => NLW_inst_m_axis_tkeep_UNCONNECTED(15 downto 0),
       m_axis_tlast => m_axis_tlast,
       m_axis_tready => m_axis_tready,
-      m_axis_tstrb(0) => NLW_inst_m_axis_tstrb_UNCONNECTED(0),
+      m_axis_tstrb(15 downto 0) => NLW_inst_m_axis_tstrb_UNCONNECTED(15 downto 0),
       m_axis_tuser(0) => NLW_inst_m_axis_tuser_UNCONNECTED(0),
       m_axis_tvalid => m_axis_tvalid,
       prog_empty => NLW_inst_prog_empty_UNCONNECTED,
@@ -3452,13 +3785,13 @@ inst: entity work.axis_data_fifo_0_axis_data_fifo_v2_0_17_top
       s_axis_aclk => s_axis_aclk,
       s_axis_aclken => '1',
       s_axis_aresetn => s_axis_aresetn,
-      s_axis_tdata(7 downto 0) => s_axis_tdata(7 downto 0),
+      s_axis_tdata(127 downto 0) => s_axis_tdata(127 downto 0),
       s_axis_tdest(0) => '0',
       s_axis_tid(0) => '0',
-      s_axis_tkeep(0) => '1',
+      s_axis_tkeep(15 downto 0) => B"1111111111111111",
       s_axis_tlast => s_axis_tlast,
       s_axis_tready => s_axis_tready,
-      s_axis_tstrb(0) => '1',
+      s_axis_tstrb(15 downto 0) => B"1111111111111111",
       s_axis_tuser(0) => '0',
       s_axis_tvalid => s_axis_tvalid,
       sbiterr => NLW_inst_sbiterr_UNCONNECTED
