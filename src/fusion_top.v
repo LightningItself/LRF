@@ -42,6 +42,7 @@ wire fifos_ready = old_fifo_ready & new_fifo_ready;
 
 // DataPath
 
+// sobel_hssim_top
 SOBEL_HSSIM_TOP #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .PIXEL_SIZE(PIXEL_SIZE), .IMAGE_DIM(IMAGE_DIM)) sob_hssim(
     .aclk(aclk),
     .aresetn(aresetn),
@@ -59,7 +60,7 @@ SOBEL_HSSIM_TOP #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .PIXEL_SIZE(PIXEL_SIZE), .
     .new_map_last(s_axis_new_tlast),
     .del(del),
     .del_valid(del_valid),
-    .del_ready(advance),
+    .del_ready(gauss_ready),
     .del_last(del_last)
 );
 
@@ -72,7 +73,7 @@ axis_data_fifo_0 old_fifo (
     .s_axis_tlast(s_axis_old_fused_tlast),
     .m_axis_tdata(old_fifo_out),
     .m_axis_tvalid(old_fifo_out_valid),
-    .m_axis_tready(advance & del_valid),
+    .m_axis_tready(gauss_ready & del_valid),
     .m_axis_tlast(old_fifo_out_last)
 );
 
@@ -85,9 +86,57 @@ axis_data_fifo_0 new_fifo (
     .s_axis_tlast(s_axis_new_tlast),
     .m_axis_tdata(new_fifo_out),
     .m_axis_tvalid(new_fifo_out_valid),
-    .m_axis_tready(advance & del_valid),
+    .m_axis_tready(gauss_ready & del_valid),
     .m_axis_tlast(new_fifo_out_last)
 );
+
+// gauss path
+
+wire [DATA_WIDTH-1:0] gauss_del;
+wire gauss_ready, gauss_del_valid, gauss_del_last;
+
+CONV_GAUSS #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .PIXEL_SIZE(PIXEL_SIZE), .IMAGE_WIDTH(IMAGE_DIM)) gauss(
+    .aclk(aclk),
+    .aresetn(aresetn),
+    .s_axis_tdata(del),
+    .s_axis_tvalid(del_valid),
+    .s_axis_tready(gauss_ready),
+    .s_axis_tlast(del_last),
+    .m_axis_tdata(gauss_del),
+    .m_axis_tvalid(gauss_del_valid),
+    .m_axis_tready(advance),
+    .m_axis_tlast(gauss_del_last)
+);
+
+reg [DATA_WIDTH-1:0] old_gauss_buff, new_gauss_buff;
+reg old_gauss_buff_valid, old_gauss_buff_last, new_gauss_buff_valid, new_gauss_buff_last;
+
+always @(posedge aclk) begin
+    if(!aresetn) begin
+        old_gauss_buff <= 0;
+        new_gauss_buff <= 0;
+        old_gauss_buff_valid <= 0;
+        old_gauss_buff_last <= 0;
+        new_gauss_buff_valid <= 0;
+        new_gauss_buff_last <= 0;
+    end
+    else begin
+        if(gauss_ready & del_valid & old_fifo_out_valid & new_fifo_out_valid) begin
+            old_gauss_buff <= old_fifo_out;
+            new_gauss_buff <= new_fifo_out;
+            old_gauss_buff_valid <= 1;
+            old_gauss_buff_last <= old_fifo_out_last;
+            new_gauss_buff_valid <= 1;
+            new_gauss_buff_last <= new_fifo_out_last;
+        end
+        else if(advance & gauss_del_valid) begin
+            old_gauss_buff_valid <= 0;
+            old_gauss_buff_last <= 0;
+            new_gauss_buff_valid <= 0;
+            new_gauss_buff_last <= 0;
+        end
+    end
+end
 
 always @(posedge aclk) begin
     if(!aresetn) begin
@@ -96,10 +145,10 @@ always @(posedge aclk) begin
         m_axis_tlast <= 0;
     end
     else begin
-        if(advance & del_valid & old_fifo_out_valid & new_fifo_out_valid) begin
-            m_axis_tdata <= del;
+        if(advance & gauss_del_valid & old_gauss_buff_valid & new_gauss_buff_valid) begin
+            m_axis_tdata <= gauss_del;
             m_axis_tvalid <= 1;
-            m_axis_tlast <= (del_last & old_fifo_out_last & new_fifo_out_last);
+            m_axis_tlast <= (gauss_del_last & old_gauss_buff_last & new_gauss_buff_last);
         end
         else if(m_axis_tvalid & m_axis_tready) begin
             m_axis_tvalid <= 0;
