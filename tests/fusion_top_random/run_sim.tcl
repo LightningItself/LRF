@@ -4,6 +4,7 @@ set WORKSPACE_DIR [file normalize "./${TEST_NAME}"]
 set TEST_DIR "../tests/${TEST_NAME}"
 set UTILS_SV_DIR "../utils/sv"
 set IP_DIR "${SRC_DIR}/ips/cordic/cordic_0"
+set FIFO_IP_DIR "${SRC_DIR}/ips/fifo/axis_data_fifo_0"
 
 if {[file exists $WORKSPACE_DIR]} { file delete -force $WORKSPACE_DIR }
 file mkdir $WORKSPACE_DIR
@@ -53,6 +54,28 @@ if {[file exists $IP_FILE]} {
     export_ip_user_files -of_objects $CORDIC_IP -no_script -sync -force -quiet
 } else {
     puts "ERROR: CORDIC IP not found at $IP_FILE"
+    return -code error
+}
+
+set FIFO_IP_FILE "${FIFO_IP_DIR}/axis_data_fifo_0.xci"
+
+if {[file exists $FIFO_IP_FILE]} {
+    import_ip -files $FIFO_IP_FILE -name axis_data_fifo_0
+
+    set FIFO_IP [get_ips axis_data_fifo_0]
+
+    report_ip_status
+    if {[catch {upgrade_ip $FIFO_IP} upgrade_result]} {
+        puts "WARNING: upgrade_ip reported: $upgrade_result"
+    } else {
+        puts $upgrade_result
+    }
+
+    reset_target all $FIFO_IP
+    generate_target all $FIFO_IP
+    export_ip_user_files -of_objects $FIFO_IP -no_script -sync -force -quiet
+} else {
+    puts "ERROR: FIFO IP not found at $FIFO_IP_FILE"
     return -code error
 }
 
