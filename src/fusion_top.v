@@ -46,6 +46,18 @@ wire gauss_ready, gauss_del_valid, gauss_del_last;
 reg [DATA_WIDTH-1:0] old_gauss_buff, new_gauss_buff;
 reg old_gauss_buff_valid, old_gauss_buff_last, new_gauss_buff_valid, new_gauss_buff_last;
 
+reg [DATA_WIDTH-1:0] del_gauss_buff;
+reg del_gauss_buff_valid, del_gauss_buff_last;
+
+wire [DATA_WIDTH-1:0] fusion_out;
+wire fusion_ready_x, fusion_ready_y, fusion_ready_z, fusion_out_valid, fusion_out_last;
+
+wire [DATA_WIDTH-1:0] old_fusion_buff;
+wire old_fusion_buff_valid, old_fusion_buff_last, buff_ready_x, buff_ready_y, buff_ready_z;
+
+wire [DATA_WIDTH-1:0] fusion_del;
+wire del_buff_ready_x, del_buff_ready_y, del_buff_ready_z, fusion_del_valid, fusion_del_last;
+
 // DataPath
 
 // sobel_hssim_top part
@@ -108,7 +120,7 @@ CONV_GAUSS #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .PIXEL_SIZE(PIXEL_SIZE), .IMAGE
     .s_axis_tlast(del_last),
     .m_axis_tdata(gauss_del),
     .m_axis_tvalid(gauss_del_valid),
-    .m_axis_tready(fusion_ready_x & buff_ready_x),
+    .m_axis_tready(fusion_ready_x & buff_ready_x & del_buff_ready_x),
     .m_axis_tlast(gauss_del_last)
 );
 
@@ -120,6 +132,9 @@ always @(posedge aclk) begin
         old_gauss_buff_last <= 0;
         new_gauss_buff_valid <= 0;
         new_gauss_buff_last <= 0;
+        del_gauss_buff <= 0;
+        del_gauss_buff_valid <= 0;
+        del_gauss_buff_last <= 0;
     end
     else begin
         if(gauss_ready & del_valid & old_fifo_out_valid & new_fifo_out_valid) begin
@@ -129,20 +144,23 @@ always @(posedge aclk) begin
             old_gauss_buff_last <= old_fifo_out_last;
             new_gauss_buff_valid <= 1;
             new_gauss_buff_last <= new_fifo_out_last;
+            del_gauss_buff <= del;
+            del_gauss_buff_valid <= 1;
+            del_gauss_buff_last <= del_last;
+
         end
-        else if(fusion_ready_x & buff_ready_x & gauss_del_valid) begin
+        else if(fusion_ready_x & buff_ready_x & del_buff_ready_x & gauss_del_valid) begin
             old_gauss_buff_valid <= 0;
             old_gauss_buff_last <= 0;
             new_gauss_buff_valid <= 0;
             new_gauss_buff_last <= 0;
+            del_gauss_buff_valid <= 0;
+            del_gauss_buff_last <= 0;
         end
     end
 end
 
 // fusion part
-
-wire [DATA_WIDTH-1:0] fusion_out;
-wire fusion_ready_x, fusion_ready_y, fusion_ready_z, fusion_out_valid, fusion_out_last;
 
 FUSION #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .IMAGE_DIM(IMAGE_DIM), .PIXEL_SIZE(PIXEL_SIZE)) fusion(
     .aclk(aclk),
@@ -165,9 +183,6 @@ FUSION #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .IMAGE_DIM(IMAGE_DIM), .PIXEL_SIZE(
     .fused_frame_tlast(fusion_out_last)
 );
 
-wire [DATA_WIDTH-1:0] old_fusion_buff;
-wire old_fusion_buff_valid, old_fusion_buff_last, buff_ready_x, buff_ready_y, buff_ready_z;
-
 FUSION #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .IMAGE_DIM(IMAGE_DIM), .PIXEL_SIZE(PIXEL_SIZE)) buff(
     .aclk(aclk),
     .aresetn(aresetn),
@@ -189,6 +204,30 @@ FUSION #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .IMAGE_DIM(IMAGE_DIM), .PIXEL_SIZE(
     .fused_frame_tlast(old_fusion_buff_last)
 );
 
+FUSION #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .IMAGE_DIM(IMAGE_DIM), .PIXEL_SIZE(PIXEL_SIZE)) del_buff(
+    .aclk(aclk),
+    .aresetn(aresetn),
+    .old_frame(del_gauss_buff),
+    .old_frame_tvalid(del_gauss_buff_valid),
+    .old_frame_tready(del_buff_ready_x),
+    .old_frame_tlast(del_gauss_buff_last),
+    .new_frame(0),
+    .new_frame_tvalid(1),
+    .new_frame_tready(del_buff_ready_y),
+    .new_frame_tlast(1),
+    .del_gauss(0),
+    .del_gauss_tvalid(1),
+    .del_gauss_tready(del_buff_ready_z),
+    .del_gauss_tlast(1),
+    .fused_frame(fusion_del),
+    .fused_frame_tvalid(fusion_del_valid),
+    .fused_frame_tready(advance),
+    .fused_frame_tlast(fusion_del_last)
+);
+
+// output stage
+
+integer i;
 always @(posedge aclk) begin
     if(!aresetn) begin
         m_axis_tdata <= 0;
@@ -196,10 +235,17 @@ always @(posedge aclk) begin
         m_axis_tlast <= 0;
     end
     else begin
-        if(advance & fusion_out_valid & old_fusion_buff_valid) begin
-            m_axis_tdata <= fusion_out;
+        if(advance & fusion_del_valid & fusion_out_valid & old_fusion_buff_valid) begin
+            for(i=0; i<PIXELS_PER_BEAT; i=i+1) begin
+                if(fusion_del[i*PIXEL_SIZE +: PIXEL_SIZE] == 0) begin
+                    m_axis_tdata[i*PIXEL_SIZE +: PIXEL_SIZE] <= old_fusion_buff[i*PIXEL_SIZE +: PIXEL_SIZE]; 
+                end
+                else begin
+                    m_axis_tdata[i*PIXEL_SIZE +: PIXEL_SIZE] <= fusion_out[i*PIXEL_SIZE +: PIXEL_SIZE];
+                end
+            end
             m_axis_tvalid <= 1;
-            m_axis_tlast <= (fusion_out_last & old_fusion_buff_last);
+            m_axis_tlast <= (fusion_out_last & old_fusion_buff_last & fusion_del_last);
         end
         else if(m_axis_tvalid & m_axis_tready) begin
             m_axis_tvalid <= 0;
