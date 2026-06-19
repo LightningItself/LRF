@@ -71,7 +71,7 @@ reg [DATA_WIDTH-1:0] fused_frame_buff_in, fused_frame; // fusion regs
 wire [DATA_WIDTH-1:0] fused_frame_buff_out; // fusion regs
  
 //DATAPATH STATES
-wire [DATA_WIDTH-1:0] curr_frame_emap, fused_frame_emap, avg_frame_emap; // hssim wires
+// wire [DATA_WIDTH-1:0] curr_frame_emap, fused_frame_emap, avg_frame_emap; // hssim wires
 wire [DATA_WIDTH-1:0] out_hssim, out_dmap, out_fused_frame; // hssim wires
 
 //FUSION STATE LOGIC
@@ -115,7 +115,7 @@ reg avg_curr_en, avg_next_en;
 reg avg_en_a, avg_en_b;
 // reg avg_first, avg_add;
 
-reg [DATA_WIDTH+(N_FUSE_COUNT+1)*PIXELS_PER_BEAT-1:0] avg_buff_in, avg_frame_buff_out;
+// reg [DATA_WIDTH+(N_FUSE_COUNT+1)*PIXELS_PER_BEAT-1:0] avg_buff_in, avg_frame_buff_out;
 wire [DATA_WIDTH+(N_FUSE_COUNT+1)*PIXELS_PER_BEAT-1:0] avg_frame_buff_out_a, avg_frame_buff_out_b;
 
 // always @(posedge s_axis_aclk) begin
@@ -161,17 +161,17 @@ genvar i;
 LSU #(PIXELS_PER_BEAT,IMAGE_DIM,9+N_FUSE_COUNT,0) avg_frame_buff_a (s_axis_aclk,s_axis_aresetn,avg_en_a,avg_frame_buff_out_a,avg_en_a,avg_buff_in);
 LSU #(PIXELS_PER_BEAT,IMAGE_DIM,9+N_FUSE_COUNT,0) avg_frame_buff_b (s_axis_aclk,s_axis_aresetn,avg_en_b,avg_frame_buff_out_b,avg_en_b,avg_buff_in);
 
-wire [DATA_WIDTH+(N_FUSE_COUNT+1)*PIXELS_PER_BEAT-1:0] iframex17, iframe;
+// wire [DATA_WIDTH+(N_FUSE_COUNT+1)*PIXELS_PER_BEAT-1:0] iframex17, iframe;
 
-generate 
-    for(i=0;i<PIXELS_PER_BEAT;i=i+1) begin
-        assign iframex17[(9+N_FUSE_COUNT)*i+:(9+N_FUSE_COUNT)] = (curr_frame_emap[8*i+:8]<<N_FUSE_COUNT) + curr_frame_emap[8*i+:8]; 
-        assign iframe[(9+N_FUSE_COUNT)*i+:8] = curr_frame_emap[8*i+:8]; 
-        assign iframe[((9+N_FUSE_COUNT)*i+8)+:(N_FUSE_COUNT+1)] = 0; 
+// generate 
+//     for(i=0;i<PIXELS_PER_BEAT;i=i+1) begin
+//         assign iframex17[(9+N_FUSE_COUNT)*i+:(9+N_FUSE_COUNT)] = (curr_frame_emap[8*i+:8]<<N_FUSE_COUNT) + curr_frame_emap[8*i+:8]; 
+//         assign iframe[(9+N_FUSE_COUNT)*i+:8] = curr_frame_emap[8*i+:8]; 
+//         assign iframe[((9+N_FUSE_COUNT)*i+8)+:(N_FUSE_COUNT+1)] = 0; 
 
-        assign avg_frame_emap[(8*i)+:8] = (avg_first) ? curr_frame_emap[(8*i)+:8] : avg_frame_buff_out[((9+N_FUSE_COUNT)*i+N_FUSE_COUNT)+:8];
-    end    
-endgenerate
+//         assign avg_frame_emap[(8*i)+:8] = (avg_first) ? curr_frame_emap[(8*i)+:8] : avg_frame_buff_out[((9+N_FUSE_COUNT)*i+N_FUSE_COUNT)+:8];
+//     end    
+// endgenerate
 
 // always @(*) begin
 //     if(avg_first) begin
