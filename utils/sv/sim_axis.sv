@@ -162,8 +162,12 @@ endclass
 // ─────────────────────────────────────────────────────────────────────────────
 class axis_input_agent #(
     parameter int NUM_AXIS = 1,
-    parameter int DATA_WIDTH = 128
+    parameter int DATA_WIDTH = 128,
+    parameter int IMAGE_DIM = 512
 );
+
+    localparam TOTAL_BEATS = (IMAGE_DIM*IMAGE_DIM*8)/DATA_WIDTH;
+
     axis_driver #(DATA_WIDTH) drv [NUM_AXIS];
     mailbox gen2drv [NUM_AXIS];
 
@@ -209,6 +213,23 @@ class axis_input_agent #(
     task load_files(string file_names [NUM_AXIS], int total_beats [NUM_AXIS]);
         for (int i = 0; i < NUM_AXIS; i++) begin
             load_file(i, file_names[i], total_beats[i]);
+        end
+    endtask
+
+    task load_video(string folder_path, string file_prefix, int frames);
+        int index = 0;
+        int fd;
+        string fname;
+
+        forever begin
+            if(index >= frames) break;
+            fname = $sformatf("%s/%s%0d.hex", folder_path, file_prefix, index);
+            fd = $fopen(fname, "r");
+            if(fd == 0) break;
+            $fclose(fd);
+            $display("[AXIS VIDEO] Loading frame %0d.", index);
+            load_file(0, fname, TOTAL_BEATS);
+            index++;
         end
     endtask
 endclass
@@ -282,6 +303,31 @@ class axis_output_agent #(
             check_file(i, file_names[i], total_beats[i]);
         end
     endtask
+
+    task write_video(string folder_path, string file_prefix, int frames);
+        int index = 0;
+        int fd;
+        string fname;
+        axis_transaction #(DATA_WIDTH) transaction;
+
+        forever begin
+            if(index >= frames) break;
+            fname = $sformatf("%s/%s%0d.hex", folder_path, file_prefix, index);
+            fd = $fopen(fname, "w");
+
+            forever begin
+                mon2scb[0].get(transaction);
+                $fdisplay(fd, "%h", transaction.tdata);
+
+                if(transaction.tlast) begin
+                    $fclose(fd);
+                    break;
+                end
+            end
+
+            index++;
+        end
+    endtask
 endclass
 
 
@@ -329,6 +375,49 @@ class axis_sim_env #(
 
         errors = output_agent.errors;
         $display("Errors Detected: %0d", errors);
+    endtask
+endclass
+
+
+class axis_sim_video_env #(
+    parameter DATA_WIDTH = 128,
+    parameter IMAGE_DIM = 512,
+    parameter VIDEO_FRAMES = 10
+);
+    axis_input_agent #(
+        .NUM_AXIS(1),
+        .DATA_WIDTH(DATA_WIDTH)
+    ) input_agent;
+
+    axis_output_agent #(
+        .NUM_AXIS(1),
+        .DATA_WIDTH(DATA_WIDTH)
+    ) output_agent;
+
+    function new(
+        virtual axis_if #(DATA_WIDTH) s_vif,
+        virtual axis_if #(DATA_WIDTH) m_vif 
+    );
+        input_agent = new(s_vif);
+        output_agent = new(m_vif);
+    endfunction
+
+    task run_agents();
+        input_agent.run();
+        output_agent.run();
+    endtask
+
+    task run(
+        string input_folder_path,
+        string output_folder_path,
+        string file_prefix
+    );
+        run_agents();
+
+        input_agent.load_video(input_folder_path, file_prefix, VIDEO_FRAMES);
+        output_agent.write_video(output_folder_path, file_prefix, VIDEO_FRAMES);
+
+        $display("[SIM VIDEO] Input Output Agents Running.");
     endtask
 endclass
 
