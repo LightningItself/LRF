@@ -68,7 +68,7 @@ reg [DATA_WIDTH-1:0] fused_frame_d [TOTAL_DELAY-1:0], curr_frame_d [TOTAL_DELAY-
 reg fused_read_en, fused_write_en; // fusion regs
 
 reg [DATA_WIDTH-1:0] fused_frame_buff_in, fused_frame; // fusion regs
-wire [DATA_WIDTH-1:0] fused_frame_buff_out; // fusion regs
+wire [DATA_WIDTH-1:0]   ; // fusion regs
  
 //DATAPATH STATES
 // wire [DATA_WIDTH-1:0] curr_frame_emap, fused_frame_emap, avg_frame_emap; // hssim wires
@@ -169,7 +169,7 @@ wire [DATA_WIDTH-1:0] out_hssim, out_dmap, out_fused_frame; // hssim wires
 //         assign iframe[(9+N_FUSE_COUNT)*i+:8] = curr_frame_emap[8*i+:8]; 
 //         assign iframe[((9+N_FUSE_COUNT)*i+8)+:(N_FUSE_COUNT+1)] = 0; 
 
-//         assign avg_frame_emap[(8*i)+:8] = (avg_first) ? curr_frame_emap[(8*i)+:8] : avg_frame_buff_out[((9+N_FUSE_COUNT)*i+N_FUSE_COUNT)+:8];
+           assign avg_frame_emap[(8*i)+:8] = (avg_first) ? curr_frame_emap[(8*i)+:8] : avg_frame_buff_out[((9+N_FUSE_COUNT)*i+N_FUSE_COUNT)+:8];
 //     end    
 // endgenerate
 
