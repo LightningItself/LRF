@@ -111,12 +111,12 @@ wire [DATA_WIDTH-1:0] out_hssim, out_dmap, out_fused_frame; // hssim wires
 
 
 //---------------------AVG BUFFER------------------------------
-reg avg_curr_en, avg_next_en;
-reg avg_en_a, avg_en_b;
+// reg avg_curr_en, avg_next_en;
+// reg avg_en_a, avg_en_b;
 // reg avg_first, avg_add;
 
 // reg [DATA_WIDTH+(N_FUSE_COUNT+1)*PIXELS_PER_BEAT-1:0] avg_buff_in, avg_frame_buff_out;
-wire [DATA_WIDTH+(N_FUSE_COUNT+1)*PIXELS_PER_BEAT-1:0] avg_frame_buff_out_a, avg_frame_buff_out_b;
+// wire [DATA_WIDTH+(N_FUSE_COUNT+1)*PIXELS_PER_BEAT-1:0] avg_frame_buff_out_a, avg_frame_buff_out_b;
 
 // always @(posedge s_axis_aclk) begin
 //     if(~s_axis_aresetn) begin
@@ -132,34 +132,34 @@ wire [DATA_WIDTH+(N_FUSE_COUNT+1)*PIXELS_PER_BEAT-1:0] avg_frame_buff_out_a, avg
 // end
 
 //********** avg_out_state decides which buffer output to use for average
-reg avg_out_state, avg_next_state;
-always @(posedge s_axis_aclk) begin
-    if(~s_axis_aresetn) begin
-        avg_out_state <= 0;
-        avg_next_state <= 1;
-    end
-    else if(step) begin
-        if(frame_counter == 0 & beat_counter == SOBEL_DELAY-1) 
-            avg_out_state <= ~avg_out_state;
-        if(beat_counter == SOBEL_DELAY-1 & frame_counter == 0)
-            avg_next_state <= 1;
-        else if(beat_counter == SOBEL_DELAY-1 && frame_counter == 2)
-            avg_next_state <= 0;
-    end
-end
+// reg avg_out_state, avg_next_state;
+// always @(posedge s_axis_aclk) begin
+//     if(~s_axis_aresetn) begin
+//         avg_out_state <= 0;
+//         avg_next_state <= 1;
+//     end
+//     else if(step) begin
+//         if(frame_counter == 0 & beat_counter == SOBEL_DELAY-1) 
+//             avg_out_state <= ~avg_out_state;
+//         if(beat_counter == SOBEL_DELAY-1 & frame_counter == 0)
+//             avg_next_state <= 1;
+//         else if(beat_counter == SOBEL_DELAY-1 && frame_counter == 2)
+//             avg_next_state <= 0;
+//     end
+// end
 
-always @(*) begin
-    avg_curr_en =  step & aresetn_d[SOBEL_DELAY-1];
-    avg_next_en =  avg_next_state & step & aresetn_d[SOBEL_DELAY-1];
-    avg_en_a = (avg_out_state) ? avg_curr_en : avg_next_en;
-    avg_en_b = (~avg_out_state) ? avg_curr_en : avg_next_en;
-    avg_frame_buff_out = avg_out_state ? avg_frame_buff_out_a : avg_frame_buff_out_b;    
-end
+// always @(*) begin
+//     avg_curr_en =  step & aresetn_d[SOBEL_DELAY-1];
+//     avg_next_en =  avg_next_state & step & aresetn_d[SOBEL_DELAY-1];
+//     avg_en_a = (avg_out_state) ? avg_curr_en : avg_next_en;
+//     avg_en_b = (~avg_out_state) ? avg_curr_en : avg_next_en;
+//     avg_frame_buff_out = avg_out_state ? avg_frame_buff_out_a : avg_frame_buff_out_b;    
+// end
 
-genvar i;
+// genvar i;
 
-LSU #(PIXELS_PER_BEAT,IMAGE_DIM,9+N_FUSE_COUNT,0) avg_frame_buff_a (s_axis_aclk,s_axis_aresetn,avg_en_a,avg_frame_buff_out_a,avg_en_a,avg_buff_in);
-LSU #(PIXELS_PER_BEAT,IMAGE_DIM,9+N_FUSE_COUNT,0) avg_frame_buff_b (s_axis_aclk,s_axis_aresetn,avg_en_b,avg_frame_buff_out_b,avg_en_b,avg_buff_in);
+// LSU #(PIXELS_PER_BEAT,IMAGE_DIM,9+N_FUSE_COUNT,0) avg_frame_buff_a (s_axis_aclk,s_axis_aresetn,avg_en_a,avg_frame_buff_out_a,avg_en_a,avg_buff_in);
+// LSU #(PIXELS_PER_BEAT,IMAGE_DIM,9+N_FUSE_COUNT,0) avg_frame_buff_b (s_axis_aclk,s_axis_aresetn,avg_en_b,avg_frame_buff_out_b,avg_en_b,avg_buff_in);
 
 // wire [DATA_WIDTH+(N_FUSE_COUNT+1)*PIXELS_PER_BEAT-1:0] iframex17, iframe;
 
@@ -185,7 +185,7 @@ LSU #(PIXELS_PER_BEAT,IMAGE_DIM,9+N_FUSE_COUNT,0) avg_frame_buff_b (s_axis_aclk,
 //     end
 // end
 //------------------------------------------------------------
-localparam FUSED_DELAY = 23;
+// localparam FUSED_DELAY = 23;
 //FUSED FRAME BUFFER
 
 reg store_inp;
