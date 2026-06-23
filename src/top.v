@@ -42,11 +42,10 @@ always @(posedge s_axis_aclk) begin
             IDLE: begin
                 if(s_axis_tvalid & s_axis_tready) begin
                     state <= NEW;
-                    new_gate <= 1
                 end
             end
             NEW: begin
-                if(s_axis_tlast & s_axis_tvalid & s_axis_tready) begin
+                if(new_gate == 0) begin
                     state <= OLD;
                 end
             end
@@ -90,10 +89,10 @@ wire sub_ready_y = &sub_ready_b;
 wire sub_valid = &int_sub_valid;
 wire sub_last = &int_sub_last;
 assign avg_buff_in = (state == OLD) ? int_sub : ((state == NEW) & (first != 0)) ? int_sum : iframex17;
-assign avg_buff_in_valid = (state == OLD) ? sub_valid : (state == NEW) ? sum_valid;
-assign avg_buff_in_last = (state == OLD) ? sub_last : (state == NEW) ? sum_last;
+assign avg_buff_in_valid = (state == OLD) ? sub_valid : (state == NEW) & (first != 0) ? sum_valid : valid_buff_new;
+assign avg_buff_in_last = (state == OLD) ? sub_last : (state == NEW) & (first != 0) ? sum_last : last_buff_new;
 wire old_state_ready = sub_ready_y & gate;
-wire new_state_ready = ;
+wire new_state_ready = (first == 1'b0) ? (add_ready_x & fusion_top_ready_y & new_gate) : 1'b0;
 wire LSU_slave_ready = (state == OLD) ? old_state_ready : (state == NEW) ? new_state_ready;
 
 reg gate;
@@ -197,7 +196,7 @@ end
 // lets start with FusionTop and LSU locic
 
 // in thesis, its mentioned, Once 16 images have been fused, it will be sent out from the DDR3; the 17th image replaces the existing fused image in DDR3,
-//serving as the new reference for the next 16-image fusion cycle. so took help of frame_counter
+//serving as the new reference for the next 16-image fusion cycle. so took help of frame_counter.
 
 reg first;
 
@@ -251,7 +250,7 @@ always @(posedge s_axis_aclk) begin
         last_buff_new <= 0;
     end
     else begin
-        if() begin
+        if(new_gate & (fusion_top_ready_z || !avg_buff_out_valid)) begin
             data_buff_new <= s_axis_tdata;
             valid_buff_new <= s_axis_tvalid;
             last_buff_new <= s_axis_tlast;
@@ -286,7 +285,6 @@ fusionTop #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .PIXEL_SIZE(PIXEL_SIZE), .IMAGE_
     .m_axis_tlast(out_fused_frame_last)
 );
 
-
 LSU #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .IMAGE_DIM(IMAGE_DIM), .BIT_WIDTH(PIXEL_SIZE)) fuse(
     .aclk(s_axis_aclk),
     .aresetn(s_axis_aresetn),
@@ -299,6 +297,11 @@ LSU #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .IMAGE_DIM(IMAGE_DIM), .BIT_WIDTH(PIXE
     .m_axis_tready((frame_counter == 0) ? 1'b0 : fusion_top_ready_x),
     .m_axis_tlast(fetched_frame_last) 
 );
+
+// let fuse LSU be active all the time irrespective of state.
+// new_gate is becoming low on next cycle (T+1) after i receive the last on this cycle(T), the state change happens on the new cycle(T+2).
+// i forward the last to fusiontop on T+1, so from T+2, the valids should drop and since fuse LSU is ready all the time, the last beat advances in fusiontop and
+// reaches the LSU, adn once the LSU received the last, the fusiontop lowers it valid and so the fuse LSU wont fetch any data.
 
 // fetching fused frame takes 1 cycle delay 
 
@@ -313,7 +316,7 @@ generate
             .s_axis_tready_x(add_ready_a[j]),
             .s_axis_tlast_x(avg_buff_out_last),
             .s_axis_tdata_y({ {(N_FUSE_COUNT+1){1'b0}}, data_buff_new[j*PIXEL_SIZE+:PIXEL_SIZE] }),
-            .s_axis_tvalid_y(valid_buff_new & & (state == NEW) & (first == 1'b0)),
+            .s_axis_tvalid_y(valid_buff_new & (state == NEW) & (first == 1'b0)),
             .s_axis_tready_y(add_ready_b[j]),
             .s_axis_tlast_y(last_buff_new),
             .s_axis_tdata_z(0),
@@ -328,7 +331,8 @@ generate
     end
 endgenerate
 
-// i should be in this state, until the final fused frame gets updated. 
+// data gets updated correctly on the cycle where the state changes, so by the time it reaches the old, the avg is already updated.
+// read and write ptrs of avg LSU is now 0. 
 
 reg new_gate;
 always @(posedge s_axis_aclk) begin
@@ -337,7 +341,10 @@ always @(posedge s_axis_aclk) begin
     end
     else begin
         if((state == NEW) & s_axis_tvalid & s_axis_tready & s_axis_tlast) begin
-            new_gate <= 0;
+            new_gate <= 0; // the moment the accepted the last beat of new frame, i then on next cycle, make the new_gate 0
+        end
+        else if ((state == IDLE) & s_axis_tvalid & s_axis_tready) begin
+            new_gate <= 1;
         end
         else if(gate == 0) begin
             new_gate <= 1;
@@ -345,6 +352,19 @@ always @(posedge s_axis_aclk) begin
     end
 end
 
-assign s_axis_tready = (state == IDLE) ? 1'b1 : (state == NEW)  ? m_axis_tready : (state == OLD)  ? (sub_ready_y || !avg_buff_out_valid) & gate : 1'b0;
+// now the pending part is sending the fused frame out when 16 new frames are fused
+// since i already set the fused_frame = (frame_counter == 0) ? data_buff_new : fetched_frame, i no need to replace the fused frame with incoming data.
+// as the sole purpose of replacing is to send the current new frame into fusionTop as olf fused frame which is already being done
+// so the output of fusionTop any how replaces the frame in LSU.
+// since i didnt replace the fused frame which is after 16 new frames, and also not being used and just being overwritten, i can now access the read pointer independently 
+// and send the frame out of module.
+
+// lets not create a seperate state for it.
+// when frame counter reaches count 31, then it is processing the oldest
+
+
+
+assign s_axis_tready = (state == IDLE) ? 1'b1 : (state == NEW)  ?  new_gate & (fusion_top_ready_z || !avg_buff_out_valid) 
+                                              : (state == OLD)  ? (sub_ready_y || !avg_buff_out_valid) & gate : 1'b0;
 
 endmodule
