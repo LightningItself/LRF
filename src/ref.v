@@ -93,7 +93,7 @@ assign avg_buff_in_valid = (state == OLD) ? sub_valid : (state == NEW) & (first 
 assign avg_buff_in_last = (state == OLD) ? sub_last : (state == NEW) & (first == 0) ? sum_last : last_buff_new;
 wire old_state_ready = sub_ready_y & gate;
 wire new_state_ready = (first == 1'b0) ? (add_ready_x & fusion_top_ready_y & new_gate) : 1'b0;
-wire LSU_slave_ready = (state == OLD) ? old_state_ready : (state == NEW) ? new_state_ready;
+wire LSU_slave_ready = (state == OLD) ? old_state_ready : (state == NEW) ? new_state_ready : 1'b0;
 
 reg gate;
 
@@ -221,11 +221,12 @@ wire add_ready_y = &add_ready_b;
 wire add_ready_z = &add_ready_c;
 
 wire [DATA_WIDTH+(N_FUSE_COUNT+1)*PIXELS_PER_BEAT-1:0] iframex17;
+wire [DATA_WIDTH-1:0] fusion_avg_input;
 genvar k;
 generate 
     for(k=0; k<PIXELS_PER_BEAT; k=k+1) begin
          assign iframex17[(9+N_FUSE_COUNT)*k+:(9+N_FUSE_COUNT)] = (data_buff_new[8*k+:8]<<N_FUSE_COUNT) + data_buff_new[8*k+:8];
-         assign fusion_avg_input[(8*k)+:8] = (first) ? iframex17[(8*k)+:8] : avg_buff_out[((9+N_FUSE_COUNT)*k+N_FUSE_COUNT)+:8];
+         assign fusion_avg_input[(8*k)+:8] = (first) ? data_buff_new[(8*k)+:8] : avg_buff_out[((9+N_FUSE_COUNT)*k+N_FUSE_COUNT)+:8];
     end
 endgenerate
 wire fusion_avg_input_valid = (first == 1) ? valid_buff_new : avg_buff_out_valid;
@@ -346,7 +347,7 @@ always @(posedge s_axis_aclk) begin
         else if ((state == IDLE) & s_axis_tvalid & s_axis_tready) begin
             new_gate <= 1;
         end
-        else if(gate == 0) begin
+        else if((state == OLD) && (gate == 0)) begin
             new_gate <= 1;
         end
     end
@@ -373,7 +374,7 @@ always @(posedge s_axis_aclk) begin
         m_axis_tlast <= 0;
     end
     else begin
-        if((frame_counter ==0) & fetched_frame_valid & advance) begin
+        if((frame_counter ==0) & (state == NEW) & fetched_frame_valid & advance) begin
             m_axis_tdata <= fetched_frame;
             m_axis_tvalid <= 1;
             m_axis_tlast <= fetched_frame_last;
