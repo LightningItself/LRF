@@ -21,49 +21,57 @@ module LSU #(
 );
 
 localparam MEM_DEPTH = IMAGE_DIM * IMAGE_DIM / PIXELS_PER_BEAT;
-localparam ADDR_WIDTH = $clog2(MEM_DEPTH); 
+localparam ADDR_WIDTH = $clog2(MEM_DEPTH);
 
 reg [DATA_WIDTH-1:0] ram [MEM_DEPTH-1:0];
+reg [ADDR_WIDTH-1:0] read_ptr, write_ptr;
 
-reg [ADDR_WIDTH:0] write_ptr, read_ptr;
+reg frame_valid;
 
-wire empty = (write_ptr == read_ptr);
-wire full  = (write_ptr[ADDR_WIDTH] != read_ptr[ADDR_WIDTH]) && (write_ptr[ADDR_WIDTH-1:0] == read_ptr[ADDR_WIDTH-1:0]);
-
-wire write_step = s_axis_tvalid & s_axis_tready;
+wire write_enable = s_axis_tready & s_axis_tvalid;
 wire read_step = m_axis_tready || !m_axis_tvalid;
 
 always @(posedge aclk) begin
-    if(~aresetn) begin
-        write_ptr <= 0; 
+    if (~aresetn)
+        frame_valid <= 0;
+    else begin
+        if (write_enable & s_axis_tlast)
+            frame_valid <= 1;
+        else if (m_axis_tvalid & m_axis_tready & m_axis_tlast)
+            frame_valid <= 0;
     end
-    else if(write_step) begin
-        ram[write_ptr[ADDR_WIDTH-1:0]] <= s_axis_tdata;
-        write_ptr <= write_ptr + 1;
+end
+
+always @(posedge aclk) begin
+    if(~aresetn)
+        write_ptr <= 0;
+    else if(write_enable) begin
+        ram[write_ptr] <= s_axis_tdata;
+        if (s_axis_tlast)
+            write_ptr <= 0;
+        else
+            write_ptr <= write_ptr + 1;
     end
 end
 
 always @(posedge aclk) begin
     if(~aresetn) begin
-        read_ptr <= 0;
-        m_axis_tdata <= 0;
-        m_axis_tvalid <= 1'b0;
-        m_axis_tlast <= 1'b0;
+        read_ptr      <= 0;
+        m_axis_tdata  <= 0;
+        m_axis_tvalid <= 0;
+        m_axis_tlast  <= 0;
     end
-    else if (read_step) begin
-        if (!empty) begin
-            m_axis_tdata <= ram[read_ptr[ADDR_WIDTH-1:0]];
-            m_axis_tvalid <= 1'b1;
-            m_axis_tlast <= (read_ptr[ADDR_WIDTH-1:0] == (MEM_DEPTH-1));
+    else if(read_step & frame_valid) begin
+        m_axis_tdata  <= ram[read_ptr];
+        m_axis_tvalid <= 1;
+        m_axis_tlast  <= (read_ptr == (MEM_DEPTH-1));
+        if (read_ptr == (MEM_DEPTH-1))
+            read_ptr <= 0;
+        else
             read_ptr <= read_ptr + 1;
-        end
-        else begin
-            m_axis_tvalid <= 1'b0;
-            m_axis_tlast <= 1'b0;
-        end
     end
 end
 
-assign s_axis_tready = !full;
+assign s_axis_tready = 1;
 
 endmodule
