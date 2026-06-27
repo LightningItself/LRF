@@ -29,7 +29,7 @@ reg [ADDR_WIDTH-1:0] read_ptr, write_ptr;
 reg frame_valid;
 
 wire write_enable = s_axis_tready & s_axis_tvalid;
-wire read_step = m_axis_tready || !m_axis_tvalid;
+wire read_step = m_axis_tready; // removed so that there will be no prefetch
 
 always @(posedge aclk) begin
     if (~aresetn)
