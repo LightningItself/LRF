@@ -33,7 +33,7 @@ reg [1:0] state;
 
 reg first;
 
-reg new_gate, new_stop;
+reg new_gate, old_gate, new_stop, old_stop;
 
 reg [DATA_WIDTH-1:0] data_buff_new;
 reg valid_buff_new, last_buff_new;
@@ -47,7 +47,7 @@ wire avg_buff_in_last = (state == NEW) ? ((first == 1) ? last_buff_new : sum_las
 wire avg_lsu_ready;
 wire [DATA_WIDTH+(N_FUSE_COUNT+1)*PIXELS_PER_BEAT-1:0] avg_buff_out;
 wire avg_buff_out_valid, avg_buff_out_last;
-wire avg_lsu_slave_ready = ((state == NEW) ? ((first == 1) ? 0 : (add_ready_x & add_ready_y & fusion_top_ready_z & new_gate)) : (sub_ready_x & sub_ready_y));
+wire avg_lsu_slave_ready = ((state == NEW) ? ((first == 1) ? 0 : (fusion_top_ready_z & new_gate)) : (sub_ready_x & sub_ready_y));
 
 wire [DATA_WIDTH+(N_FUSE_COUNT+1)*PIXELS_PER_BEAT-1:0] int_sum;
 wire [PIXELS_PER_BEAT-1:0] add_ready_a, add_ready_b, add_ready_c, int_sum_valid, int_sum_last;
@@ -63,8 +63,13 @@ always @(posedge s_axis_aclk) begin
     if(~s_axis_aresetn) begin
         frame_counter <= 0;
     end
-    else if(fusion_top_ready_y & fusion_avg_input_last & fusion_avg_input_valid) begin 
-        frame_counter <= frame_counter + 1;
+    else begin
+        if((state == NEW) & (fusion_top_ready_y & fusion_avg_input_last & fusion_avg_input_valid)) begin 
+            frame_counter <= frame_counter + 1;
+        end
+        else if((state == OLD) & s_axis_tvalid & s_axis_tready & s_axis_tlast) begin
+            frame_counter <= frame_counter + 1;
+        end
     end
 end
 
@@ -114,8 +119,8 @@ always @(posedge s_axis_aclk) begin
                 end
             end
             OLD: begin
-                if(new_gate == 0) begin // for now
-                    // state <= NEW;
+                if(sub_last & avg_lsu_ready) begin
+                    state <= NEW;
                 end
             end
             default: begin
@@ -160,7 +165,7 @@ always @(posedge s_axis_aclk) begin
             new_gate <= 0; // so that new_gate wont allow the beat after the last beat into adder and fusion 
         end
         else if(state == OLD) begin
-            new_gate <= 1'b1;
+            new_gate <= 1;
         end
     end
 end
@@ -179,7 +184,7 @@ always @(posedge s_axis_aclk) begin
         last_buff_new  <= 0;
     end
     else begin
-        if(((state == NEW) & (first == 1)) ? (avg_lsu_ready & s_axis_tvalid & s_axis_tready) : (avg_lsu_slave_ready & s_axis_tvalid & new_gate & s_axis_tready)) begin
+        if ((state == NEW) ? ((first == 1) ? (avg_lsu_ready & s_axis_tvalid & s_axis_tready) : ((avg_lsu_slave_ready || !valid_buff_new) & s_axis_tvalid & new_gate & s_axis_tready)) : 0) begin
             data_buff_new  <= s_axis_tdata;
             valid_buff_new <= s_axis_tvalid;
             last_buff_new  <= s_axis_tlast;
@@ -243,7 +248,7 @@ LSU #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .IMAGE_DIM(IMAGE_DIM), .BIT_WIDTH(PIXE
     .s_axis_tlast(out_fused_frame_last),
     .m_axis_tdata(fetched_frame),
     .m_axis_tvalid(fetched_frame_valid),
-    .m_axis_tready((frame_counter == 0) ? m_axis_tready : fusion_top_ready_x),
+    .m_axis_tready((frame_counter == 0) ? (advance & (state == NEW)) : fusion_top_ready_x),
     .m_axis_tlast(fetched_frame_last) 
 );
 
@@ -274,19 +279,47 @@ fusionTop #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .PIXEL_SIZE(PIXEL_SIZE), .IMAGE_
 
 always @(posedge s_axis_aclk) begin
     if(!s_axis_aresetn) begin
+        old_stop <= 0;
+    end
+    else begin
+        if((state == OLD) & s_axis_tvalid & s_axis_tready & s_axis_tlast) begin
+            old_stop <= 0; // so that stop wont allow the beat after the last beat into module
+        end
+        else if(state == NEW) begin
+            old_stop <= 1; // so that it goes high after a state change
+        end
+    end
+end
+
+always @(posedge s_axis_aclk) begin
+    if(!s_axis_aresetn) begin
+        old_gate <= 0;
+    end
+    else begin
+        if((state == OLD) & last_buff_old & sub_ready_x & sub_ready_y & valid_buff_old) begin
+            old_gate <= 0; // so that new_gate wont allow the beat after the last beat into sub
+        end
+        else if(state == NEW) begin
+            old_gate <= 1;
+        end
+    end
+end
+
+always @(posedge s_axis_aclk) begin
+    if(!s_axis_aresetn) begin
         data_buff_old <= 0;
         valid_buff_old <= 0;
         last_buff_old <= 0;
     end
     else begin
-        if(s_axis_tvalid & avg_lsu_slave_ready & (state == OLD) & s_axis_tready) begin
+        if(s_axis_tvalid & (state == OLD) & s_axis_tready & old_gate) begin
             data_buff_old <= s_axis_tdata;
             valid_buff_old <= s_axis_tvalid;
             last_buff_old <= s_axis_tlast;
         end
         else if (sub_ready_x & sub_ready_y & valid_buff_old) begin
-            valid_buff_old <= 1'b0;
-            last_buff_old  <= 1'b0;
+            valid_buff_old <= 0;
+            last_buff_old <= 0;
         end
     end
 end
@@ -298,11 +331,11 @@ generate
             .aclk(s_axis_aclk),
             .aresetn(s_axis_aresetn),
             .s_axis_a_tdata(avg_buff_out[i*(9+N_FUSE_COUNT)+:(9+N_FUSE_COUNT)]),
-            .s_axis_a_tvalid(avg_buff_out_valid),
+            .s_axis_a_tvalid(avg_buff_out_valid & old_gate & (state == OLD)),
             .s_axis_a_tready(sub_ready_a[i]),
             .s_axis_a_tlast(avg_buff_out_last),
             .s_axis_b_tdata({ {(N_FUSE_COUNT+1){1'b0}}, data_buff_old[i*PIXEL_SIZE+:PIXEL_SIZE] }),
-            .s_axis_b_tvalid(valid_buff_old),
+            .s_axis_b_tvalid(valid_buff_old & old_gate & (state == OLD)),
             .s_axis_b_tready(sub_ready_b[i]),
             .s_axis_b_tlast(last_buff_old),
             .m_axis_tdata(int_sub[i*(9+N_FUSE_COUNT)+:(9+N_FUSE_COUNT)]),
@@ -315,6 +348,21 @@ endgenerate
 
 // ............................................................................................................................................................
 
+reg done;
+always @(posedge s_axis_aclk) begin
+    if(!s_axis_aresetn) begin
+        done <= 1;
+    end
+    else begin
+        if(fetched_frame_last & fetched_frame_valid & advance) begin
+            done <= 0;
+        end
+        else if((state == OLD)) begin
+            done <= 1;
+        end
+    end
+end
+
 always @(posedge s_axis_aclk) begin
     if(!s_axis_aresetn) begin
         m_axis_tdata <= 0;
@@ -322,9 +370,9 @@ always @(posedge s_axis_aclk) begin
         m_axis_tlast <= 0;
     end
     else begin
-        if((frame_counter == 0) & (state == NEW) & fetched_frame_valid & advance) begin
+        if((frame_counter == 0) & (state == NEW) & fetched_frame_valid & advance & done) begin
             m_axis_tdata <= fetched_frame;
-            m_axis_tvalid <= 1;
+            m_axis_tvalid <= (m_axis_tlast ? 0 : 1);
             m_axis_tlast <= fetched_frame_last;
         end
         else if(m_axis_tready & m_axis_tvalid) begin
@@ -336,7 +384,7 @@ end
 
 // when in new state, after i get the last beat of new frame, i need to stop as when new state done, i go to old state, there again i will be ready
 
-assign s_axis_tready = (state == NEW)  ? ((first == 1) ? (avg_lsu_ready & new_stop) : (avg_lsu_slave_ready & new_stop)) : 
-                       1'b0;
+assign s_axis_tready = (state == NEW) ? ((first == 1) ? (avg_lsu_ready & new_stop) : ((avg_lsu_slave_ready || !valid_buff_new) & new_stop)) : 
+                       (state == OLD) ? (old_stop) : 1'b0; 
                        
 endmodule

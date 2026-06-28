@@ -116,14 +116,14 @@ always @(posedge s_axis_aclk) begin
     end
 end
 
-always @(posedge s_axis_aclk) begin
-    if(~s_axis_aresetn) begin
-        frame_counter <= 0;
-    end
-    else if(s_axis_tlast & s_axis_tready & s_axis_tvalid) begin 
-            frame_counter <= frame_counter+1;
-    end
-end
+// always @(posedge s_axis_aclk) begin
+//     if(~s_axis_aresetn) begin
+//         frame_counter <= 0;
+//     end
+//     else if(s_axis_tlast & s_axis_tready & s_axis_tvalid) begin 
+//             frame_counter <= frame_counter+1;
+//     end
+// end
 
 always @(posedge s_axis_aclk) begin
     if(!s_axis_aresetn) begin
@@ -139,22 +139,22 @@ always @(posedge s_axis_aclk) begin
     end
 end
 
-always @(posedge s_axis_aclk) begin
-    if(!s_axis_aresetn) begin
-        new_gate <= 0;
-    end
-    else begin
-        if((state == NEW) & s_axis_tvalid & s_axis_tready & s_axis_tlast) begin
-            new_gate <= 0;
-        end
-        else if ((state == IDLE) & s_axis_tvalid & s_axis_tready) begin
-            new_gate <= 1;
-        end
-        else if((state == OLD) && (gate == 0)) begin
-            new_gate <= 1;
-        end
-    end
-end
+// always @(posedge s_axis_aclk) begin
+//     if(!s_axis_aresetn) begin
+//         new_gate <= 0;
+//     end
+//     else begin
+//         if((state == NEW) & s_axis_tvalid & s_axis_tready & s_axis_tlast) begin
+//             new_gate <= 0;
+//         end
+//         else if ((state == IDLE) & s_axis_tvalid & s_axis_tready) begin
+//             new_gate <= 1;
+//         end
+//         else if((state == OLD) && (gate == 0)) begin
+//             new_gate <= 1;
+//         end
+//     end
+// end
 
 LSU #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .IMAGE_DIM(IMAGE_DIM), .BIT_WIDTH(9+N_FUSE_COUNT)) average(
     .aclk(s_axis_aclk),
@@ -210,120 +210,75 @@ generate
     end
 endgenerate
 
-genvar k;
-generate 
-    for(k=0; k<PIXELS_PER_BEAT; k=k+1) begin
-         assign iframex17[(9+N_FUSE_COUNT)*k+:(9+N_FUSE_COUNT)] = (data_buff_new[8*k+:8]<<N_FUSE_COUNT) + data_buff_new[8*k+:8];
-         assign fusion_avg_input[(8*k)+:8] = (first) ? data_buff_new[(8*k)+:8] : avg_buff_out[((9+N_FUSE_COUNT)*k+N_FUSE_COUNT)+:8];
-    end
-endgenerate
+// genvar k;
+// generate 
+//     for(k=0; k<PIXELS_PER_BEAT; k=k+1) begin
+//          assign iframex17[(9+N_FUSE_COUNT)*k+:(9+N_FUSE_COUNT)] = (data_buff_new[8*k+:8]<<N_FUSE_COUNT) + data_buff_new[8*k+:8];
+//          assign fusion_avg_input[(8*k)+:8] = (first) ? data_buff_new[(8*k)+:8] : avg_buff_out[((9+N_FUSE_COUNT)*k+N_FUSE_COUNT)+:8];
+//     end
+// endgenerate
 
-always @(posedge s_axis_aclk) begin
-    if(!s_axis_aresetn) begin
-        first <= 1;
-    end
-    else if(s_axis_tready & s_axis_tvalid & s_axis_tlast) begin
-        first <= 0;
-    end
-end
+// always @(posedge s_axis_aclk) begin
+//     if(!s_axis_aresetn) begin
+//         first <= 1;
+//     end
+//     else if(s_axis_tready & s_axis_tvalid & s_axis_tlast) begin
+//         first <= 0;
+//     end
+// end
 
-always @(posedge s_axis_aclk) begin
-    if(!s_axis_aresetn) begin
-        data_buff_new <= 0;
-        valid_buff_new <= 0;
-        last_buff_new <= 0;
-    end
-    else begin
-        if(new_gate & (fusion_top_ready_z || !avg_buff_out_valid)) begin
-            data_buff_new <= s_axis_tdata;
-            valid_buff_new <= s_axis_tvalid;
-            last_buff_new <= s_axis_tlast;
-        end
-        else if (!new_gate) begin
-            valid_buff_new <= 1'b0;
-            last_buff_new <= 1'b0;
-        end
-    end
-end
+// always @(posedge s_axis_aclk) begin
+//     if(!s_axis_aresetn) begin
+//         data_buff_new <= 0;
+//         valid_buff_new <= 0;
+//         last_buff_new <= 0;
+//     end
+//     else begin
+//         if(new_gate & (fusion_top_ready_z || !avg_buff_out_valid)) begin
+//             data_buff_new <= s_axis_tdata;
+//             valid_buff_new <= s_axis_tvalid;
+//             last_buff_new <= s_axis_tlast;
+//         end
+//         else if (!new_gate) begin
+//             valid_buff_new <= 1'b0;
+//             last_buff_new <= 1'b0;
+//         end
+//     end
+// end
 
-fusionTop #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .PIXEL_SIZE(PIXEL_SIZE), .IMAGE_DIM(IMAGE_DIM)) fusion_top(  
-    .aclk(s_axis_aclk),
-    .aresetn(s_axis_aresetn),
-    .s_axis_old_fused_tdata(fused_frame), 
-    .s_axis_old_fused_tvalid(fused_frame_valid & (state == NEW)),
-    .s_axis_old_fused_tready(fusion_top_ready_x),
-    .s_axis_old_fused_tlast(fused_frame_last),
-    .s_axis_avg_tdata(fusion_avg_input), 
-    .s_axis_avg_tvalid(fusion_avg_input_valid & (state == NEW)),
-    .s_axis_avg_tready(fusion_top_ready_y),
-    .s_axis_avg_tlast(fusion_avg_input_last),
-    .s_axis_new_tdata(data_buff_new), 
-    .s_axis_new_tvalid(valid_buff_new & (state == NEW)),
-    .s_axis_new_tready(fusion_top_ready_z),
-    .s_axis_new_tlast(last_buff_new),
-    .m_axis_tdata(out_fused_frame),
-    .m_axis_tvalid(out_fused_frame_valid),
-    .m_axis_tready(fuse_ready),
-    .m_axis_tlast(out_fused_frame_last)
-);
+// fusionTop #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .PIXEL_SIZE(PIXEL_SIZE), .IMAGE_DIM(IMAGE_DIM)) fusion_top(  
+//     .aclk(s_axis_aclk),
+//     .aresetn(s_axis_aresetn),
+//     .s_axis_old_fused_tdata(fused_frame), 
+//     .s_axis_old_fused_tvalid(fused_frame_valid & (state == NEW)),
+//     .s_axis_old_fused_tready(fusion_top_ready_x),
+//     .s_axis_old_fused_tlast(fused_frame_last),
+//     .s_axis_avg_tdata(fusion_avg_input), 
+//     .s_axis_avg_tvalid(fusion_avg_input_valid & (state == NEW)),
+//     .s_axis_avg_tready(fusion_top_ready_y),
+//     .s_axis_avg_tlast(fusion_avg_input_last),
+//     .s_axis_new_tdata(data_buff_new), 
+//     .s_axis_new_tvalid(valid_buff_new & (state == NEW)),
+//     .s_axis_new_tready(fusion_top_ready_z),
+//     .s_axis_new_tlast(last_buff_new),
+//     .m_axis_tdata(out_fused_frame),
+//     .m_axis_tvalid(out_fused_frame_valid),
+//     .m_axis_tready(fuse_ready),
+//     .m_axis_tlast(out_fused_frame_last)
+// );
 
-LSU #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .IMAGE_DIM(IMAGE_DIM), .BIT_WIDTH(PIXEL_SIZE)) fuse(
-    .aclk(s_axis_aclk),
-    .aresetn(s_axis_aresetn),
-    .s_axis_tdata(out_fused_frame),
-    .s_axis_tvalid(out_fused_frame_valid),
-    .s_axis_tready(fuse_ready),
-    .s_axis_tlast(out_fused_frame_last),
-    .m_axis_tdata(fetched_frame),
-    .m_axis_tvalid(fetched_frame_valid),
-    .m_axis_tready((frame_counter == 0) ? m_axis_tready : fusion_top_ready_x),
-    .m_axis_tlast(fetched_frame_last) 
-);
-
-genvar j;
-generate 
-    for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
-        axis_adder #( .DATA_WIDTH(9+N_FUSE_COUNT), .mode(0)) add(
-            .aclk(s_axis_aclk),
-            .aresetn(s_axis_aresetn),
-            .s_axis_tdata_x(avg_buff_out[j*(9+N_FUSE_COUNT)+:(9+N_FUSE_COUNT)]),
-            .s_axis_tvalid_x(avg_buff_out_valid & (state == NEW) & (first == 1'b0)),
-            .s_axis_tready_x(add_ready_a[j]),
-            .s_axis_tlast_x(avg_buff_out_last),
-            .s_axis_tdata_y({ {(N_FUSE_COUNT+1){1'b0}}, data_buff_new[j*PIXEL_SIZE+:PIXEL_SIZE] }),
-            .s_axis_tvalid_y(valid_buff_new & (state == NEW) & (first == 1'b0)),
-            .s_axis_tready_y(add_ready_b[j]),
-            .s_axis_tlast_y(last_buff_new),
-            .s_axis_tdata_z(0),
-            .s_axis_tvalid_z(1),
-            .s_axis_tready_z(add_ready_c[j]),
-            .s_axis_tlast_z(1),
-            .m_axis_tdata(int_sum[j*(9+N_FUSE_COUNT)+:(9+N_FUSE_COUNT)]),
-            .m_axis_tvalid(int_sum_valid[j]),
-            .m_axis_tready(avg_lsu_ready),
-            .m_axis_tlast(int_sum_last[j])
-        );
-    end
-endgenerate
-
-always @(posedge s_axis_aclk) begin
-    if(!s_axis_aresetn) begin
-        m_axis_tdata <= 0;
-        m_axis_tvalid <= 0;
-        m_axis_tlast <= 0;
-    end
-    else begin
-        if((frame_counter ==0) & (state == NEW) & fetched_frame_valid & advance) begin
-            m_axis_tdata <= fetched_frame;
-            m_axis_tvalid <= 1;
-            m_axis_tlast <= fetched_frame_last;
-        end
-        else if(m_axis_tready & m_axis_tvalid) begin
-            m_axis_tvalid <= 0;
-            m_axis_tlast <= 0;
-        end
-    end
-end
+// LSU #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .IMAGE_DIM(IMAGE_DIM), .BIT_WIDTH(PIXEL_SIZE)) fuse(
+//     .aclk(s_axis_aclk),
+//     .aresetn(s_axis_aresetn),
+//     .s_axis_tdata(out_fused_frame),
+//     .s_axis_tvalid(out_fused_frame_valid),
+//     .s_axis_tready(fuse_ready),
+//     .s_axis_tlast(out_fused_frame_last),
+//     .m_axis_tdata(fetched_frame),
+//     .m_axis_tvalid(fetched_frame_valid),
+//     .m_axis_tready((frame_counter == 0) ? m_axis_tready : fusion_top_ready_x),
+//     .m_axis_tlast(fetched_frame_last) 
+// );
 
 assign s_axis_tready = (state == IDLE) ? 1'b1 : 
                        (state == NEW)  ? new_gate & (fusion_top_ready_z || !avg_buff_out_valid) & ((frame_counter == 0) ? m_axis_tready : 1'b1) : 
