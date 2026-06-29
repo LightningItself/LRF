@@ -59,20 +59,6 @@ wire add_ready_z = &add_ready_c;
 
 reg [FRAME_COUNTER_BITS-1:0] frame_counter;
 
-always @(posedge s_axis_aclk) begin
-    if(~s_axis_aresetn) begin
-        frame_counter <= 0;
-    end
-    else begin
-        if((state == NEW) & (fusion_top_ready_y & fusion_avg_input_last & fusion_avg_input_valid)) begin 
-            frame_counter <= frame_counter + 1;
-        end
-        else if((state == OLD) & s_axis_tvalid & s_axis_tready & s_axis_tlast) begin
-            frame_counter <= frame_counter + 1;
-        end
-    end
-end
-
 wire fuse_ready;
 wire [DATA_WIDTH-1:0] fetched_frame;
 wire fetched_frame_valid, fetched_frame_last;
@@ -106,6 +92,20 @@ wire sub_ready_x = &sub_ready_a;
 wire sub_ready_y = &sub_ready_b;
 wire sub_valid = &int_sub_valid;
 wire sub_last = &int_sub_last;
+
+always @(posedge s_axis_aclk) begin
+    if(~s_axis_aresetn) begin
+        frame_counter <= 0;
+    end
+    else begin
+        if((state == NEW) & (fusion_top_ready_y & fusion_avg_input_last & fusion_avg_input_valid)) begin 
+            frame_counter <= frame_counter + 1;
+        end
+        else if((state == OLD) & s_axis_tvalid & s_axis_tready & s_axis_tlast) begin
+            frame_counter <= frame_counter + 1;
+        end
+    end
+end
 
 always @(posedge s_axis_aclk) begin
     if(!s_axis_aresetn) begin
@@ -271,7 +271,7 @@ fusionTop #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .PIXEL_SIZE(PIXEL_SIZE), .IMAGE_
     .s_axis_new_tlast(last_buff_new),
     .m_axis_tdata(out_fused_frame),
     .m_axis_tvalid(out_fused_frame_valid),
-    .m_axis_tready(fuse_ready),
+    .m_axis_tready(((frame_counter == 0) ? (fuse_ready & m_axis_tready) : fuse_ready)), // sync
     .m_axis_tlast(out_fused_frame_last)
 );
 
