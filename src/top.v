@@ -243,7 +243,7 @@ LSU #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .IMAGE_DIM(IMAGE_DIM), .BIT_WIDTH(PIXE
     .aclk(s_axis_aclk),
     .aresetn(s_axis_aresetn),
     .s_axis_tdata(out_fused_frame),
-    .s_axis_tvalid(out_fused_frame_valid),
+    .s_axis_tvalid(((first == 1) ? out_fused_frame_valid : ((frame_counter == 0) ? (out_fused_frame_valid & m_axis_tready) : out_fused_frame_valid))),
     .s_axis_tready(fuse_ready),
     .s_axis_tlast(out_fused_frame_last),
     .m_axis_tdata(fetched_frame),
@@ -271,7 +271,7 @@ fusionTop #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .PIXEL_SIZE(PIXEL_SIZE), .IMAGE_
     .s_axis_new_tlast(last_buff_new),
     .m_axis_tdata(out_fused_frame),
     .m_axis_tvalid(out_fused_frame_valid),
-    .m_axis_tready(((frame_counter == 0) ? (fuse_ready & m_axis_tready) : fuse_ready)), // sync
+    .m_axis_tready(((first == 1) ? fuse_ready : ((frame_counter == 0) ? (fuse_ready & m_axis_tready) : fuse_ready))), // sync
     .m_axis_tlast(out_fused_frame_last)
 );
 
