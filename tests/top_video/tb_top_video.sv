@@ -4,7 +4,7 @@ module tb_top;
  
 // ─── Parameters ──────────────────────────────────────────────────────────────
 localparam PIXELS_PER_BEAT  = 16;
-localparam IMAGE_DIM        = 520;
+localparam IMAGE_DIM        = 512;
 localparam PIXEL_SIZE       = 8;
 localparam N_FUSE_COUNT     = 4;
 localparam DATA_WIDTH       = PIXEL_SIZE * PIXELS_PER_BEAT;   // 128
