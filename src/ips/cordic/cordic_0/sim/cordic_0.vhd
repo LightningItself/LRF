@@ -152,7 +152,7 @@ BEGIN
       C_CORDIC_FUNCTION => 6,
       C_COARSE_ROTATE => 0,
       C_DATA_FORMAT => 2,
-      C_XDEVICEFAMILY => "zynq",
+      C_XDEVICEFAMILY => "zynquplus",
       C_HAS_ACLKEN => 1,
       C_HAS_ACLK => 1,
       C_HAS_S_AXIS_CARTESIAN => 1,
