@@ -96,7 +96,7 @@ output wire [127 : 0] m_axis_tdata;
 output wire m_axis_tlast;
 
   axis_data_fifo_v2_0_17_top #(
-    .C_FAMILY("zynq"),
+    .C_FAMILY("zynquplus"),
     .C_AXIS_TDATA_WIDTH(128),
     .C_AXIS_TID_WIDTH(1),
     .C_AXIS_TDEST_WIDTH(1),

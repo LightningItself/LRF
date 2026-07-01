@@ -25,7 +25,7 @@ module LRF #(
     parameter IMAGE_DIM = 64,
     parameter N_FUSE_COUNT = 4,
     parameter PIPELINE_DELAY = 3,
-    parameter DATA_WIDTH = 8*PIXELS_PER_BEAT
+        
 ) (
     input wire s_axis_aclk,
     input wire s_axis_aresetn,
