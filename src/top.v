@@ -5,7 +5,7 @@ module LRF #(
     parameter  IMAGE_DIM = 64,
     parameter  PIXEL_SIZE = 8,
     parameter  N_FUSE_COUNT = 4,
-    localparam DATA_WIDTH = PIXEL_SIZE*PIXELS_PER_BEAT
+    parameter DATA_WIDTH = PIXEL_SIZE*PIXELS_PER_BEAT
 ) (
     input                       s_axis_aclk,
     input                       s_axis_aresetn,
