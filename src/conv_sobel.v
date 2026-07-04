@@ -58,23 +58,11 @@ module CONV_SOBEL #(
 
     integer i;
 
-    always @(posedge aclk) begin
-        if (!aresetn) begin
-            for(i = 0; i < BUFF_DEPTH; i = i + 1) begin
-                buff_top[i] <= 0;
-                buff_mid[i] <= 0;
-            end
-        end
-    end
-
     // below stages are mentioned only wrt tdata
     // stage 1 : compute conv_x and conv_y for each pixel in the beat
 
     always @(posedge aclk) begin
         if (~aresetn) begin
-            m_axis_tdata <= 0;
-            m_axis_tvalid <= 0;
-            m_axis_tlast <= 0;
 
             row_ptr <= 0;
             col_ptr <= 0;
@@ -85,6 +73,11 @@ module CONV_SOBEL #(
             last_top <= 0;
             last_mid <= 0;
             last_bot <= 0;
+            
+            for(i = 0; i < BUFF_DEPTH; i = i + 1) begin
+                buff_top[i] <= 0;
+                buff_mid[i] <= 0;
+            end
         end
         else begin
             if (s_axis_tvalid && advance) begin
@@ -183,6 +176,7 @@ module CONV_SOBEL #(
             cordic_0 sqrt_inst (
                 .aclk(aclk),
                 .aclken(advance),
+                .aresetn(aresetn),                                  
                 .s_axis_cartesian_tvalid(valid_s3),
                 .s_axis_cartesian_tdata(conv_sum_reg[k]),
 
@@ -195,15 +189,18 @@ module CONV_SOBEL #(
 
     // stage 4: assign output data, saturate
 
-    generate
-        for (j=0; j<PIXELS_PER_BEAT; j=j+1) begin
-            always @(posedge aclk) begin
-                if(advance) begin
-                    m_axis_tdata[j*PIXEL_SIZE+:PIXEL_SIZE] <= (sobel_out_wire[j] > (2**PIXEL_SIZE-1)) ? (2**PIXEL_SIZE-1) : sobel_out_wire[j][PIXEL_SIZE-1:0];
-                end
-            end
+    
+    integer p;
+    always @(posedge aclk) begin
+        if(!aresetn) begin
+            m_axis_tdata <= 0;
         end
-    endgenerate
+        else if(advance) begin
+            for (p=0; p<PIXELS_PER_BEAT; p=p+1) begin
+                 m_axis_tdata[p*PIXEL_SIZE+:PIXEL_SIZE] <= (sobel_out_wire[p] > (2**PIXEL_SIZE-1)) ? (2**PIXEL_SIZE-1) : sobel_out_wire[p][PIXEL_SIZE-1:0];
+            end
+         end
+    end
 
     
     always @(posedge aclk) begin

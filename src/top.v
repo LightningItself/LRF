@@ -2,7 +2,7 @@
 
 module LRF #(
     parameter  PIXELS_PER_BEAT = 16,
-    parameter  IMAGE_DIM = 64,
+    parameter  IMAGE_DIM = 512,
     parameter  PIXEL_SIZE = 8,
     parameter  N_FUSE_COUNT = 4,
     parameter DATA_WIDTH = PIXEL_SIZE*PIXELS_PER_BEAT
