@@ -13,7 +13,7 @@
 extern struct netif *echo_netif;
 extern volatile int TcpFastTmrFlag;
 extern volatile int TcpSlowTmrFlag;
-#define IMAGE_DIM           520
+#define IMAGE_DIM           512
 #define FRAME_SIZE_BYTES    (IMAGE_DIM * IMAGE_DIM)
 #define NUM_FRAMES          300
 #define FRAMES_PER_FUSION   16
