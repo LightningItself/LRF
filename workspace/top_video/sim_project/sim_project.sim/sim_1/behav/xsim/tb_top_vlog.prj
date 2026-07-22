@@ -1,0 +1,30 @@
+# compile verilog/system verilog design source files
+verilog xil_defaultlib  -i "../../../../../" -i "../../../../../../../tests/top_video" --include "../../../../sim_project.ip_user_files/ipstatic/hdl" \
+"../../../../sim_project.gen/sources_1/ip/axis_data_fifo_0/sim/axis_data_fifo_0.v" \
+"../../../../../../../src/axis_add_sub.v" \
+"../../../../../../../src/axis_adder.v" \
+"../../../../../../../src/axis_buff.v" \
+"../../../../../../../src/axis_comparator.v" \
+"../../../../../../../src/axis_sub.v" \
+"../../../../../../../src/conv_gauss.v" \
+"../../../../../../../src/conv_sobel.v" \
+"../../../../../../../src/fusion.v" \
+"../../../../../../../src/fusion_top.v" \
+"../../../../../../../src/hssim.v" \
+"../../../../../../../src/hssim_top.v" \
+"../../../../../../../src/lsu.v" \
+"../../../../../../../src/lsu_valid.v" \
+"../../../../../../../src/multiplier.v" \
+"../../../../../../../src/sig_xy.v" \
+"../../../../../../../src/sobel_hssim_top.v" \
+"../../../../../../../src/top.v" \
+
+sv xil_defaultlib  -i "../../../../../" -i "../../../../../../../tests/top_video" --include "../../../../sim_project.ip_user_files/ipstatic/hdl" \
+"../../../../../../../utils/sv/sim_axis.sv" \
+"../../../../../../../tests/top_video/tb_top_video.sv" \
+
+# compile glbl module
+verilog xil_defaultlib "glbl.v"
+
+# Do not sort compile order
+nosort

@@ -1,0 +1,32 @@
+#-----------------------------------------------------------
+# Vivado v2024.2 (64-bit)
+# SW Build 5239630 on Fri Nov 08 22:34:34 MST 2024
+# IP Build 5239520 on Sun Nov 10 16:12:51 MST 2024
+# SharedData Build 5239561 on Fri Nov 08 14:39:27 MST 2024
+# Start of session at: Sat Jul 18 14:42:41 2026
+# Process ID         : 2227567
+# Current directory  : /home/23EC01052/Desktop/my_branch/LRF/workspace
+# Command line       : vivado -mode gui -source ../tests/top_video/run_sim.tcl
+# Log file           : /home/23EC01052/Desktop/my_branch/LRF/workspace/vivado.log
+# Journal file       : /home/23EC01052/Desktop/my_branch/LRF/workspace/vivado.jou
+# Running On         : cdsl17.cdsl.iitbbs.ac.in
+# Platform           : unknown
+# Operating System   : unknown
+# Processor Detail   : Intel(R) Core(TM) i7-14700
+# CPU Frequency      : 2669.062 MHz
+# CPU Physical cores : 20
+# CPU Logical cores  : 28
+# Host memory        : 33107 MB
+# Swap memory        : 42949 MB
+# Total Virtual      : 76057 MB
+# Available Virtual  : 67148 MB
+#-----------------------------------------------------------
+start_gui
+source ../tests/top_video/run_sim.tcl
+source tb_top.tcl
+update_compile_order -fileset sources_1
+open_wave_config {/home/23EC01052/Desktop/my_branch/LRF/new_algo.wcfg}
+restart
+run all
+update_compile_order -fileset sources_1
+close_sim

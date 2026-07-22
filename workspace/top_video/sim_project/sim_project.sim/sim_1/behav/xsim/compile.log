@@ -1,0 +1,53 @@
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/23EC01052/Desktop/my_branch/LRF/workspace/top_video/sim_project/sim_project.gen/sources_1/ip/axis_data_fifo_0/sim/axis_data_fifo_0.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module axis_data_fifo_0
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/23EC01052/Desktop/my_branch/LRF/src/axis_add_sub.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module axis_add_sub
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/23EC01052/Desktop/my_branch/LRF/src/axis_adder.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module axis_adder
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/23EC01052/Desktop/my_branch/LRF/src/axis_buff.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module axis_buff
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/23EC01052/Desktop/my_branch/LRF/src/axis_comparator.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module axis_comparator
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/23EC01052/Desktop/my_branch/LRF/src/axis_sub.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module AXIS_SUB
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/23EC01052/Desktop/my_branch/LRF/src/conv_gauss.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module CONV_GAUSS
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/23EC01052/Desktop/my_branch/LRF/src/conv_sobel.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module CONV_SOBEL
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/23EC01052/Desktop/my_branch/LRF/src/fusion.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module FUSION
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/23EC01052/Desktop/my_branch/LRF/src/fusion_top.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module fusionTop
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/23EC01052/Desktop/my_branch/LRF/src/hssim.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module HSSIM
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/23EC01052/Desktop/my_branch/LRF/src/hssim_top.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module HSSIM_TOP
+WARNING: [VRFC 10-3380] identifier 'p1_buff_1' is used before its declaration [/home/23EC01052/Desktop/my_branch/LRF/src/hssim_top.v:188]
+WARNING: [VRFC 10-3380] identifier 'p2_buff_1' is used before its declaration [/home/23EC01052/Desktop/my_branch/LRF/src/hssim_top.v:189]
+WARNING: [VRFC 10-3380] identifier 'p1_buff_1_valid' is used before its declaration [/home/23EC01052/Desktop/my_branch/LRF/src/hssim_top.v:190]
+WARNING: [VRFC 10-3380] identifier 'p2_buff_1_valid' is used before its declaration [/home/23EC01052/Desktop/my_branch/LRF/src/hssim_top.v:191]
+WARNING: [VRFC 10-3380] identifier 'p1_buff_1' is used before its declaration [/home/23EC01052/Desktop/my_branch/LRF/src/hssim_top.v:197]
+WARNING: [VRFC 10-3380] identifier 'p2_buff_1' is used before its declaration [/home/23EC01052/Desktop/my_branch/LRF/src/hssim_top.v:198]
+WARNING: [VRFC 10-3380] identifier 'p1_buff_1_valid' is used before its declaration [/home/23EC01052/Desktop/my_branch/LRF/src/hssim_top.v:199]
+WARNING: [VRFC 10-3380] identifier 'p2_buff_1_valid' is used before its declaration [/home/23EC01052/Desktop/my_branch/LRF/src/hssim_top.v:200]
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/23EC01052/Desktop/my_branch/LRF/src/lsu.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module LSU
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/23EC01052/Desktop/my_branch/LRF/src/lsu_valid.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module LSU_valid
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/23EC01052/Desktop/my_branch/LRF/src/multiplier.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module MULTIPLIER
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/23EC01052/Desktop/my_branch/LRF/src/sig_xy.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module SIG_XY
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/23EC01052/Desktop/my_branch/LRF/src/sobel_hssim_top.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module SOBEL_HSSIM_TOP
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/23EC01052/Desktop/my_branch/LRF/src/top.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module LRF
+WARNING: [VRFC 10-3380] identifier 'out_fused_frame_last' is used before its declaration [/home/23EC01052/Desktop/my_branch/LRF/src/top.v:40]
+WARNING: [VRFC 10-3380] identifier 'data_buff_new' is used before its declaration [/home/23EC01052/Desktop/my_branch/LRF/src/top.v:49]
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/23EC01052/Desktop/my_branch/LRF/utils/sv/sim_axis.sv" into library xil_defaultlib
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/23EC01052/Desktop/my_branch/LRF/tests/top_video/tb_top_video.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module tb_top
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/23EC01052/Desktop/my_branch/LRF/workspace/top_video/sim_project/sim_project.sim/sim_1/behav/xsim/glbl.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module glbl
+INFO: [VRFC 10-163] Analyzing VHDL file "/home/23EC01052/Desktop/my_branch/LRF/workspace/top_video/sim_project/sim_project.gen/sources_1/ip/cordic_0/sim/cordic_0.vhd" into library xil_defaultlib
+INFO: [VRFC 10-3107] analyzing entity 'cordic_0'

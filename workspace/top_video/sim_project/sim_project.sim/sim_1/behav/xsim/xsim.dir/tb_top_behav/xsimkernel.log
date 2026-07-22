@@ -1,0 +1,7 @@
+Running: xsim.dir/tb_top_behav/xsimk -simmode gui -testplusarg INPUT_FOLDER=/home/23EC01052/Desktop/my_branch/LRF/data/hex_data -testplusarg OUTPUT_FOLDER=/home/23EC01052/Desktop/my_branch/LRF/workspace/top_video/outputs -testplusarg FILE_PREFIX=hex_img_ -testplusarg TOTAL_FRAMES=300 -wdb tb_top_behav.wdb -simrunnum 0 -socket 34793
+Design successfully loaded
+Design Loading Memory Usage: 430844 KB (Peak: 430844 KB)
+Design Loading CPU Usage: 790 ms
+Simulation completed
+Simulation Memory Usage: 3075648 KB (Peak: 3141184 KB)
+Simulation CPU Usage: 1268130 ms
