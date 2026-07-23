@@ -115,32 +115,36 @@ void fusion_system_polling(void)
     void* old_frame;
     int fusion_count = 0;
     xil_printf("--- Beginning Fusion DMA Transfers ---\r\n");
-    for(int i = 0; i < NUM_FRAMES; i++) {
-        new_idx = i;
-        old_idx = old_frame_index(new_idx);
-        new_frame = get_frame_ptr(new_idx);
-        old_frame = get_frame_ptr(old_idx);
-        if (send_frame_via_dma_polling(new_frame) != 0) {
-            xil_printf("DMA MM2S failed on new frame %d\r\n", new_idx);
-            return;
-        }
-        xil_printf("DMA MM2S success on new frame %d\r\n", new_idx);
-        if (send_frame_via_dma_polling(old_frame) != 0) {
-            xil_printf("DMA MM2S failed on old frame %d\r\n", old_idx);
-            return;
-        }
-        xil_printf("DMA MM2S success on old frame %d\r\n", old_idx);
-        if (((i + 1) % FRAMES_PER_FUSION) == 0) {
-            if (receive_fused_frame_via_dma_polling() != 0) {
-                xil_printf("DMA S2MM failed on fusion %d\r\n", fusion_count);
-                return;
+    for(int i = 0; i < (NUM_FRAMES-FRAMES_PER_FUSION+1); i++) {
+        for(int j = 0; j <= FRAMES_PER_FUSION; j++) {
+            new_idx = i+j;
+            old_idx = old_frame_index(i);
+            new_frame = get_frame_ptr(new_idx);
+            old_frame = get_frame_ptr(old_idx);
+            if(j < FRAMES_PER_FUSION) {
+                if (send_frame_via_dma_polling(new_frame) != 0) {
+                    xil_printf("DMA MM2S failed on new frame %d\r\n", new_idx);
+                    return;
+                }
+                xil_printf("DMA MM2S success on new frame %d\r\n", new_idx);
             }
-            if (tcp_send_frame((unsigned char *)fusion_sys.fused_frame_buffer, FRAME_SIZE_BYTES) != 0) {
-                xil_printf("TCP send failed on fusion %d\r\n", fusion_count);
-                return;
+            else if(j == FRAMES_PER_FUSION) {
+                if (send_frame_via_dma_polling(old_frame) != 0) {
+                    xil_printf("DMA MM2S failed on old frame %d\r\n", old_idx);
+                    return;
+                }
+                xil_printf("DMA MM2S success on old frame %d\r\n", old_idx);
+                if (receive_fused_frame_via_dma_polling() != 0) {
+                    xil_printf("DMA S2MM failed on fusion %d\r\n", fusion_count);
+                    return;
+                }
+                if (tcp_send_frame((unsigned char *)fusion_sys.fused_frame_buffer, FRAME_SIZE_BYTES) != 0) {
+                    xil_printf("TCP send failed on fusion %d\r\n", fusion_count);
+                    return;
+                }
+                xil_printf("Fusion %d complete and sent.\r\n", fusion_count);
+                fusion_count++;
             }
-            xil_printf("Fusion %d complete and sent.\r\n", fusion_count);
-            fusion_count++;
         }
     }
     xil_printf("--- All Fusion Processing Complete ---\r\n");
