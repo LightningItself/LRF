@@ -13,15 +13,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
-      <ZoomEndTime time="1,334.000001 us"></ZoomEndTime>
-      <Cursor1Time time="61.995000 us"></Cursor1Time>
+      <ZoomStartTime time="8,314,158.867 ns"></ZoomStartTime>
+      <ZoomEndTime time="8,314,315.668 ns"></ZoomEndTime>
+      <Cursor1Time time="8,314,195.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="243"></NameColumnWidth>
-      <ValueColumnWidth column_width="89"></ValueColumnWidth>
+      <NameColumnWidth column_width="242"></NameColumnWidth>
+      <ValueColumnWidth column_width="66"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="26" />
+   <WVObjectSize size="27" />
    <wvobject type="logic" fp_name="/tb_top/dut/s_axis_aclk">
       <obj_property name="ElementShortName">s_axis_aclk</obj_property>
       <obj_property name="ObjectShortName">s_axis_aclk</obj_property>
@@ -87,7 +87,6 @@
    <wvobject type="group" fp_name="group607">
       <obj_property name="label">buff_new</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject type="array" fp_name="/tb_top/dut/data_buff_new">
          <obj_property name="ElementShortName">data_buff_new[127:0]</obj_property>
          <obj_property name="ObjectShortName">data_buff_new[127:0]</obj_property>
@@ -108,7 +107,6 @@
    <wvobject type="group" fp_name="group612">
       <obj_property name="label">avg_lsu</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject type="array" fp_name="/tb_top/dut/avg_buff_in">
          <obj_property name="ElementShortName">avg_buff_in[207:0]</obj_property>
          <obj_property name="ObjectShortName">avg_buff_in[207:0]</obj_property>
@@ -170,10 +168,53 @@
          <obj_property name="ObjectShortName">add_ready_z</obj_property>
       </wvobject>
    </wvobject>
+   <wvobject type="group" fp_name="group1372">
+      <obj_property name="label">buff_old</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="array" fp_name="/tb_top/dut/data_buff_old">
+         <obj_property name="ElementShortName">data_buff_old[127:0]</obj_property>
+         <obj_property name="ObjectShortName">data_buff_old[127:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/valid_buff_old">
+         <obj_property name="ElementShortName">valid_buff_old</obj_property>
+         <obj_property name="ObjectShortName">valid_buff_old</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/last_buff_old">
+         <obj_property name="ElementShortName">last_buff_old</obj_property>
+         <obj_property name="ObjectShortName">last_buff_old</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group1376">
+      <obj_property name="label">sub</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject type="array" fp_name="/tb_top/dut/int_sub">
+         <obj_property name="ElementShortName">int_sub[207:0]</obj_property>
+         <obj_property name="ObjectShortName">int_sub[207:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/sub_ready_x">
+         <obj_property name="ElementShortName">sub_ready_x</obj_property>
+         <obj_property name="ObjectShortName">sub_ready_x</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/sub_ready_y">
+         <obj_property name="ElementShortName">sub_ready_y</obj_property>
+         <obj_property name="ObjectShortName">sub_ready_y</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/sub_valid">
+         <obj_property name="ElementShortName">sub_valid</obj_property>
+         <obj_property name="ObjectShortName">sub_valid</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/sub_last">
+         <obj_property name="ElementShortName">sub_last</obj_property>
+         <obj_property name="ObjectShortName">sub_last</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_top/dut/advance">
+      <obj_property name="ElementShortName">advance</obj_property>
+      <obj_property name="ObjectShortName">advance</obj_property>
+   </wvobject>
    <wvobject type="group" fp_name="group842">
       <obj_property name="label">fusion</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject type="logic" fp_name="/tb_top/dut/fuse_ready">
          <obj_property name="ElementShortName">fuse_ready</obj_property>
          <obj_property name="ObjectShortName">fuse_ready</obj_property>
@@ -243,50 +284,8 @@
       <wvobject type="logic" fp_name="/tb_top/dut/fusion_top_ready_z">
          <obj_property name="ElementShortName">fusion_top_ready_z</obj_property>
          <obj_property name="ObjectShortName">fusion_top_ready_z</obj_property>
-      </wvobject>
-   </wvobject>
-   <wvobject type="logic" fp_name="/tb_top/dut/advance">
-      <obj_property name="ElementShortName">advance</obj_property>
-      <obj_property name="ObjectShortName">advance</obj_property>
-   </wvobject>
-   <wvobject type="group" fp_name="group1372">
-      <obj_property name="label">buff_old</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="array" fp_name="/tb_top/dut/data_buff_old">
-         <obj_property name="ElementShortName">data_buff_old[127:0]</obj_property>
-         <obj_property name="ObjectShortName">data_buff_old[127:0]</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/valid_buff_old">
-         <obj_property name="ElementShortName">valid_buff_old</obj_property>
-         <obj_property name="ObjectShortName">valid_buff_old</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/last_buff_old">
-         <obj_property name="ElementShortName">last_buff_old</obj_property>
-         <obj_property name="ObjectShortName">last_buff_old</obj_property>
-      </wvobject>
-   </wvobject>
-   <wvobject type="group" fp_name="group1376">
-      <obj_property name="label">sub</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-      <wvobject type="array" fp_name="/tb_top/dut/int_sub">
-         <obj_property name="ElementShortName">int_sub[207:0]</obj_property>
-         <obj_property name="ObjectShortName">int_sub[207:0]</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/sub_ready_x">
-         <obj_property name="ElementShortName">sub_ready_x</obj_property>
-         <obj_property name="ObjectShortName">sub_ready_x</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/sub_ready_y">
-         <obj_property name="ElementShortName">sub_ready_y</obj_property>
-         <obj_property name="ObjectShortName">sub_ready_y</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/sub_valid">
-         <obj_property name="ElementShortName">sub_valid</obj_property>
-         <obj_property name="ObjectShortName">sub_valid</obj_property>
-      </wvobject>
-      <wvobject type="logic" fp_name="/tb_top/dut/sub_last">
-         <obj_property name="ElementShortName">sub_last</obj_property>
-         <obj_property name="ObjectShortName">sub_last</obj_property>
+         <obj_property name="CustomSignalColor">#00FF00</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
       </wvobject>
    </wvobject>
    <wvobject fp_name="divider291" type="divider">
@@ -329,12 +328,12 @@
          <obj_property name="ObjectShortName">m_axis_tlast</obj_property>
       </wvobject>
       <wvobject type="array" fp_name="/tb_top/dut/average/read_ptr">
-         <obj_property name="ElementShortName">read_ptr[14:0]</obj_property>
-         <obj_property name="ObjectShortName">read_ptr[14:0]</obj_property>
+         <obj_property name="ElementShortName">read_ptr[13:0]</obj_property>
+         <obj_property name="ObjectShortName">read_ptr[13:0]</obj_property>
       </wvobject>
       <wvobject type="array" fp_name="/tb_top/dut/average/write_ptr">
-         <obj_property name="ElementShortName">write_ptr[14:0]</obj_property>
-         <obj_property name="ObjectShortName">write_ptr[14:0]</obj_property>
+         <obj_property name="ElementShortName">write_ptr[13:0]</obj_property>
+         <obj_property name="ObjectShortName">write_ptr[13:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
       <wvobject type="logic" fp_name="/tb_top/dut/average/frame_valid">
@@ -353,7 +352,6 @@
    <wvobject type="group" fp_name="group306">
       <obj_property name="label">fuse</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject type="array" fp_name="/tb_top/dut/fuse/s_axis_tdata">
          <obj_property name="ElementShortName">s_axis_tdata[127:0]</obj_property>
          <obj_property name="ObjectShortName">s_axis_tdata[127:0]</obj_property>
@@ -381,19 +379,21 @@
       <wvobject type="logic" fp_name="/tb_top/dut/fuse/m_axis_tready">
          <obj_property name="ElementShortName">m_axis_tready</obj_property>
          <obj_property name="ObjectShortName">m_axis_tready</obj_property>
+         <obj_property name="CustomSignalColor">#00FF00</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
       </wvobject>
       <wvobject type="logic" fp_name="/tb_top/dut/fuse/m_axis_tlast">
          <obj_property name="ElementShortName">m_axis_tlast</obj_property>
          <obj_property name="ObjectShortName">m_axis_tlast</obj_property>
       </wvobject>
       <wvobject type="array" fp_name="/tb_top/dut/fuse/read_ptr">
-         <obj_property name="ElementShortName">read_ptr[14:0]</obj_property>
-         <obj_property name="ObjectShortName">read_ptr[14:0]</obj_property>
+         <obj_property name="ElementShortName">read_ptr[13:0]</obj_property>
+         <obj_property name="ObjectShortName">read_ptr[13:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
       <wvobject type="array" fp_name="/tb_top/dut/fuse/write_ptr">
-         <obj_property name="ElementShortName">write_ptr[14:0]</obj_property>
-         <obj_property name="ObjectShortName">write_ptr[14:0]</obj_property>
+         <obj_property name="ElementShortName">write_ptr[13:0]</obj_property>
+         <obj_property name="ObjectShortName">write_ptr[13:0]</obj_property>
          <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
       <wvobject type="logic" fp_name="/tb_top/dut/fuse/frame_valid">
@@ -476,7 +476,6 @@
    <wvobject type="group" fp_name="group124">
       <obj_property name="label">add</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject type="array" fp_name="/tb_top/dut/\genblk3[0].add /s_axis_tdata_x">
          <obj_property name="ElementShortName">s_axis_tdata_x[12:0]</obj_property>
          <obj_property name="ObjectShortName">s_axis_tdata_x[12:0]</obj_property>
@@ -586,5 +585,9 @@
    <wvobject type="logic" fp_name="/tb_top/dut/done">
       <obj_property name="ElementShortName">done</obj_property>
       <obj_property name="ObjectShortName">done</obj_property>
+   </wvobject>
+   <wvobject type="logic" fp_name="/tb_top/dut/warmup">
+      <obj_property name="ElementShortName">warmup</obj_property>
+      <obj_property name="ObjectShortName">warmup</obj_property>
    </wvobject>
 </wave_config>

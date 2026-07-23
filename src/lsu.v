@@ -31,16 +31,16 @@ reg frame_valid;
 wire write_enable = s_axis_tready & s_axis_tvalid;
 wire read_step = m_axis_tready || ~m_axis_tvalid;
 
-always @(posedge aclk) begin
-    if (~aresetn)
-        frame_valid <= 0;
-    else begin
-        if (write_enable & s_axis_tlast)
-            frame_valid <= 1;
-        else if (m_axis_tvalid & m_axis_tready & m_axis_tlast)
-            frame_valid <= 0;
-    end
-end
+// always @(posedge aclk) begin
+//     if (~aresetn)
+//         frame_valid <= 0;
+//     else begin
+//         if (write_enable & s_axis_tlast)
+//             frame_valid <= 1;
+//         else if (m_axis_tvalid & m_axis_tready & m_axis_tlast)
+//             frame_valid <= 0;
+//     end
+// end
 
 always @(posedge aclk) begin
     if(~aresetn)
@@ -61,7 +61,7 @@ always @(posedge aclk) begin
         m_axis_tvalid <= 0;
         m_axis_tlast  <= 0;
     end
-    else if(read_step & frame_valid) begin
+    else if(read_step) begin
         m_axis_tdata  <= ram[read_ptr];
         m_axis_tvalid <= 1;
         m_axis_tlast  <= (read_ptr == (MEM_DEPTH-1));

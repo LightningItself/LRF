@@ -71,6 +71,7 @@ add_files -fileset sources_1 ${SRC_DIR}/unsigned_sub.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_buff.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_comparator.v
 add_files -fileset sources_1 ${SRC_DIR}/lsu.v
+add_files -fileset sources_1 ${SRC_DIR}/lsu_valid.v
 add_files -fileset sources_1 ${SRC_DIR}/sig_xy.v
 add_files -fileset sources_1 ${SRC_DIR}/hssim.v
 add_files -fileset sources_1 ${SRC_DIR}/hssim_top.v
@@ -79,6 +80,7 @@ add_files -fileset sources_1 ${SRC_DIR}/conv_sobel.v
 add_files -fileset sources_1 ${SRC_DIR}/sobel_hssim_top.v
 add_files -fileset sources_1 ${SRC_DIR}/fusion.v
 add_files -fileset sources_1 ${SRC_DIR}/fusion_top.v
+add_files -fileset sources_1 ${SRC_DIR}/axis_add_sub.v
 add_files -fileset sources_1 ${SRC_DIR}/top.v
 
 add_files -fileset sim_1 ${UTILS_SV_DIR}/sim_axis.sv
