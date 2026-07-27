@@ -42,7 +42,7 @@ for img in image_files:
 
 print("All frames sent.")
 
-num_outputs = len(image_files) // FRAMES_PER_FUSION
+num_outputs = len(image_files) - FRAMES_PER_FUSION + 1
 
 print(f"Expecting {num_outputs} fused images")
 
