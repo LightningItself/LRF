@@ -84,7 +84,7 @@ wire fused_frame_last = (frame_counter == 0) ? last_buff_new : fetched_frame_las
 wire [DATA_WIDTH-1:0] fusion_avg_input;
 generate 
     for(k=0; k<PIXELS_PER_BEAT; k=k+1) begin
-         assign fusion_avg_input[(8*k)+:8] = (first) ? data_buff_new[(8*k)+:8] : avg_buff_out;
+         assign fusion_avg_input[(8*k)+:8] = (first) ? data_buff_new[(8*k)+:8] : avg_buff_out[((9+N_FUSE_COUNT)*k+N_FUSE_COUNT)+:8];
     end
 endgenerate
 wire fusion_avg_input_valid = (first) ? valid_buff_new : avg_buff_out_valid;
