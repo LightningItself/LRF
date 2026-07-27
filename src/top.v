@@ -43,10 +43,10 @@ always @(posedge s_axis_aclk) begin
 end
 
 genvar k;
-wire [DATA_WIDTH+(N_FUSE_COUNT+1)*PIXELS_PER_BEAT-1:0] iframex17;
+wire [DATA_WIDTH+(N_FUSE_COUNT)*PIXELS_PER_BEAT-1:0] iframex16;
 generate 
-    for(k=0; k<PIXELS_PER_BEAT; k=k+1) begin :iframex17_block
-         assign iframex17[(9+N_FUSE_COUNT)*k+:(9+N_FUSE_COUNT)] = (data_buff_new[8*k+:8]<<N_FUSE_COUNT) + data_buff_new[8*k+:8];
+    for(k=0; k<PIXELS_PER_BEAT; k=k+1) begin :iframex16_block
+         assign iframex16[(8+N_FUSE_COUNT)*k+:(8+N_FUSE_COUNT)] = (data_buff_new[8*k+:8]<<N_FUSE_COUNT);
     end
 endgenerate
 
@@ -58,7 +58,7 @@ wire [DATA_WIDTH-1:0] frame_lsu_out;
 wire frame_lsu_ready, frame_lsu_out_valid, frame_lsu_out_last;
 
 //add_sub wires
-wire [DATA_WIDTH+(N_FUSE_COUNT+1)*PIXELS_PER_BEAT-1:0] add_sub_out;
+wire [DATA_WIDTH+(N_FUSE_COUNT)*PIXELS_PER_BEAT-1:0] add_sub_out;
 wire [PIXELS_PER_BEAT-1:0] add_sub_ready_a, add_sub_ready_b, add_sub_ready_c, int_add_sub_out_valid, int_add_sub_out_last;
 wire add_sub_ready_x = &add_sub_ready_a;
 wire add_sub_ready_y = &add_sub_ready_b;
@@ -67,9 +67,9 @@ wire add_sub_valid = &int_add_sub_out_valid;
 wire add_sub_last = &int_add_sub_out_last;
 
 // avg lsu wires
-wire [DATA_WIDTH+(N_FUSE_COUNT+1)*PIXELS_PER_BEAT-1:0] avg_buff_out;
+wire [DATA_WIDTH+(N_FUSE_COUNT)*PIXELS_PER_BEAT-1:0] avg_buff_out;
 wire avg_buff_out_valid, avg_buff_out_last, avg_lsu_ready;
-wire [DATA_WIDTH+(N_FUSE_COUNT+1)*PIXELS_PER_BEAT-1:0] avg_buff_in = (first) ? iframex17 : ((frame_counter == 16) ? add_sub_out : 0);
+wire [DATA_WIDTH+(N_FUSE_COUNT)*PIXELS_PER_BEAT-1:0] avg_buff_in = (first) ? iframex16 : ((frame_counter == 16) ? add_sub_out : 0);
 wire avg_buff_in_valid = (first) ? valid_buff_new : ((frame_counter == 16) ? add_sub_valid : 0);
 wire avg_buff_in_last = (first) ? last_buff_new : ((frame_counter == 16) ? add_sub_last : 0);
 
@@ -84,7 +84,7 @@ wire fused_frame_last = (frame_counter == 0) ? last_buff_new : fetched_frame_las
 wire [DATA_WIDTH-1:0] fusion_avg_input;
 generate 
     for(k=0; k<PIXELS_PER_BEAT; k=k+1) begin
-         assign fusion_avg_input[(8*k)+:8] = (first) ? data_buff_new[(8*k)+:8] : avg_buff_out[((9+N_FUSE_COUNT)*k+N_FUSE_COUNT)+:8];
+         assign fusion_avg_input[(8*k)+:8] = (first) ? data_buff_new[(8*k)+:8] : avg_buff_out[((8+N_FUSE_COUNT)*k+N_FUSE_COUNT)+:8];
     end
 endgenerate
 wire fusion_avg_input_valid = (first) ? valid_buff_new : avg_buff_out_valid;
@@ -187,7 +187,7 @@ LSU_valid #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .IMAGE_DIM(IMAGE_DIM), .BIT_WIDT
     .m_axis_tlast(frame_lsu_out_last) 
 );
 
-LSU #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .IMAGE_DIM(IMAGE_DIM), .BIT_WIDTH(9+N_FUSE_COUNT)) average(
+LSU #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .IMAGE_DIM(IMAGE_DIM), .BIT_WIDTH(8+N_FUSE_COUNT)) average(
     .aclk(s_axis_aclk),
     .aresetn(s_axis_aresetn),
     .s_axis_tdata(avg_buff_in),
@@ -258,22 +258,22 @@ end
 genvar j;
 generate 
     for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
-        axis_add_sub #( .DATA_WIDTH(9+N_FUSE_COUNT), .mode(0)) add_sub(
+        axis_add_sub #( .DATA_WIDTH(8+N_FUSE_COUNT), .mode(0)) add_sub(
             .aclk(s_axis_aclk),
             .aresetn(s_axis_aresetn),
-            .s_axis_tdata_x(avg_buff_out[j*(9+N_FUSE_COUNT)+:(9+N_FUSE_COUNT)]),
+            .s_axis_tdata_x(avg_buff_out[j*(8+N_FUSE_COUNT)+:(8+N_FUSE_COUNT)]),
             .s_axis_tvalid_x(avg_buff_out_valid & (state == OLD)),
             .s_axis_tready_x(add_sub_ready_a[j]),
             .s_axis_tlast_x(avg_buff_out_last),
-            .s_axis_tdata_y({ {(N_FUSE_COUNT+1){1'b0}}, data_buff_old[j*PIXEL_SIZE+:PIXEL_SIZE] }),
+            .s_axis_tdata_y({ {(N_FUSE_COUNT){1'b0}}, data_buff_old[j*PIXEL_SIZE+:PIXEL_SIZE] }),
             .s_axis_tvalid_y(valid_buff_old & (state == OLD)),
             .s_axis_tready_y(add_sub_ready_b[j]),
             .s_axis_tlast_y(last_buff_old),
-            .s_axis_tdata_z({ {(N_FUSE_COUNT+1){1'b0}}, frame_lsu_out[j*PIXEL_SIZE+:PIXEL_SIZE] }),
+            .s_axis_tdata_z({ {(N_FUSE_COUNT){1'b0}}, frame_lsu_out[j*PIXEL_SIZE+:PIXEL_SIZE] }),
             .s_axis_tvalid_z(frame_lsu_out_valid & (state == OLD)),
             .s_axis_tready_z(add_sub_ready_c[j]),
             .s_axis_tlast_z(frame_lsu_out_last),
-            .m_axis_tdata(add_sub_out[j*(9+N_FUSE_COUNT)+:(9+N_FUSE_COUNT)]),
+            .m_axis_tdata(add_sub_out[j*(8+N_FUSE_COUNT)+:(8+N_FUSE_COUNT)]),
             .m_axis_tvalid(int_add_sub_out_valid[j]),
             .m_axis_tready(avg_lsu_ready),
             .m_axis_tlast(int_add_sub_out_last[j])

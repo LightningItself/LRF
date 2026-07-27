@@ -36,10 +36,10 @@ always@(posedge aclk) begin
     else begin
         if(pair_valid && s_axis_tready_x && s_axis_tready_y && s_axis_tready_z) begin
             if(mode == 0) begin
-                m_axis_tdata <= s_axis_tdata_x - s_axis_tdata_y + s_axis_tdata_z;
+                m_axis_tdata <= (s_axis_tdata_x - s_axis_tdata_y) + s_axis_tdata_z;
             end
             else begin
-                m_axis_tdata <= $signed(s_axis_tdata_x) - $signed(s_axis_tdata_y) + $signed(s_axis_tdata_z);
+                m_axis_tdata <= ($signed(s_axis_tdata_x) - $signed(s_axis_tdata_y)) + $signed(s_axis_tdata_z);
             end
             m_axis_tvalid <= 1;
             m_axis_tlast <= pair_last;
