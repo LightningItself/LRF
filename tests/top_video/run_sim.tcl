@@ -67,7 +67,6 @@ if {[file exists $FIFO_IP_FILE]} {
 add_files -fileset sources_1 ${SRC_DIR}/multiplier.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_adder.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_sub.v
-add_files -fileset sources_1 ${SRC_DIR}/unsigned_sub.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_buff.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_comparator.v
 add_files -fileset sources_1 ${SRC_DIR}/lsu.v

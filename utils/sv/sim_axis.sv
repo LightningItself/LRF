@@ -216,22 +216,57 @@ class axis_input_agent #(
         end
     endtask
 
-    task load_video(string folder_path, string file_prefix, int frames);
-        int index = 0;
+    task load_video(
+        string folder_path,
+        string file_prefix,
+        int frames,
+        int frames_per_fusion = 16
+    );
+        int i, j;
+        int new_idx, old_idx;
         int fd;
         string fname;
 
-        forever begin
-            if(index >= frames) break;
-            fname = $sformatf("%s/%s%0d.hex", folder_path, file_prefix, index);
+        for (i = 0; i <= frames - frames_per_fusion; i++) begin
+
+            for (j = 0; j < frames_per_fusion; j++) begin
+                new_idx = i + j;
+
+                fname = $sformatf("%s/%s%0d.hex",
+                                folder_path,
+                                file_prefix,
+                                new_idx);
+
+                fd = $fopen(fname, "r");
+                if (fd == 0) begin
+                    $display("[AXIS VIDEO] Cannot open %s", fname);
+                    return;
+                end
+                $fclose(fd);
+
+                $display("[AXIS VIDEO] Loading NEW frame %0d", new_idx);
+                load_file(0, fname, TOTAL_BEATS);
+            end
+
+            old_idx = (i >= frames_per_fusion) ? (i - frames_per_fusion) : 0;
+
+            fname = $sformatf("%s/%s%0d.hex",
+                            folder_path,
+                            file_prefix,
+                            old_idx);
+
             fd = $fopen(fname, "r");
-            if(fd == 0) break;
+            if (fd == 0) begin
+                $display("[AXIS VIDEO] Cannot open %s", fname);
+                return;
+            end
             $fclose(fd);
-            $display("[AXIS VIDEO] Loading frame %0d.", index);
+
+            $display("[AXIS VIDEO] Loading OLD frame %0d", old_idx);
             load_file(0, fname, TOTAL_BEATS);
-            index++;
         end
     endtask
+
 endclass
 
 
