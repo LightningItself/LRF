@@ -120,38 +120,34 @@ initial begin
     fork
         // Producer: send (frame_i, frame_i-16) pairs
         begin : stimulus
-        for (int i = 0; i <= total_frames - FUSE_DEPTH; i++) begin
-
-            // Send the 16 NEW frames
-            for (int j = 0; j < FUSE_DEPTH; j++) begin
-                int idx_new;
-                string fname_new;
-        
-                idx_new   = frame_idx(i + j);
-                fname_new = frame_file_name(idx_new);
-        
-                $display("[TB] Sending NEW frame %0d", idx_new);
-        
-                require_readable(fname_new);
-                env.input_agent.load_file(0, fname_new, BEATS_PER_FRAME);
+            for (int i = 0; i <= total_frames - FUSE_DEPTH; i++) begin
+                int idx_new, idx_old;
+                string fname_new, fname_old;
+    
+                // Send the NEW frames
+                for (int j = 0; j < FUSE_DEPTH; j++) begin
+                    idx_new = frame_idx(i + j);
+                    fname_new = frame_file_name(idx_new);
+    
+                    $display("[TB] Sending NEW frame %0d", idx_new);
+    
+                    require_readable(fname_new);
+                    env.input_agent.load_file(0, fname_new, BEATS_PER_FRAME);
+                end
+    
+                // Send the OLD frame
+                if (i >= FUSE_DEPTH)
+                    idx_old = frame_idx(i - FUSE_DEPTH);
+                else
+                    idx_old = frame_idx(0);
+    
+                fname_old = frame_file_name(idx_old);
+    
+                $display("[TB] Sending OLD frame %0d", idx_old);
+    
+                require_readable(fname_old);
+                env.input_agent.load_file(0, fname_old, BEATS_PER_FRAME);
             end
-        
-            // Send the OLD frame
-            int idx_old;
-            string fname_old;
-        
-            if (i >= FUSE_DEPTH)
-                idx_old = frame_idx(i - FUSE_DEPTH);
-            else
-                idx_old = frame_idx(0);
-        
-            fname_old = frame_file_name(idx_old);
-        
-            $display("[TB] Sending OLD frame %0d", idx_old);
-        
-            require_readable(fname_old);
-            env.input_agent.load_file(0, fname_old, BEATS_PER_FRAME);
-        end
             $display("[TB] All %0d pairs enqueued.", total_frames);
         end
  

@@ -13,12 +13,12 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="3,985,671.600 ns"></ZoomStartTime>
-      <ZoomEndTime time="3,985,743.101 ns"></ZoomEndTime>
-      <Cursor1Time time="3,985,765.000 ns"></Cursor1Time>
+      <ZoomStartTime time="230,537.100 ns"></ZoomStartTime>
+      <ZoomEndTime time="230,900.601 ns"></ZoomEndTime>
+      <Cursor1Time time="230,834.600 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="218"></NameColumnWidth>
+      <NameColumnWidth column_width="206"></NameColumnWidth>
       <ValueColumnWidth column_width="66"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="25" />
@@ -85,10 +85,6 @@
          <obj_property name="ObjectShortName">old_stop</obj_property>
       </wvobject>
    </wvobject>
-   <wvobject type="array" fp_name="/tb_top/dut/iframex17">
-      <obj_property name="ElementShortName">iframex17[207:0]</obj_property>
-      <obj_property name="ObjectShortName">iframex17[207:0]</obj_property>
-   </wvobject>
    <wvobject fp_name="divider406" type="divider">
       <obj_property name="label">old buff</obj_property>
       <obj_property name="DisplayName">label</obj_property>
@@ -137,7 +133,6 @@
    <wvobject type="group" fp_name="group359">
       <obj_property name="label">frame lsu</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject type="array" fp_name="/tb_top/dut/frame_lsu_out">
          <obj_property name="ElementShortName">frame_lsu_out[127:0]</obj_property>
          <obj_property name="ObjectShortName">frame_lsu_out[127:0]</obj_property>
@@ -163,8 +158,8 @@
       <obj_property name="label">add sub</obj_property>
       <obj_property name="DisplayName">label</obj_property>
       <wvobject type="array" fp_name="/tb_top/dut/add_sub_out">
-         <obj_property name="ElementShortName">add_sub_out[207:0]</obj_property>
-         <obj_property name="ObjectShortName">add_sub_out[207:0]</obj_property>
+         <obj_property name="ElementShortName">add_sub_out[191:0]</obj_property>
+         <obj_property name="ObjectShortName">add_sub_out[191:0]</obj_property>
       </wvobject>
       <wvobject type="logic" fp_name="/tb_top/dut/add_sub_ready_x">
          <obj_property name="ElementShortName">add_sub_ready_x</obj_property>
@@ -196,8 +191,8 @@
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="isExpanded"></obj_property>
       <wvobject type="array" fp_name="/tb_top/dut/avg_buff_out">
-         <obj_property name="ElementShortName">avg_buff_out[207:0]</obj_property>
-         <obj_property name="ObjectShortName">avg_buff_out[207:0]</obj_property>
+         <obj_property name="ElementShortName">avg_buff_out[191:0]</obj_property>
+         <obj_property name="ObjectShortName">avg_buff_out[191:0]</obj_property>
       </wvobject>
       <wvobject type="logic" fp_name="/tb_top/dut/avg_buff_out_valid">
          <obj_property name="ElementShortName">avg_buff_out_valid</obj_property>
@@ -212,8 +207,8 @@
          <obj_property name="ObjectShortName">avg_lsu_ready</obj_property>
       </wvobject>
       <wvobject type="array" fp_name="/tb_top/dut/avg_buff_in">
-         <obj_property name="ElementShortName">avg_buff_in[207:0]</obj_property>
-         <obj_property name="ObjectShortName">avg_buff_in[207:0]</obj_property>
+         <obj_property name="ElementShortName">avg_buff_in[191:0]</obj_property>
+         <obj_property name="ObjectShortName">avg_buff_in[191:0]</obj_property>
       </wvobject>
       <wvobject type="logic" fp_name="/tb_top/dut/avg_buff_in_valid">
          <obj_property name="ElementShortName">avg_buff_in_valid</obj_property>
@@ -341,6 +336,8 @@
       <wvobject type="logic" fp_name="/tb_top/dut/fuse/m_axis_tready">
          <obj_property name="ElementShortName">m_axis_tready</obj_property>
          <obj_property name="ObjectShortName">m_axis_tready</obj_property>
+         <obj_property name="CustomSignalColor">#FF0000</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
       </wvobject>
       <wvobject type="logic" fp_name="/tb_top/dut/fuse/m_axis_tlast">
          <obj_property name="ElementShortName">m_axis_tlast</obj_property>
@@ -349,6 +346,7 @@
       <wvobject type="array" fp_name="/tb_top/dut/fuse/read_ptr">
          <obj_property name="ElementShortName">read_ptr[13:0]</obj_property>
          <obj_property name="ObjectShortName">read_ptr[13:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
       </wvobject>
       <wvobject type="array" fp_name="/tb_top/dut/fuse/write_ptr">
          <obj_property name="ElementShortName">write_ptr[13:0]</obj_property>
@@ -362,6 +360,71 @@
       <wvobject type="logic" fp_name="/tb_top/dut/fuse/read_step">
          <obj_property name="ElementShortName">read_step</obj_property>
          <obj_property name="ObjectShortName">read_step</obj_property>
+         <obj_property name="CustomSignalColor">#FAAFBE</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/fuse/frame_valid">
+         <obj_property name="ElementShortName">frame_valid</obj_property>
+         <obj_property name="ObjectShortName">frame_valid</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group104">
+      <obj_property name="label">avg_internals</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="array" fp_name="/tb_top/dut/average/s_axis_tdata">
+         <obj_property name="ElementShortName">s_axis_tdata[191:0]</obj_property>
+         <obj_property name="ObjectShortName">s_axis_tdata[191:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/average/s_axis_tvalid">
+         <obj_property name="ElementShortName">s_axis_tvalid</obj_property>
+         <obj_property name="ObjectShortName">s_axis_tvalid</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/average/s_axis_tready">
+         <obj_property name="ElementShortName">s_axis_tready</obj_property>
+         <obj_property name="ObjectShortName">s_axis_tready</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/average/s_axis_tlast">
+         <obj_property name="ElementShortName">s_axis_tlast</obj_property>
+         <obj_property name="ObjectShortName">s_axis_tlast</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/average/m_axis_tdata">
+         <obj_property name="ElementShortName">m_axis_tdata[191:0]</obj_property>
+         <obj_property name="ObjectShortName">m_axis_tdata[191:0]</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/average/m_axis_tvalid">
+         <obj_property name="ElementShortName">m_axis_tvalid</obj_property>
+         <obj_property name="ObjectShortName">m_axis_tvalid</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/average/m_axis_tready">
+         <obj_property name="ElementShortName">m_axis_tready</obj_property>
+         <obj_property name="ObjectShortName">m_axis_tready</obj_property>
+         <obj_property name="CustomSignalColor">#FF0000</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/average/m_axis_tlast">
+         <obj_property name="ElementShortName">m_axis_tlast</obj_property>
+         <obj_property name="ObjectShortName">m_axis_tlast</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/average/read_ptr">
+         <obj_property name="ElementShortName">read_ptr[13:0]</obj_property>
+         <obj_property name="ObjectShortName">read_ptr[13:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="/tb_top/dut/average/write_ptr">
+         <obj_property name="ElementShortName">write_ptr[13:0]</obj_property>
+         <obj_property name="ObjectShortName">write_ptr[13:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/average/write_enable">
+         <obj_property name="ElementShortName">write_enable</obj_property>
+         <obj_property name="ObjectShortName">write_enable</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="/tb_top/dut/average/read_step">
+         <obj_property name="ElementShortName">read_step</obj_property>
+         <obj_property name="ObjectShortName">read_step</obj_property>
+         <obj_property name="CustomSignalColor">#FAAFBE</obj_property>
+         <obj_property name="UseCustomSignalColor">true</obj_property>
       </wvobject>
    </wvobject>
    <wvobject fp_name="divider103" type="divider">
@@ -371,7 +434,6 @@
    <wvobject type="group" fp_name="group102">
       <obj_property name="label">outputs</obj_property>
       <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="isExpanded"></obj_property>
       <wvobject type="array" fp_name="/tb_top/dut/m_axis_tdata">
          <obj_property name="ElementShortName">m_axis_tdata[127:0]</obj_property>
          <obj_property name="ObjectShortName">m_axis_tdata[127:0]</obj_property>
