@@ -107,8 +107,23 @@ always@(posedge s_axis_aclk) begin
         if((state == NEW) & out_fused_frame_last & fuse_ready) begin 
             frame_counter <= frame_counter + 1;
         end
-        else if((state == OLD) & s_axis_tvalid & s_axis_tready & s_axis_tlast) begin
+        else if((state == OLD) & add_sub_last) begin
             frame_counter <= 0;
+        end
+    end
+end
+
+reg fuse_lsu_reset;
+always@(posedge s_axis_aclk) begin
+    if(~s_axis_aresetn) begin
+        fuse_lsu_reset <= 0;
+    end
+    else begin
+        if(m_axis_tready & m_axis_tvalid & m_axis_tlast) begin
+            fuse_lsu_reset <= 0;
+        end
+        else if((state == NEW)) begin
+            fuse_lsu_reset <= 1;
         end
     end
 end
@@ -202,7 +217,7 @@ LSU #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .IMAGE_DIM(IMAGE_DIM), .BIT_WIDTH(8+N_
 
 LSU_valid #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .IMAGE_DIM(IMAGE_DIM), .BIT_WIDTH(PIXEL_SIZE)) fuse(
     .aclk(s_axis_aclk),
-    .aresetn(s_axis_aresetn),
+    .aresetn(fuse_lsu_reset),
     .s_axis_tdata(out_fused_frame),
     .s_axis_tvalid(out_fused_frame_valid),
     .s_axis_tready(fuse_ready),
