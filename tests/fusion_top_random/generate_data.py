@@ -126,9 +126,8 @@ def main():
     del_gauss = compute_gauss(del_map, dtype=np.uint8)
 
     fused_frame = compute_fusion(image_old, image_new, del_gauss)
-    
-    zeros = np.zeros_like(image_old)
-    old_fusion_buff = compute_fusion(image_old, zeros, zeros)
+    old_fusion_buff = image_old 
+    fusion_del      = del_gauss
 
     final_output = compute_output(old_fusion_buff, fused_frame, del_map)
 

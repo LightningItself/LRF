@@ -51,12 +51,16 @@ reg del_gauss_buff_valid, del_gauss_buff_last;
 
 wire [DATA_WIDTH-1:0] fusion_out;
 wire fusion_ready_x, fusion_ready_y, fusion_ready_z, fusion_out_valid, fusion_out_last;
+wire fusion_ready = fusion_ready_x & fusion_ready_y & fusion_ready_z;
 
 wire [DATA_WIDTH-1:0] old_fusion_buff;
-wire old_fusion_buff_valid, old_fusion_buff_last, buff_ready_x, buff_ready_y, buff_ready_z;
+wire old_fusion_buff_valid, old_fusion_buff_last;
 
 wire [DATA_WIDTH-1:0] fusion_del;
-wire del_buff_ready_x, del_buff_ready_y, del_buff_ready_z, fusion_del_valid, fusion_del_last;
+wire fusion_del_valid, fusion_del_last;
+
+wire fifo_1_ready, fifo_2_ready;
+wire fifo_1_2_ready = fifo_1_ready & fifo_2_ready;
 
 // DataPath
 
@@ -120,7 +124,7 @@ CONV_GAUSS #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .PIXEL_SIZE(PIXEL_SIZE), .IMAGE
     .s_axis_tlast(del_last),
     .m_axis_tdata(gauss_del),
     .m_axis_tvalid(gauss_del_valid),
-    .m_axis_tready(fusion_ready_x & buff_ready_x & del_buff_ready_x),
+    .m_axis_tready(fusion_ready_x & fifo_1_2_ready),
     .m_axis_tlast(gauss_del_last)
 );
 
@@ -149,7 +153,7 @@ always @(posedge aclk) begin
             del_gauss_buff_last <= del_last;
 
         end
-        else if(fusion_ready_x & buff_ready_x & del_buff_ready_x & gauss_del_valid) begin
+        else if(fusion_ready_x & fifo_1_2_ready & gauss_del_valid) begin
             old_gauss_buff_valid <= 0;
             old_gauss_buff_last <= 0;
             new_gauss_buff_valid <= 0;
@@ -166,15 +170,15 @@ FUSION #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .IMAGE_DIM(IMAGE_DIM), .PIXEL_SIZE(
     .aclk(aclk),
     .aresetn(aresetn),
     .old_frame(old_gauss_buff),
-    .old_frame_tvalid(old_gauss_buff_valid),
+    .old_frame_tvalid(old_gauss_buff_valid & fifo_1_2_ready),
     .old_frame_tready(fusion_ready_x),
     .old_frame_tlast(old_gauss_buff_last),
     .new_frame(new_gauss_buff),
-    .new_frame_tvalid(new_gauss_buff_valid),
+    .new_frame_tvalid(new_gauss_buff_valid & fifo_1_2_ready),
     .new_frame_tready(fusion_ready_y),
     .new_frame_tlast(new_gauss_buff_last),
     .del_gauss(gauss_del),
-    .del_gauss_tvalid(gauss_del_valid),
+    .del_gauss_tvalid(gauss_del_valid & fifo_1_2_ready),
     .del_gauss_tready(fusion_ready_z),
     .del_gauss_tlast(gauss_del_last),
     .fused_frame(fusion_out),
@@ -183,46 +187,30 @@ FUSION #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .IMAGE_DIM(IMAGE_DIM), .PIXEL_SIZE(
     .fused_frame_tlast(fusion_out_last)
 );
 
-FUSION #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .IMAGE_DIM(IMAGE_DIM), .PIXEL_SIZE(PIXEL_SIZE)) buff(
-    .aclk(aclk),
-    .aresetn(aresetn),
-    .old_frame(old_gauss_buff),
-    .old_frame_tvalid(old_gauss_buff_valid),
-    .old_frame_tready(buff_ready_x),
-    .old_frame_tlast(old_gauss_buff_last),
-    .new_frame(0),
-    .new_frame_tvalid(1),
-    .new_frame_tready(buff_ready_y),
-    .new_frame_tlast(1),
-    .del_gauss(0),
-    .del_gauss_tvalid(1),
-    .del_gauss_tready(buff_ready_z),
-    .del_gauss_tlast(1),
-    .fused_frame(old_fusion_buff),
-    .fused_frame_tvalid(old_fusion_buff_valid),
-    .fused_frame_tready(advance),
-    .fused_frame_tlast(old_fusion_buff_last)
+axis_data_fifo_0 fifo_1 (
+    .s_axis_aclk(aclk), 
+    .s_axis_aresetn(aresetn),
+    .s_axis_tdata(old_gauss_buff),        
+    .s_axis_tvalid(old_gauss_buff_valid & fusion_ready),    
+    .s_axis_tready(fifo_1_ready),      
+    .s_axis_tlast(old_gauss_buff_last),
+    .m_axis_tdata(old_fusion_buff),
+    .m_axis_tvalid(old_fusion_buff_valid),
+    .m_axis_tready(advance & fusion_out_valid),
+    .m_axis_tlast(old_fusion_buff_last)
 );
 
-FUSION #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .IMAGE_DIM(IMAGE_DIM), .PIXEL_SIZE(PIXEL_SIZE)) del_buff(
-    .aclk(aclk),
-    .aresetn(aresetn),
-    .old_frame(del_gauss_buff),
-    .old_frame_tvalid(del_gauss_buff_valid),
-    .old_frame_tready(del_buff_ready_x),
-    .old_frame_tlast(del_gauss_buff_last),
-    .new_frame(0),
-    .new_frame_tvalid(1),
-    .new_frame_tready(del_buff_ready_y),
-    .new_frame_tlast(1),
-    .del_gauss(0),
-    .del_gauss_tvalid(1),
-    .del_gauss_tready(del_buff_ready_z),
-    .del_gauss_tlast(1),
-    .fused_frame(fusion_del),
-    .fused_frame_tvalid(fusion_del_valid),
-    .fused_frame_tready(advance),
-    .fused_frame_tlast(fusion_del_last)
+axis_data_fifo_0 fifo_2 (
+    .s_axis_aclk(aclk), 
+    .s_axis_aresetn(aresetn),
+    .s_axis_tdata(del_gauss_buff),        
+    .s_axis_tvalid(del_gauss_buff_valid & fusion_ready),    
+    .s_axis_tready(fifo_2_ready),      
+    .s_axis_tlast(del_gauss_buff_last),
+    .m_axis_tdata(fusion_del),
+    .m_axis_tvalid(fusion_del_valid),
+    .m_axis_tready(advance & fusion_out_valid),
+    .m_axis_tlast(fusion_del_last)
 );
 
 // output stage
