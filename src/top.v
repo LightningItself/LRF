@@ -60,11 +60,11 @@ wire frame_lsu_ready, frame_lsu_out_valid, frame_lsu_out_last;
 //add_sub wires
 wire [DATA_WIDTH+(N_FUSE_COUNT)*PIXELS_PER_BEAT-1:0] add_sub_out;
 wire [PIXELS_PER_BEAT-1:0] add_sub_ready_a, add_sub_ready_b, add_sub_ready_c, int_add_sub_out_valid, int_add_sub_out_last;
-wire add_sub_ready_x = &add_sub_ready_a;
-wire add_sub_ready_y = &add_sub_ready_b;
-wire add_sub_ready_z = &add_sub_ready_c;
-wire add_sub_valid = &int_add_sub_out_valid;
-wire add_sub_last = &int_add_sub_out_last;
+wire add_sub_ready_x = add_sub_ready_a[0];
+wire add_sub_ready_y = add_sub_ready_b[0];
+wire add_sub_ready_z = add_sub_ready_c[0];
+wire add_sub_valid = int_add_sub_out_valid[0];
+wire add_sub_last = int_add_sub_out_last[0];
 
 // avg lsu wires
 wire [DATA_WIDTH+(N_FUSE_COUNT)*PIXELS_PER_BEAT-1:0] avg_buff_out;

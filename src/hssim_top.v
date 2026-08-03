@@ -49,23 +49,23 @@ assign denr_z = hssim_out_avg_new[((2*(2*PIXEL_SIZE+2))*PIXELS_PER_BEAT)-1:0];
 
 wire [(2*2*(2*PIXEL_SIZE+2)*PIXELS_PER_BEAT)-1:0] p1, p2;
 wire [PIXELS_PER_BEAT-1:0] p1_mult_ready_1, p1_mult_ready_2, p1_valid_1, p1_last_1, p2_mult_ready_1, p2_mult_ready_2, p2_valid_1, p2_last_1;
-wire p1_mult_ready_x = &p1_mult_ready_1;
-wire p1_mult_ready_y = &p1_mult_ready_2;
-wire p1_valid = &p1_valid_1;
-wire p1_last = &p1_last_1;
-wire p2_mult_ready_x = &p2_mult_ready_1;
-wire p2_mult_ready_y = &p2_mult_ready_2;
-wire p2_valid = &p2_valid_1;
-wire p2_last = &p2_last_1;
+wire p1_mult_ready_x = p1_mult_ready_1[0];
+wire p1_mult_ready_y = p1_mult_ready_2[0];
+wire p1_valid = p1_valid_1[0];
+wire p1_last = p1_last_1[0];
+wire p2_mult_ready_x = p2_mult_ready_1[0];
+wire p2_mult_ready_y = p2_mult_ready_2[0];
+wire p2_valid = p2_valid_1[0];
+wire p2_last = p2_last_1[0];
 
 reg [PIXELS_PER_BEAT-1:0] numr_x_sign_1, numr_z_sign_1;
 
 wire [PIXELS_PER_BEAT-1:0] comp_out;
 wire [PIXELS_PER_BEAT-1:0] comp_ready_1, comp_ready_2, comp_valid_1, comp_last_1;
-wire comp_ready_x = &comp_ready_1;
-wire comp_ready_y = &comp_ready_2;
-wire comp_valid = &comp_valid_1;
-wire comp_last = &comp_last_1;
+wire comp_ready_x = comp_ready_1[0];
+wire comp_ready_y = comp_ready_2[0];
+wire comp_valid = comp_valid_1[0];
+wire comp_last = comp_last_1[0];
 
 reg [PIXELS_PER_BEAT-1:0] numr_x_sign_2, numr_z_sign_2;
 

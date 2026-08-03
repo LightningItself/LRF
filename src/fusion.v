@@ -38,23 +38,23 @@ wire [DATA_WIDTH-1:0] dbar;
 wire [2*DATA_WIDTH-1:0] x_dbar, y_d;
 wire [PIXELS_PER_BEAT-1:0] x_dbar_mult_ready_1, x_dbar_mult_ready_2, x_dbar_valid_1, x_dbar_last_1;
 wire [PIXELS_PER_BEAT-1:0] y_d_mult_ready_1, y_d_mult_ready_2, y_d_valid_1, y_d_last_1;
-wire x_dbar_mult_ready_x = &x_dbar_mult_ready_1;
-wire x_dbar_mult_ready_y = &x_dbar_mult_ready_2;
-wire x_dbar_valid = &x_dbar_valid_1;
-wire x_dbar_last = &x_dbar_last_1;
-wire y_d_mult_ready_x = &y_d_mult_ready_1;
-wire y_d_mult_ready_y = &y_d_mult_ready_2;
-wire y_d_valid = &y_d_valid_1;
-wire y_d_last = &y_d_last_1;
+wire x_dbar_mult_ready_x = x_dbar_mult_ready_1[0];
+wire x_dbar_mult_ready_y = x_dbar_mult_ready_2[0];
+wire x_dbar_valid = x_dbar_valid_1[0];
+wire x_dbar_last = x_dbar_last_1[0];
+wire y_d_mult_ready_x = y_d_mult_ready_1[0];
+wire y_d_mult_ready_y = y_d_mult_ready_2[0];
+wire y_d_valid = y_d_valid_1[0];
+wire y_d_last = y_d_last_1[0];
 
 wire [((2*PIXEL_SIZE)+2)*PIXELS_PER_BEAT-1:0] int_value;
 wire [PIXELS_PER_BEAT-1:0] final_adder_ready_1, final_adder_ready_2, final_adder_ready_3, int_value_valid, int_value_last;
-wire final_adder_ready_x = &final_adder_ready_1;
-wire final_adder_ready_y = &final_adder_ready_2;
-wire final_adder_ready_z = &final_adder_ready_3;
+wire final_adder_ready_x = final_adder_ready_1[0];
+wire final_adder_ready_y = final_adder_ready_2[0];
+wire final_adder_ready_z = final_adder_ready_3[0];
 wire adder_ready = final_adder_ready_x & final_adder_ready_y & final_adder_ready_z;
-wire final_valid = &int_value_valid;
-wire final_last = &int_value_last;
+wire final_valid = int_value_valid[0];
+wire final_last = int_value_last[0];
 
 // DataPath
 

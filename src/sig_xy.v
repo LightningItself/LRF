@@ -28,12 +28,12 @@ wire gauss_xy_ready;
 wire advance = (m_axis_tready || !m_axis_tvalid);
 wire [PIXELS_PER_BEAT-1:0] mul2_x_ready;
 wire [PIXELS_PER_BEAT-1:0] mul2_y_ready;
-wire mult_x_ready2 = &mul2_x_ready;
-wire mult_y_ready2 = &mul2_y_ready;
+wire mult_x_ready2 = mul2_x_ready[0];
+wire mult_y_ready2 = mul2_y_ready[0];
 wire [PIXELS_PER_BEAT-1:0] sub_1_ready, sub_2_ready, sub_val, sub_la;
 
-wire sub_a_ready = &sub_1_ready;
-wire sub_b_ready = &sub_2_ready;
+wire sub_a_ready = sub_1_ready[0];
+wire sub_b_ready = sub_2_ready[0];
 wire pair_valid = s_axis_tvalid_x & s_axis_tvalid_y;
 
 wire [DATA_WIDTH-1:0] mu_x, mu_y;
@@ -44,8 +44,8 @@ wire [PIXELS_PER_BEAT-1:0] mu_x_mu_y_val;
 wire [PIXELS_PER_BEAT-1:0] mu_x_mu_y_la;
 wire mu_pair_valid = mu_valid_x & mu_valid_y;
 
-wire mu_x_mu_y_valid = &mu_x_mu_y_val;
-wire mu_x_mu_y_last  = &mu_x_mu_y_la;
+wire mu_x_mu_y_valid = mu_x_mu_y_val[0];
+wire mu_x_mu_y_last  = mu_x_mu_y_la[0];
 
 wire [2*DATA_WIDTH-1:0] mult_xy;
 wire [PIXELS_PER_BEAT-1:0] mul_xy_valid, mul_xy_last;
@@ -53,18 +53,18 @@ wire [PIXELS_PER_BEAT-1:0] mul_xy_valid, mul_xy_last;
 wire [PIXELS_PER_BEAT-1:0] mul1_x_ready;
 wire [PIXELS_PER_BEAT-1:0] mul1_y_ready;
 
-wire mult_x_ready1 = &mul1_x_ready;
-wire mult_y_ready1= &mul1_y_ready;
-wire mult_xy_valid = &mul_xy_valid;
-wire mult_xy_last  = &mul_xy_last;
+wire mult_x_ready1 = mul1_x_ready[0];
+wire mult_y_ready1= mul1_y_ready[0];
+wire mult_xy_valid = mul_xy_valid[0];
+wire mult_xy_last  = mul_xy_last[0];
 
 localparam CONV_GAUSS_INPUT_WIDTH = 2 * PIXEL_SIZE;
 wire [CONV_GAUSS_INPUT_WIDTH*PIXELS_PER_BEAT-1:0] out_gauss_xy;
 wire out_gauss_xy_valid, out_gauss_xy_last;
 
 wire signed[(2*PIXEL_SIZE+1) * PIXELS_PER_BEAT -1:0] sub_out;
-wire sub_valid = &sub_val;
-wire sub_last  = &sub_la;
+wire sub_valid = sub_val[0];
+wire sub_last  = sub_la[0];
 
 
 
