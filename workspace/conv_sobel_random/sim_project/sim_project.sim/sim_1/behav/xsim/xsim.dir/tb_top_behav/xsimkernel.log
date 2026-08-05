@@ -1,7 +1,0 @@
-Running: xsim.dir/tb_top_behav/xsimk -simmode gui -testplusarg IN_FILE_NAME=/home/23EC01052/Desktop/my_branch/LRF/workspace/conv_sobel_random/inputs.hex -testplusarg OUT_FILE_NAME=/home/23EC01052/Desktop/my_branch/LRF/workspace/conv_sobel_random/outputs.hex -wdb tb_top_behav.wdb -simrunnum 0 -socket 38883
-Design successfully loaded
-Design Loading Memory Usage: 405036 KB (Peak: 405036 KB)
-Design Loading CPU Usage: 780 ms
-Simulation completed
-Simulation Memory Usage: 504844 KB (Peak: 544304 KB)
-Simulation CPU Usage: 14050 ms

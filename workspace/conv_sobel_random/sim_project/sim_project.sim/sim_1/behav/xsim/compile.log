@@ -1,9 +1,0 @@
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/23EC01052/Desktop/my_branch/LRF/src/conv_sobel.v" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module CONV_SOBEL
-INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/23EC01052/Desktop/my_branch/LRF/utils/sv/sim_axis.sv" into library xil_defaultlib
-INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/23EC01052/Desktop/my_branch/LRF/tests/conv_sobel_random/tb_conv_sobel.sv" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module tb_top
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/23EC01052/Desktop/my_branch/LRF/workspace/conv_sobel_random/sim_project/sim_project.sim/sim_1/behav/xsim/glbl.v" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module glbl
-INFO: [VRFC 10-163] Analyzing VHDL file "/home/23EC01052/Desktop/my_branch/LRF/workspace/conv_sobel_random/sim_project/sim_project.gen/sources_1/ip/cordic_0/sim/cordic_0.vhd" into library xil_defaultlib
-INFO: [VRFC 10-3107] analyzing entity 'cordic_0'
