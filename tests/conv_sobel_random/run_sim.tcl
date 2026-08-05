@@ -40,6 +40,8 @@ if {$has_pythonpath} { set env(PYTHONPATH) $saved_pythonpath }
 puts "Generating Vivado project..."
 create_project -force sim_project ${WORKSPACE_DIR}/sim_project -part xc7z010clg225-1
 
+add_files -fileset sources_1 ${SRC_DIR}/axis_buff.v
+
 # -----------------------------
 # ADD CORDIC IP (Using IMPORT to keep .gen in Workspace)
 # -----------------------------
