@@ -47,7 +47,7 @@
 // DO NOT MODIFY THIS FILE.
 
 // IP VLNV: xilinx.com:ip:cordic:6.0
-// IP Revision: 24
+// IP Revision: 23
 
 // The following must be inserted into your Verilog file for this
 // core to be instantiated. Change the instance name and port connections
@@ -59,8 +59,10 @@ cordic_0 your_instance_name (
   .aclken(aclken),                                    // input wire aclken
   .aresetn(aresetn),                                  // input wire aresetn
   .s_axis_cartesian_tvalid(s_axis_cartesian_tvalid),  // input wire s_axis_cartesian_tvalid
+  .s_axis_cartesian_tlast(s_axis_cartesian_tlast),    // input wire s_axis_cartesian_tlast
   .s_axis_cartesian_tdata(s_axis_cartesian_tdata),    // input wire [23 : 0] s_axis_cartesian_tdata
   .m_axis_dout_tvalid(m_axis_dout_tvalid),            // output wire m_axis_dout_tvalid
+  .m_axis_dout_tlast(m_axis_dout_tlast),              // output wire m_axis_dout_tlast
   .m_axis_dout_tdata(m_axis_dout_tdata)              // output wire [15 : 0] m_axis_dout_tdata
 );
 // INST_TAG_END ------ End INSTANTIATION Template ---------

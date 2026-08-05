@@ -119,7 +119,7 @@
         </spirit:parameter>
         <spirit:parameter>
           <spirit:name>HAS_TLAST</spirit:name>
-          <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.S_AXIS_CARTESIAN.HAS_TLAST">0</spirit:value>
+          <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.S_AXIS_CARTESIAN.HAS_TLAST">1</spirit:value>
           <spirit:vendorExtensions>
             <xilinx:parameterInfo>
               <xilinx:parameterUsage>none</xilinx:parameterUsage>
@@ -602,7 +602,7 @@
         </spirit:parameter>
         <spirit:parameter>
           <spirit:name>HAS_TLAST</spirit:name>
-          <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.M_AXIS_DOUT.HAS_TLAST">0</spirit:value>
+          <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="BUSIFPARAM_VALUE.M_AXIS_DOUT.HAS_TLAST">1</spirit:value>
           <spirit:vendorExtensions>
             <xilinx:parameterInfo>
               <xilinx:parameterUsage>none</xilinx:parameterUsage>
@@ -663,10 +663,17 @@
         <spirit:name>xilinx_blockmodel</spirit:name>
         <spirit:displayName>Block Model files</spirit:displayName>
         <spirit:envIdentifier>:vivado.xilinx.com:block_model</spirit:envIdentifier>
+        <spirit:fileSetRef>
+          <spirit:localName>xilinx_blockmodel_view_fileset</spirit:localName>
+        </spirit:fileSetRef>
         <spirit:parameters>
           <spirit:parameter>
+            <spirit:name>GENtimestamp</spirit:name>
+            <spirit:value>Wed Aug 05 13:26:54 UTC 2026</spirit:value>
+          </spirit:parameter>
+          <spirit:parameter>
             <spirit:name>outputProductCRC</spirit:name>
-            <spirit:value>9:04114e4c</spirit:value>
+            <spirit:value>9:a7333196</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -681,11 +688,11 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>GENtimestamp</spirit:name>
-            <spirit:value>Wed Jul 01 14:18:25 UTC 2026</spirit:value>
+            <spirit:value>Wed Aug 05 13:26:54 UTC 2026</spirit:value>
           </spirit:parameter>
           <spirit:parameter>
             <spirit:name>outputProductCRC</spirit:name>
-            <spirit:value>9:04114e4c</spirit:value>
+            <spirit:value>9:a7333196</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -698,8 +705,12 @@
         </spirit:fileSetRef>
         <spirit:parameters>
           <spirit:parameter>
+            <spirit:name>GENtimestamp</spirit:name>
+            <spirit:value>Wed Aug 05 13:27:38 UTC 2026</spirit:value>
+          </spirit:parameter>
+          <spirit:parameter>
             <spirit:name>outputProductCRC</spirit:name>
-            <spirit:value>9:04114e4c</spirit:value>
+            <spirit:value>9:a7333196</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -713,11 +724,11 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>GENtimestamp</spirit:name>
-            <spirit:value>Wed Jul 01 14:18:25 UTC 2026</spirit:value>
+            <spirit:value>Wed Aug 05 13:26:54 UTC 2026</spirit:value>
           </spirit:parameter>
           <spirit:parameter>
             <spirit:name>outputProductCRC</spirit:name>
-            <spirit:value>9:04114e4c</spirit:value>
+            <spirit:value>9:a7333196</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -732,11 +743,11 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>GENtimestamp</spirit:name>
-            <spirit:value>Wed Jul 01 14:18:23 UTC 2026</spirit:value>
+            <spirit:value>Wed Aug 05 13:26:54 UTC 2026</spirit:value>
           </spirit:parameter>
           <spirit:parameter>
             <spirit:name>outputProductCRC</spirit:name>
-            <spirit:value>9:04114e4c</spirit:value>
+            <spirit:value>9:a7333196</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -750,11 +761,11 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>GENtimestamp</spirit:name>
-            <spirit:value>Wed Jul 01 14:18:25 UTC 2026</spirit:value>
+            <spirit:value>Wed Aug 05 13:26:54 UTC 2026</spirit:value>
           </spirit:parameter>
           <spirit:parameter>
             <spirit:name>outputProductCRC</spirit:name>
-            <spirit:value>9:04114e4c</spirit:value>
+            <spirit:value>9:a7333196</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -763,7 +774,7 @@
         <spirit:displayName>VHDL Simulation</spirit:displayName>
         <spirit:envIdentifier>vhdlSource:vivado.xilinx.com:simulation</spirit:envIdentifier>
         <spirit:language>vhdl</spirit:language>
-        <spirit:modelName>cordic_v6_0_24</spirit:modelName>
+        <spirit:modelName>cordic_v6_0_23</spirit:modelName>
         <spirit:fileSetRef>
           <spirit:localName>xilinx_vhdlbehavioralsimulation_xilinx_com_ip_xbip_utils_3_0__ref_view_fileset</spirit:localName>
         </spirit:fileSetRef>
@@ -791,11 +802,11 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>GENtimestamp</spirit:name>
-            <spirit:value>Wed Jul 01 14:18:25 UTC 2026</spirit:value>
+            <spirit:value>Wed Aug 05 13:26:54 UTC 2026</spirit:value>
           </spirit:parameter>
           <spirit:parameter>
             <spirit:name>outputProductCRC</spirit:name>
-            <spirit:value>9:0f0b0b93</spirit:value>
+            <spirit:value>9:4b136083</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -811,11 +822,11 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>GENtimestamp</spirit:name>
-            <spirit:value>Wed Jul 01 14:18:25 UTC 2026</spirit:value>
+            <spirit:value>Wed Aug 05 13:26:54 UTC 2026</spirit:value>
           </spirit:parameter>
           <spirit:parameter>
             <spirit:name>outputProductCRC</spirit:name>
-            <spirit:value>9:0f0b0b93</spirit:value>
+            <spirit:value>9:4b136083</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -824,7 +835,7 @@
         <spirit:displayName>VHDL Synthesis</spirit:displayName>
         <spirit:envIdentifier>vhdlSource:vivado.xilinx.com:synthesis</spirit:envIdentifier>
         <spirit:language>vhdl</spirit:language>
-        <spirit:modelName>cordic_v6_0_24</spirit:modelName>
+        <spirit:modelName>cordic_v6_0_23</spirit:modelName>
         <spirit:fileSetRef>
           <spirit:localName>xilinx_vhdlsynthesis_xilinx_com_ip_xbip_utils_3_0__ref_view_fileset</spirit:localName>
         </spirit:fileSetRef>
@@ -852,11 +863,11 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>GENtimestamp</spirit:name>
-            <spirit:value>Wed Jul 01 14:18:25 UTC 2026</spirit:value>
+            <spirit:value>Wed Aug 05 13:26:54 UTC 2026</spirit:value>
           </spirit:parameter>
           <spirit:parameter>
             <spirit:name>outputProductCRC</spirit:name>
-            <spirit:value>9:04114e4c</spirit:value>
+            <spirit:value>9:a7333196</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -872,11 +883,11 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>GENtimestamp</spirit:name>
-            <spirit:value>Wed Jul 01 14:18:25 UTC 2026</spirit:value>
+            <spirit:value>Wed Aug 05 13:26:54 UTC 2026</spirit:value>
           </spirit:parameter>
           <spirit:parameter>
             <spirit:name>outputProductCRC</spirit:name>
-            <spirit:value>9:04114e4c</spirit:value>
+            <spirit:value>9:a7333196</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -892,11 +903,11 @@
         <spirit:parameters>
           <spirit:parameter>
             <spirit:name>GENtimestamp</spirit:name>
-            <spirit:value>Wed Jul 01 14:18:25 UTC 2026</spirit:value>
+            <spirit:value>Wed Aug 05 13:26:54 UTC 2026</spirit:value>
           </spirit:parameter>
           <spirit:parameter>
             <spirit:name>outputProductCRC</spirit:name>
-            <spirit:value>9:04114e4c</spirit:value>
+            <spirit:value>9:a7333196</spirit:value>
           </spirit:parameter>
         </spirit:parameters>
       </spirit:view>
@@ -1185,7 +1196,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.s_axis_cartesian_tlast" xilinx:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_HAS_S_AXIS_CARTESIAN_TLAST&apos;)) != 0)">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.s_axis_cartesian_tlast" xilinx:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_HAS_S_AXIS_CARTESIAN_TLAST&apos;)) != 0)">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -1301,7 +1312,7 @@
         <spirit:vendorExtensions>
           <xilinx:portInfo>
             <xilinx:enablement>
-              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.m_axis_dout_tlast" xilinx:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_HAS_S_AXIS_CARTESIAN_TLAST&apos;)) != 0) or (spirit:decode(id(&apos;MODELPARAM_VALUE.C_HAS_S_AXIS_PHASE_TLAST&apos;)) != 0)">false</xilinx:isEnabled>
+              <xilinx:isEnabled xilinx:resolve="dependent" xilinx:id="PORT_ENABLEMENT.m_axis_dout_tlast" xilinx:dependency="(spirit:decode(id(&apos;MODELPARAM_VALUE.C_HAS_S_AXIS_CARTESIAN_TLAST&apos;)) != 0) or (spirit:decode(id(&apos;MODELPARAM_VALUE.C_HAS_S_AXIS_PHASE_TLAST&apos;)) != 0)">true</xilinx:isEnabled>
             </xilinx:enablement>
           </xilinx:portInfo>
         </spirit:vendorExtensions>
@@ -1370,7 +1381,7 @@
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="integer">
         <spirit:name>C_INPUT_WIDTH</spirit:name>
-        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_INPUT_WIDTH">21</spirit:value>
+        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_INPUT_WIDTH">24</spirit:value>
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="integer">
         <spirit:name>C_ITERATIONS</spirit:name>
@@ -1378,7 +1389,7 @@
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="integer">
         <spirit:name>C_OUTPUT_WIDTH</spirit:name>
-        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_OUTPUT_WIDTH">11</spirit:value>
+        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_OUTPUT_WIDTH">13</spirit:value>
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="integer">
         <spirit:name>C_PHASE_FORMAT</spirit:name>
@@ -1406,7 +1417,7 @@
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="integer">
         <spirit:name>C_TLAST_RESOLUTION</spirit:name>
-        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_TLAST_RESOLUTION">0</spirit:value>
+        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_TLAST_RESOLUTION">1</spirit:value>
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="integer">
         <spirit:name>C_HAS_S_AXIS_PHASE_TUSER</spirit:name>
@@ -1430,7 +1441,7 @@
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="integer">
         <spirit:name>C_HAS_S_AXIS_CARTESIAN_TLAST</spirit:name>
-        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_HAS_S_AXIS_CARTESIAN_TLAST">0</spirit:value>
+        <spirit:value spirit:format="long" spirit:resolve="generated" spirit:id="MODELPARAM_VALUE.C_HAS_S_AXIS_CARTESIAN_TLAST">1</spirit:value>
       </spirit:modelParameter>
       <spirit:modelParameter spirit:dataType="integer">
         <spirit:name>C_S_AXIS_CARTESIAN_TDATA_WIDTH</spirit:name>
@@ -1516,6 +1527,21 @@
     </spirit:choice>
   </spirit:choices>
   <spirit:fileSets>
+    <spirit:fileSet>
+      <spirit:name>xilinx_blockmodel_view_fileset</spirit:name>
+      <spirit:file>
+        <spirit:name>cordic_0.bmj</spirit:name>
+        <spirit:userFileType>bmj</spirit:userFileType>
+        <spirit:userFileType>USED_IN_simulation_pre</spirit:userFileType>
+        <spirit:userFileType>USED_IN_synthesis_pre</spirit:userFileType>
+      </spirit:file>
+      <spirit:file>
+        <spirit:name>cordic_0_bmstub.v</spirit:name>
+        <spirit:fileType>verilogSource</spirit:fileType>
+        <spirit:userFileType>USED_IN_simulation_pre</spirit:userFileType>
+        <spirit:userFileType>USED_IN_synthesis_pre</spirit:userFileType>
+      </spirit:file>
+    </spirit:fileSet>
     <spirit:fileSet>
       <spirit:name>xilinx_cmodelsimulation_view_fileset</spirit:name>
       <spirit:file>
@@ -1629,11 +1655,11 @@
         <spirit:name>hdl/xbip_dsp48_wrapper_v3_0_vh_rfs.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
         <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
-        <spirit:logicalName>xbip_dsp48_wrapper_v3_0_7</spirit:logicalName>
+        <spirit:logicalName>xbip_dsp48_wrapper_v3_0_6</spirit:logicalName>
       </spirit:file>
       <spirit:vendorExtensions>
         <xilinx:subCoreRef>
-          <xilinx:componentRef xilinx:vendor="xilinx.com" xilinx:library="ip" xilinx:name="xbip_dsp48_wrapper" xilinx:version="3.0" xilinx:isGenerated="true" xilinx:checksum="8471713f">
+          <xilinx:componentRef xilinx:vendor="xilinx.com" xilinx:library="ip" xilinx:name="xbip_dsp48_wrapper" xilinx:version="3.0" xilinx:isGenerated="true" xilinx:checksum="37f63cc0">
             <xilinx:mode xilinx:name="copy_mode"/>
           </xilinx:componentRef>
         </xilinx:subCoreRef>
@@ -1661,11 +1687,11 @@
         <spirit:name>hdl/c_addsub_v12_0_vh_rfs.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
         <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
-        <spirit:logicalName>c_addsub_v12_0_20</spirit:logicalName>
+        <spirit:logicalName>c_addsub_v12_0_19</spirit:logicalName>
       </spirit:file>
       <spirit:vendorExtensions>
         <xilinx:subCoreRef>
-          <xilinx:componentRef xilinx:vendor="xilinx.com" xilinx:library="ip" xilinx:name="c_addsub" xilinx:version="12.0" xilinx:isGenerated="true" xilinx:checksum="1a98093d">
+          <xilinx:componentRef xilinx:vendor="xilinx.com" xilinx:library="ip" xilinx:name="c_addsub" xilinx:version="12.0" xilinx:isGenerated="true" xilinx:checksum="c761d759">
             <xilinx:mode xilinx:name="copy_mode"/>
           </xilinx:componentRef>
         </xilinx:subCoreRef>
@@ -1677,11 +1703,11 @@
         <spirit:name>hdl/mult_gen_v12_0_vh_rfs.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
         <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
-        <spirit:logicalName>mult_gen_v12_0_23</spirit:logicalName>
+        <spirit:logicalName>mult_gen_v12_0_22</spirit:logicalName>
       </spirit:file>
       <spirit:vendorExtensions>
         <xilinx:subCoreRef>
-          <xilinx:componentRef xilinx:vendor="xilinx.com" xilinx:library="ip" xilinx:name="mult_gen" xilinx:version="12.0" xilinx:isGenerated="true" xilinx:checksum="bcf50f38">
+          <xilinx:componentRef xilinx:vendor="xilinx.com" xilinx:library="ip" xilinx:name="mult_gen" xilinx:version="12.0" xilinx:isGenerated="true" xilinx:checksum="34476406">
             <xilinx:mode xilinx:name="copy_mode"/>
           </xilinx:componentRef>
         </xilinx:subCoreRef>
@@ -1709,7 +1735,7 @@
         <spirit:name>hdl/cordic_v6_0_vh_rfs.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
         <spirit:userFileType>USED_IN_ipstatic</spirit:userFileType>
-        <spirit:logicalName>cordic_v6_0_24</spirit:logicalName>
+        <spirit:logicalName>cordic_v6_0_23</spirit:logicalName>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
@@ -1755,11 +1781,11 @@
       <spirit:file>
         <spirit:name>hdl/xbip_dsp48_wrapper_v3_0_vh_rfs.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:logicalName>xbip_dsp48_wrapper_v3_0_7</spirit:logicalName>
+        <spirit:logicalName>xbip_dsp48_wrapper_v3_0_6</spirit:logicalName>
       </spirit:file>
       <spirit:vendorExtensions>
         <xilinx:subCoreRef>
-          <xilinx:componentRef xilinx:vendor="xilinx.com" xilinx:library="ip" xilinx:name="xbip_dsp48_wrapper" xilinx:version="3.0" xilinx:isGenerated="true" xilinx:checksum="8471713f">
+          <xilinx:componentRef xilinx:vendor="xilinx.com" xilinx:library="ip" xilinx:name="xbip_dsp48_wrapper" xilinx:version="3.0" xilinx:isGenerated="true" xilinx:checksum="37f63cc0">
             <xilinx:mode xilinx:name="copy_mode"/>
           </xilinx:componentRef>
         </xilinx:subCoreRef>
@@ -1785,11 +1811,11 @@
       <spirit:file>
         <spirit:name>hdl/c_addsub_v12_0_vh_rfs.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:logicalName>c_addsub_v12_0_20</spirit:logicalName>
+        <spirit:logicalName>c_addsub_v12_0_19</spirit:logicalName>
       </spirit:file>
       <spirit:vendorExtensions>
         <xilinx:subCoreRef>
-          <xilinx:componentRef xilinx:vendor="xilinx.com" xilinx:library="ip" xilinx:name="c_addsub" xilinx:version="12.0" xilinx:isGenerated="true" xilinx:checksum="1a98093d">
+          <xilinx:componentRef xilinx:vendor="xilinx.com" xilinx:library="ip" xilinx:name="c_addsub" xilinx:version="12.0" xilinx:isGenerated="true" xilinx:checksum="c761d759">
             <xilinx:mode xilinx:name="copy_mode"/>
           </xilinx:componentRef>
         </xilinx:subCoreRef>
@@ -1800,11 +1826,11 @@
       <spirit:file>
         <spirit:name>hdl/mult_gen_v12_0_vh_rfs.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:logicalName>mult_gen_v12_0_23</spirit:logicalName>
+        <spirit:logicalName>mult_gen_v12_0_22</spirit:logicalName>
       </spirit:file>
       <spirit:vendorExtensions>
         <xilinx:subCoreRef>
-          <xilinx:componentRef xilinx:vendor="xilinx.com" xilinx:library="ip" xilinx:name="mult_gen" xilinx:version="12.0" xilinx:isGenerated="true" xilinx:checksum="bcf50f38">
+          <xilinx:componentRef xilinx:vendor="xilinx.com" xilinx:library="ip" xilinx:name="mult_gen" xilinx:version="12.0" xilinx:isGenerated="true" xilinx:checksum="34476406">
             <xilinx:mode xilinx:name="copy_mode"/>
           </xilinx:componentRef>
         </xilinx:subCoreRef>
@@ -1830,7 +1856,7 @@
       <spirit:file>
         <spirit:name>hdl/cordic_v6_0_vh_rfs.vhd</spirit:name>
         <spirit:fileType>vhdlSource</spirit:fileType>
-        <spirit:logicalName>cordic_v6_0_24</spirit:logicalName>
+        <spirit:logicalName>cordic_v6_0_23</spirit:logicalName>
       </spirit:file>
     </spirit:fileSet>
     <spirit:fileSet>
@@ -1877,11 +1903,11 @@
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>Input_Width</spirit:name>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.Input_Width" spirit:order="7" spirit:minimum="8" spirit:maximum="48" spirit:rangeType="long">21</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.Input_Width" spirit:order="7" spirit:minimum="8" spirit:maximum="48" spirit:rangeType="long">24</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>Output_Width</spirit:name>
-      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.Output_Width" spirit:order="8" spirit:minimum="5" spirit:maximum="48" spirit:rangeType="long">11</spirit:value>
+      <spirit:value spirit:format="long" spirit:resolve="user" spirit:id="PARAM_VALUE.Output_Width" spirit:order="8" spirit:minimum="5" spirit:maximum="48" spirit:rangeType="long">13</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>Round_Mode</spirit:name>
@@ -1913,7 +1939,7 @@
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>cartesian_has_tlast</spirit:name>
-      <spirit:value spirit:format="bool" spirit:resolve="user" spirit:id="PARAM_VALUE.cartesian_has_tlast" spirit:order="16">false</spirit:value>
+      <spirit:value spirit:format="bool" spirit:resolve="user" spirit:id="PARAM_VALUE.cartesian_has_tlast" spirit:order="16">true</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>phase_has_tuser</spirit:name>
@@ -1941,7 +1967,7 @@
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>out_tlast_behv</spirit:name>
-      <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.out_tlast_behv" spirit:choiceRef="choice_pairs_31f92c27" spirit:order="23">Null</spirit:value>
+      <spirit:value spirit:resolve="user" spirit:id="PARAM_VALUE.out_tlast_behv" spirit:choiceRef="choice_pairs_31f92c27" spirit:order="23">Pass_Cartesian_TLAST</spirit:value>
     </spirit:parameter>
     <spirit:parameter>
       <spirit:name>ACLKEN</spirit:name>
@@ -1955,15 +1981,17 @@
   <spirit:vendorExtensions>
     <xilinx:coreExtensions>
       <xilinx:displayName>CORDIC</xilinx:displayName>
-      <xilinx:coreRevision>24</xilinx:coreRevision>
+      <xilinx:coreRevision>23</xilinx:coreRevision>
       <xilinx:configElementInfos>
         <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.M_AXIS_DOUT.HAS_TKEEP" xilinx:valueSource="constant"/>
+        <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.M_AXIS_DOUT.HAS_TLAST" xilinx:valueSource="auto"/>
         <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.M_AXIS_DOUT.HAS_TREADY" xilinx:valueSource="auto"/>
         <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.M_AXIS_DOUT.HAS_TSTRB" xilinx:valueSource="constant"/>
         <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.M_AXIS_DOUT.TDATA_NUM_BYTES" xilinx:valueSource="auto"/>
         <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.M_AXIS_DOUT.TDEST_WIDTH" xilinx:valueSource="constant"/>
         <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.M_AXIS_DOUT.TID_WIDTH" xilinx:valueSource="constant"/>
         <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.S_AXIS_CARTESIAN.HAS_TKEEP" xilinx:valueSource="constant"/>
+        <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.S_AXIS_CARTESIAN.HAS_TLAST" xilinx:valueSource="auto"/>
         <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.S_AXIS_CARTESIAN.HAS_TREADY" xilinx:valueSource="auto"/>
         <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.S_AXIS_CARTESIAN.HAS_TSTRB" xilinx:valueSource="constant"/>
         <xilinx:configElementInfo xilinx:referenceId="BUSIFPARAM_VALUE.S_AXIS_CARTESIAN.TDATA_NUM_BYTES" xilinx:valueSource="auto"/>
@@ -1987,9 +2015,9 @@
       </xilinx:configElementInfos>
     </xilinx:coreExtensions>
     <xilinx:packagingInfo>
-      <xilinx:xilinxVersion>2025.1</xilinx:xilinxVersion>
+      <xilinx:xilinxVersion>2024.2</xilinx:xilinxVersion>
       <xilinx:checksum xilinx:scope="busInterfaces" xilinx:value="c0c791dc"/>
-      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="188c2d07"/>
+      <xilinx:checksum xilinx:scope="fileGroups" xilinx:value="2f8699a2"/>
       <xilinx:checksum xilinx:scope="ports" xilinx:value="3c202b47"/>
       <xilinx:checksum xilinx:scope="hdlParameters" xilinx:value="ff111dcc"/>
       <xilinx:checksum xilinx:scope="parameters" xilinx:value="6a523062"/>

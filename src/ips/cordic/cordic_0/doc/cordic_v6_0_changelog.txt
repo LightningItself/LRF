@@ -1,16 +1,3 @@
-2025.1:
- * Version 6.0 (Rev. 24)
- * General: Updated IP Catalog taxonomy structure. This change has no impact to the IP.
- * Revision change in one or more subcores
-
-2024.2.2:
- * Version 6.0 (Rev. 23)
- * No changes
-
-2024.2.1:
- * Version 6.0 (Rev. 23)
- * No changes
-
 2024.2:
  * Version 6.0 (Rev. 23)
  * General: Reduced number of internal subcores used, no functional change
@@ -291,7 +278,7 @@
  * Native Vivado Release
  * There have been no functional or interface changes to this IP.  The version number has changed to support unique versioning in Vivado starting with 2013.1.
 
-(c) Copyright 2002 - 2025 Advanced Micro Devices, Inc. All rights reserved.
+(c) Copyright 2002 - 2024 Advanced Micro Devices, Inc. All rights reserved.
 
 This file contains confidential and proprietary information
 of AMD and is protected under U.S. and international copyright

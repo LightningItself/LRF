@@ -46,7 +46,7 @@
 -- 
 -- DO NOT MODIFY THIS FILE.
 -- IP VLNV: xilinx.com:ip:cordic:6.0
--- IP Revision: 24
+-- IP Revision: 23
 
 -- The following code must appear in the VHDL architecture header.
 
@@ -57,8 +57,10 @@ COMPONENT cordic_0
     aclken : IN STD_LOGIC;
     aresetn : IN STD_LOGIC;
     s_axis_cartesian_tvalid : IN STD_LOGIC;
+    s_axis_cartesian_tlast : IN STD_LOGIC;
     s_axis_cartesian_tdata : IN STD_LOGIC_VECTOR(23 DOWNTO 0);
     m_axis_dout_tvalid : OUT STD_LOGIC;
+    m_axis_dout_tlast : OUT STD_LOGIC;
     m_axis_dout_tdata : OUT STD_LOGIC_VECTOR(15 DOWNTO 0) 
   );
 END COMPONENT;
@@ -74,8 +76,10 @@ your_instance_name : cordic_0
     aclken => aclken,
     aresetn => aresetn,
     s_axis_cartesian_tvalid => s_axis_cartesian_tvalid,
+    s_axis_cartesian_tlast => s_axis_cartesian_tlast,
     s_axis_cartesian_tdata => s_axis_cartesian_tdata,
     m_axis_dout_tvalid => m_axis_dout_tvalid,
+    m_axis_dout_tlast => m_axis_dout_tlast,
     m_axis_dout_tdata => m_axis_dout_tdata
   );
 -- INST_TAG_END ------ End INSTANTIATION Template ---------
