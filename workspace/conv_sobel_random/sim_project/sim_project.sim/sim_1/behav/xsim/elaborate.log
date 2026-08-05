@@ -1,0 +1,162 @@
+Vivado Simulator v2024.2.0
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+Running: /cad/xilinx/Vivado/2024.2/bin/unwrapped/lnx64.o/xelab --incr --debug typical --relax --mt 8 -L xil_defaultlib -L xbip_utils_v3_0_14 -L c_reg_fd_v12_0_10 -L xbip_dsp48_wrapper_v3_0_6 -L xbip_pipe_v3_0_10 -L c_addsub_v12_0_19 -L mult_gen_v12_0_22 -L axi_utils_v2_0_10 -L cordic_v6_0_23 -L uvm -L unisims_ver -L unimacro_ver -L secureip -L xpm --snapshot tb_top_behav xil_defaultlib.tb_top xil_defaultlib.glbl -log elaborate.log 
+Using 8 slave threads.
+Starting static elaboration
+Pass Through NonSizing Optimizer
+WARNING: [VRFC 10-9380] size mismatch in mixed-language port association of VHDL port 's_axis_cartesian_tdata' [/home/23EC01052/Desktop/my_branch/LRF/src/conv_sobel.v:176]
+WARNING: [VRFC 10-9380] size mismatch in mixed-language port association of VHDL port 's_axis_cartesian_tdata' [/home/23EC01052/Desktop/my_branch/LRF/src/conv_sobel.v:176]
+WARNING: [VRFC 10-9380] size mismatch in mixed-language port association of VHDL port 's_axis_cartesian_tdata' [/home/23EC01052/Desktop/my_branch/LRF/src/conv_sobel.v:176]
+WARNING: [VRFC 10-9380] size mismatch in mixed-language port association of VHDL port 's_axis_cartesian_tdata' [/home/23EC01052/Desktop/my_branch/LRF/src/conv_sobel.v:176]
+WARNING: [VRFC 10-9380] size mismatch in mixed-language port association of VHDL port 's_axis_cartesian_tdata' [/home/23EC01052/Desktop/my_branch/LRF/src/conv_sobel.v:176]
+WARNING: [VRFC 10-9380] size mismatch in mixed-language port association of VHDL port 's_axis_cartesian_tdata' [/home/23EC01052/Desktop/my_branch/LRF/src/conv_sobel.v:176]
+WARNING: [VRFC 10-9380] size mismatch in mixed-language port association of VHDL port 's_axis_cartesian_tdata' [/home/23EC01052/Desktop/my_branch/LRF/src/conv_sobel.v:176]
+WARNING: [VRFC 10-9380] size mismatch in mixed-language port association of VHDL port 's_axis_cartesian_tdata' [/home/23EC01052/Desktop/my_branch/LRF/src/conv_sobel.v:176]
+WARNING: [VRFC 10-9380] size mismatch in mixed-language port association of VHDL port 's_axis_cartesian_tdata' [/home/23EC01052/Desktop/my_branch/LRF/src/conv_sobel.v:176]
+WARNING: [VRFC 10-9380] size mismatch in mixed-language port association of VHDL port 's_axis_cartesian_tdata' [/home/23EC01052/Desktop/my_branch/LRF/src/conv_sobel.v:176]
+WARNING: [VRFC 10-9380] size mismatch in mixed-language port association of VHDL port 's_axis_cartesian_tdata' [/home/23EC01052/Desktop/my_branch/LRF/src/conv_sobel.v:176]
+WARNING: [VRFC 10-9380] size mismatch in mixed-language port association of VHDL port 's_axis_cartesian_tdata' [/home/23EC01052/Desktop/my_branch/LRF/src/conv_sobel.v:176]
+WARNING: [VRFC 10-9380] size mismatch in mixed-language port association of VHDL port 's_axis_cartesian_tdata' [/home/23EC01052/Desktop/my_branch/LRF/src/conv_sobel.v:176]
+WARNING: [VRFC 10-9380] size mismatch in mixed-language port association of VHDL port 's_axis_cartesian_tdata' [/home/23EC01052/Desktop/my_branch/LRF/src/conv_sobel.v:176]
+WARNING: [VRFC 10-9380] size mismatch in mixed-language port association of VHDL port 's_axis_cartesian_tdata' [/home/23EC01052/Desktop/my_branch/LRF/src/conv_sobel.v:176]
+WARNING: [VRFC 10-9380] size mismatch in mixed-language port association of VHDL port 's_axis_cartesian_tdata' [/home/23EC01052/Desktop/my_branch/LRF/src/conv_sobel.v:176]
+Completed static elaboration
+Starting simulation data flow analysis
+WARNING: [XSIM 43-4100] "/home/23EC01052/Desktop/my_branch/LRF/src/conv_sobel.v" Line 3. Module CONV_SOBEL_default has a timescale but at least one module in design doesn't have timescale.
+WARNING: [XSIM 43-4100] "/home/23EC01052/Desktop/my_branch/LRF/src/conv_sobel.v" Line 3. Module CONV_SOBEL_default has a timescale but at least one module in design doesn't have timescale.
+WARNING: [XSIM 43-4100] "/home/23EC01052/Desktop/my_branch/LRF/workspace/conv_sobel_random/sim_project/sim_project.sim/sim_1/behav/xsim/glbl.v" Line 6. Module glbl has a timescale but at least one module in design doesn't have timescale.
+WARNING: [XSIM 43-4100] "/home/23EC01052/Desktop/my_branch/LRF/workspace/conv_sobel_random/sim_project/sim_project.sim/sim_1/behav/xsim/glbl.v" Line 6. Module glbl has a timescale but at least one module in design doesn't have timescale.
+Completed simulation data flow analysis
+Time Resolution for simulation is 1ps
+Compiling package std.standard
+Compiling package std.textio
+Compiling package ieee.std_logic_1164
+Compiling package ieee.numeric_std
+Compiling package cordic_v6_0_23.cordic_v6_0_23_viv_comp
+Compiling package xbip_utils_v3_0_14.xbip_utils_v3_0_14_pkg
+Compiling package xbip_pipe_v3_0_10.xbip_pipe_v3_0_10_viv_comp
+Compiling package axi_utils_v2_0_10.axi_utils_v2_0_10_pkg
+Compiling package ieee.math_real
+Compiling package axi_utils_v2_0_10.global_util_pkg
+Compiling package axi_utils_v2_0_10.axi_utils_comps
+Compiling package mult_gen_v12_0_22.mult_gen_v12_0_22_pkg
+Compiling package ieee.std_logic_arith
+Compiling package ieee.std_logic_signed
+Compiling package cordic_v6_0_23.cordic_pack
+Compiling package cordic_v6_0_23.cordic_hdl_comps
+Compiling package c_addsub_v12_0_19.c_addsub_v12_0_19_viv_comp
+Compiling package c_addsub_v12_0_19.c_addsub_v12_0_19_pkg
+Compiling package c_addsub_v12_0_19.c_addsub_v12_0_19_pkg_legacy
+Compiling package c_reg_fd_v12_0_10.c_reg_fd_v12_0_10_viv_comp
+Compiling package unisim.vcomponents
+Compiling package xil_defaultlib.$unit_sim_axis_sv_2661856312
+Compiling package std.std
+Compiling module xil_defaultlib.axis_if_default
+Compiling architecture synth of entity xbip_pipe_v3_0_10.xbip_pipe_v3_0_10_viv [\xbip_pipe_v3_0_10_viv(c_latency...]
+Compiling architecture synth of entity xbip_pipe_v3_0_10.xbip_pipe_v3_0_10_viv [\xbip_pipe_v3_0_10_viv(c_latency...]
+Compiling architecture synth of entity xbip_pipe_v3_0_10.xbip_pipe_v3_0_10_viv [\xbip_pipe_v3_0_10_viv(c_latency...]
+Compiling architecture struct_all of entity cordic_v6_0_23.delay [\delay(delay_len=1,family="zynq"...]
+Compiling architecture muxcy_v of entity unisim.MUXCY [muxcy_default]
+Compiling architecture xorcy_v of entity unisim.XORCY [xorcy_default]
+Compiling architecture rtl of entity c_addsub_v12_0_19.c_addsub_v12_0_19_lut6_legacy [\c_addsub_v12_0_19_lut6_legacy(c...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_fabric_legacy [\c_addsub_v12_0_19_fabric_legacy...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_legacy [\c_addsub_v12_0_19_legacy(c_fami...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_viv [\c_addsub_v12_0_19_viv(c_xdevice...]
+Compiling architecture synth of entity cordic_v6_0_23.addsub [\addsub(family="zynq",add_mode=0...]
+Compiling architecture struct_all of entity cordic_v6_0_23.delay [\delay(delay_len=1,family="zynq"...]
+Compiling architecture struct_all of entity cordic_v6_0_23.delay [\delay(delay_len=4,family="zynq"...]
+Compiling architecture synth of entity cordic_v6_0_23.cordic_sqrt_mod [\cordic_sqrt_mod(p_xdevicefamily...]
+Compiling architecture struct_all of entity cordic_v6_0_23.delay [\delay(delay_len=1,family="zynq"...]
+Compiling architecture rtl of entity c_addsub_v12_0_19.c_addsub_v12_0_19_lut6_legacy [\c_addsub_v12_0_19_lut6_legacy(c...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_fabric_legacy [\c_addsub_v12_0_19_fabric_legacy...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_legacy [\c_addsub_v12_0_19_legacy(c_fami...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_viv [\c_addsub_v12_0_19_viv(c_xdevice...]
+Compiling architecture synth of entity cordic_v6_0_23.addsub [\addsub(family="zynq",add_mode=0...]
+Compiling architecture struct_all of entity cordic_v6_0_23.delay [\delay(delay_len=5,family="zynq"...]
+Compiling architecture synth of entity cordic_v6_0_23.cordic_sqrt_mod [\cordic_sqrt_mod(p_xdevicefamily...]
+Compiling architecture rtl of entity c_addsub_v12_0_19.c_addsub_v12_0_19_lut6_legacy [\c_addsub_v12_0_19_lut6_legacy(c...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_fabric_legacy [\c_addsub_v12_0_19_fabric_legacy...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_legacy [\c_addsub_v12_0_19_legacy(c_fami...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_viv [\c_addsub_v12_0_19_viv(c_xdevice...]
+Compiling architecture synth of entity cordic_v6_0_23.addsub [\addsub(family="zynq",add_mode=0...]
+Compiling architecture struct_all of entity cordic_v6_0_23.delay [\delay(delay_len=1,family="zynq"...]
+Compiling architecture struct_all of entity cordic_v6_0_23.delay [\delay(delay_len=3,family="zynq"...]
+Compiling architecture synth of entity cordic_v6_0_23.cordic_sqrt_mod [\cordic_sqrt_mod(p_xdevicefamily...]
+Compiling architecture struct_all of entity cordic_v6_0_23.delay [\delay(delay_len=1,family="zynq"...]
+Compiling architecture rtl of entity c_addsub_v12_0_19.c_addsub_v12_0_19_lut6_legacy [\c_addsub_v12_0_19_lut6_legacy(c...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_fabric_legacy [\c_addsub_v12_0_19_fabric_legacy...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_legacy [\c_addsub_v12_0_19_legacy(c_fami...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_viv [\c_addsub_v12_0_19_viv(c_xdevice...]
+Compiling architecture synth of entity cordic_v6_0_23.addsub [\addsub(family="zynq",add_mode=0...]
+Compiling architecture struct_all of entity cordic_v6_0_23.delay [\delay(delay_len=6,family="zynq"...]
+Compiling architecture synth of entity cordic_v6_0_23.cordic_sqrt_mod [\cordic_sqrt_mod(p_xdevicefamily...]
+Compiling architecture rtl of entity c_addsub_v12_0_19.c_addsub_v12_0_19_lut6_legacy [\c_addsub_v12_0_19_lut6_legacy(c...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_fabric_legacy [\c_addsub_v12_0_19_fabric_legacy...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_legacy [\c_addsub_v12_0_19_legacy(c_fami...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_viv [\c_addsub_v12_0_19_viv(c_xdevice...]
+Compiling architecture synth of entity cordic_v6_0_23.addsub [\addsub(family="zynq",add_mode=0...]
+Compiling architecture struct_all of entity cordic_v6_0_23.delay [\delay(delay_len=1,family="zynq"...]
+Compiling architecture struct_all of entity cordic_v6_0_23.delay [\delay(delay_len=2,family="zynq"...]
+Compiling architecture synth of entity cordic_v6_0_23.cordic_sqrt_mod [\cordic_sqrt_mod(p_xdevicefamily...]
+Compiling architecture struct_all of entity cordic_v6_0_23.delay [\delay(delay_len=1,family="zynq"...]
+Compiling architecture rtl of entity c_addsub_v12_0_19.c_addsub_v12_0_19_lut6_legacy [\c_addsub_v12_0_19_lut6_legacy(c...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_fabric_legacy [\c_addsub_v12_0_19_fabric_legacy...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_legacy [\c_addsub_v12_0_19_legacy(c_fami...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_viv [\c_addsub_v12_0_19_viv(c_xdevice...]
+Compiling architecture synth of entity cordic_v6_0_23.addsub [\addsub(family="zynq",add_mode=0...]
+Compiling architecture struct_all of entity cordic_v6_0_23.delay [\delay(delay_len=7,family="zynq"...]
+Compiling architecture synth of entity cordic_v6_0_23.cordic_sqrt_mod [\cordic_sqrt_mod(p_xdevicefamily...]
+Compiling architecture rtl of entity c_addsub_v12_0_19.c_addsub_v12_0_19_lut6_legacy [\c_addsub_v12_0_19_lut6_legacy(c...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_fabric_legacy [\c_addsub_v12_0_19_fabric_legacy...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_legacy [\c_addsub_v12_0_19_legacy(c_fami...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_viv [\c_addsub_v12_0_19_viv(c_xdevice...]
+Compiling architecture synth of entity cordic_v6_0_23.addsub [\addsub(family="zynq",add_mode=0...]
+Compiling architecture struct_all of entity cordic_v6_0_23.delay [\delay(delay_len=1,family="zynq"...]
+Compiling architecture struct_all of entity cordic_v6_0_23.delay [\delay(delay_len=1,family="zynq"...]
+Compiling architecture synth of entity cordic_v6_0_23.cordic_sqrt_mod [\cordic_sqrt_mod(p_xdevicefamily...]
+Compiling architecture struct_all of entity cordic_v6_0_23.delay [\delay(delay_len=1,family="zynq"...]
+Compiling architecture rtl of entity c_addsub_v12_0_19.c_addsub_v12_0_19_lut6_legacy [\c_addsub_v12_0_19_lut6_legacy(c...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_fabric_legacy [\c_addsub_v12_0_19_fabric_legacy...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_legacy [\c_addsub_v12_0_19_legacy(c_fami...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_viv [\c_addsub_v12_0_19_viv(c_xdevice...]
+Compiling architecture synth of entity cordic_v6_0_23.addsub [\addsub(family="zynq",add_mode=0...]
+Compiling architecture struct_all of entity cordic_v6_0_23.delay [\delay(delay_len=8,family="zynq"...]
+Compiling architecture synth of entity cordic_v6_0_23.cordic_sqrt_mod [\cordic_sqrt_mod(p_xdevicefamily...]
+Compiling architecture rtl of entity c_addsub_v12_0_19.c_addsub_v12_0_19_lut6_legacy [\c_addsub_v12_0_19_lut6_legacy(c...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_fabric_legacy [\c_addsub_v12_0_19_fabric_legacy...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_legacy [\c_addsub_v12_0_19_legacy(c_fami...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_viv [\c_addsub_v12_0_19_viv(c_xdevice...]
+Compiling architecture synth of entity cordic_v6_0_23.addsub [\addsub(family="zynq",add_mode=0...]
+Compiling architecture struct_all of entity cordic_v6_0_23.delay [\delay(delay_len=1,family="zynq"...]
+Compiling architecture struct_all of entity cordic_v6_0_23.delay [\delay(delay_len=0,family="zynq"...]
+Compiling architecture synth of entity cordic_v6_0_23.cordic_sqrt_mod [\cordic_sqrt_mod(p_xdevicefamily...]
+Compiling architecture struct_all of entity cordic_v6_0_23.delay [\delay(delay_len=1,family="zynq"...]
+Compiling architecture rtl of entity c_addsub_v12_0_19.c_addsub_v12_0_19_lut6_legacy [\c_addsub_v12_0_19_lut6_legacy(c...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_fabric_legacy [\c_addsub_v12_0_19_fabric_legacy...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_legacy [\c_addsub_v12_0_19_legacy(c_fami...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_viv [\c_addsub_v12_0_19_viv(c_xdevice...]
+Compiling architecture synth of entity cordic_v6_0_23.addsub [\addsub(family="zynq",add_mode=0...]
+Compiling architecture struct_all of entity cordic_v6_0_23.delay [\delay(delay_len=9,family="zynq"...]
+Compiling architecture synth of entity cordic_v6_0_23.cordic_sqrt_mod [\cordic_sqrt_mod(p_xdevicefamily...]
+Compiling architecture rtl of entity c_addsub_v12_0_19.c_addsub_v12_0_19_lut6_legacy [\c_addsub_v12_0_19_lut6_legacy(c...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_fabric_legacy [\c_addsub_v12_0_19_fabric_legacy...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_legacy [\c_addsub_v12_0_19_legacy(c_fami...]
+Compiling architecture synth of entity c_addsub_v12_0_19.c_addsub_v12_0_19_viv [\c_addsub_v12_0_19_viv(c_xdevice...]
+Compiling architecture synth of entity cordic_v6_0_23.addsub [\addsub(family="zynq",add_mode=0...]
+Compiling architecture struct_all of entity cordic_v6_0_23.delay [\delay(delay_len=10,family="zynq...]
+Compiling architecture synth of entity cordic_v6_0_23.cordic_sqrt_mod [\cordic_sqrt_mod(p_xdevicefamily...]
+Compiling architecture struct_all of entity cordic_v6_0_23.delay [\delay(delay_len=1,family="zynq"...]
+Compiling architecture struct_all of entity cordic_v6_0_23.delay_bit [\delay_bit(delay_len=1,family="z...]
+Compiling architecture struct_all of entity cordic_v6_0_23.delay_bit [\delay_bit(delay_len=11,family="...]
+Compiling architecture synth of entity cordic_v6_0_23.cordic_sqrt [\cordic_sqrt(p_xdevicefamily="zy...]
+Compiling architecture synth of entity cordic_v6_0_23.cordic_v6_0_23_synth [\cordic_v6_0_23_synth(c_architec...]
+Compiling architecture synth of entity cordic_v6_0_23.cordic_v6_0_23_viv [\cordic_v6_0_23_viv(c_architectu...]
+Compiling architecture xilinx of entity cordic_v6_0_23.cordic_v6_0_23 [\cordic_v6_0_23(c_architecture=2...]
+Compiling architecture cordic_0_arch of entity xil_defaultlib.cordic_0 [cordic_0_default]
+Compiling module xil_defaultlib.CONV_SOBEL_default
+Compiling module xil_defaultlib.tb_top
+WARNING: [XSIM 43-3373] "/home/23EC01052/Desktop/my_branch/LRF/tests/conv_sobel_random/tb_conv_sobel.sv" Line 58. System function $value$plusargs is used as system task. This system function should have a LHS e.g. x=$value$plusargs().
+WARNING: [XSIM 43-3373] "/home/23EC01052/Desktop/my_branch/LRF/tests/conv_sobel_random/tb_conv_sobel.sv" Line 59. System function $value$plusargs is used as system task. This system function should have a LHS e.g. x=$value$plusargs().
+Compiling module xil_defaultlib.glbl
+Built simulation snapshot tb_top_behav

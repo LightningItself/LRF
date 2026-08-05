@@ -1,0 +1,13 @@
+# compile verilog/system verilog design source files
+verilog xil_defaultlib  -i "../../../../../../../tests/conv_sobel_random" -i "../../../../../" --include "../../../../../" \
+"../../../../../../../src/conv_sobel.v" \
+
+sv xil_defaultlib  -i "../../../../../../../tests/conv_sobel_random" -i "../../../../../" --include "../../../../../" \
+"../../../../../../../utils/sv/sim_axis.sv" \
+"../../../../../../../tests/conv_sobel_random/tb_conv_sobel.sv" \
+
+# compile glbl module
+verilog xil_defaultlib "glbl.v"
+
+# Do not sort compile order
+nosort
