@@ -58,16 +58,14 @@ wire int_muX_muY_times2_valid = muX_muY_val[0];
 wire int_muX_muY_times2_last = muX_muY_la[0];
 
 wire [2*PIXEL_SIZE*PIXELS_PER_BEAT-1:0] muX_muY;
-wire [PIXELS_PER_BEAT-1:0] buff_ready_1, buff_ready_2, buff_ready_3;
+wire [PIXELS_PER_BEAT-1:0] buff_ready_1;
 wire buff_ready_x = buff_ready_1[0];
-wire buff_ready_y = buff_ready_2[0];
-wire buff_ready_z = buff_ready_3[0];
 wire [PIXELS_PER_BEAT-1:0] muX_muY_val_1, muX_muY_la_1;
 wire muX_muY_times2_valid = muX_muY_val_1[0];
 wire muX_muY_times2_last = muX_muY_la_1[0];
 
 wire [((2*PIXEL_SIZE+1)*PIXELS_PER_BEAT)-1:0] muX_sq_plus_muY_sq;
-wire [PIXELS_PER_BEAT-1:0] muX_sq_plus_muY_sq_ready_1, muX_sq_plus_muY_sq_ready_2, muX_sq_plus_muY_sq_ready_3;
+wire [PIXELS_PER_BEAT-1:0] muX_sq_plus_muY_sq_ready_1, muX_sq_plus_muY_sq_ready_2;
 wire muX_sq_plus_muY_sq_ready_x = muX_sq_plus_muY_sq_ready_1[0];
 wire muX_sq_plus_muY_sq_ready_y = muX_sq_plus_muY_sq_ready_2[0];
 wire [PIXELS_PER_BEAT-1:0] muX_sq_plus_muY_sq_val, muX_sq_plus_muY_sq_la;
@@ -75,12 +73,11 @@ wire muX_sq_plus_muY_sq_valid = muX_sq_plus_muY_sq_val[0];
 wire muX_sq_plus_muY_sq_last = muX_sq_plus_muY_sq_la[0];
 
 wire [((2*PIXEL_SIZE+2)*PIXELS_PER_BEAT)-1:0] numr_part_1_x, denr_part_1_x;
-wire [PIXELS_PER_BEAT-1:0] muX_muY_times2_plus_c1_ready_1, muX_muY_times2_plus_c1_ready_2, muX_muY_times2_plus_c1_ready_3;
-wire [PIXELS_PER_BEAT-1:0] muX_sq_plus_muY_sq_plus_c1_ready_1, muX_sq_plus_muY_sq_plus_c1_ready_2, muX_sq_plus_muY_sq_plus_c1_ready_3;
+wire [PIXELS_PER_BEAT-1:0] muX_muY_times2_plus_c1_ready_1, muX_muY_times2_plus_c1_ready_2;
+wire [PIXELS_PER_BEAT-1:0] muX_sq_plus_muY_sq_plus_c1_ready_1, muX_sq_plus_muY_sq_plus_c1_ready_2;
 wire muX_sq_plus_muY_sq_plus_c1_ready_x = muX_sq_plus_muY_sq_plus_c1_ready_1[0];
 wire muX_muY_times2_plus_c1_ready_x = muX_muY_times2_plus_c1_ready_1[0];
 wire muX_muY_times2_plus_c1_ready_y = muX_muY_times2_plus_c1_ready_2[0];
-wire muX_muY_times2_plus_c1_ready_z = muX_muY_times2_plus_c1_ready_3[0];
 wire [PIXELS_PER_BEAT-1:0] numr_part_1_x_val, numr_part_1_x_la, denr_part_1_x_val, denr_part_1_x_la;
 wire numr_part_1_x_valid = numr_part_1_x_val[0];
 wire numr_part_1_x_last = numr_part_1_x_la[0];
@@ -89,7 +86,7 @@ wire denr_part_1_x_last = denr_part_1_x_la[0];
 
 wire [(((2*PIXEL_SIZE)+2)*PIXELS_PER_BEAT)-1:0] numr_part_2_x;
 wire [(((2*PIXEL_SIZE)+2)*PIXELS_PER_BEAT)-1:0] denr_part_2_x;
-wire [PIXELS_PER_BEAT-1:0] numr_part_2_x_ready_1, numr_part_2_x_ready_2, numr_part_2_x_ready_3;
+wire [PIXELS_PER_BEAT-1:0] numr_part_2_x_ready_1, numr_part_2_x_ready_2;
 wire [PIXELS_PER_BEAT-1:0] denr_part_2_x_ready_1, denr_part_2_x_ready_2, denr_part_2_x_ready_3;
 wire numr_part_2_x_ready_x = numr_part_2_x_ready_1[0];
 wire denr_part_2_x_ready_x = denr_part_2_x_ready_1[0];
@@ -119,8 +116,6 @@ wire buff_map_x_ready, buff_map_y_ready;
 
 wire [DATA_WIDTH-1:0] buff_out_mu_x, buff_out_mu_y;
 wire buff_out_mu_x_ready, buff_out_mu_y_ready, buff_out_mu_x_valid, buff_out_mu_y_valid, buff_out_mu_x_last, buff_out_mu_y_last;
-
-// Datapath
 
 axis_buff #( .S_AXIS_DATA_WIDTH(DATA_WIDTH), .M_AXIS_DATA_WIDTH(DATA_WIDTH) )buff_map_x (
     .aclk(aclk),
@@ -325,7 +320,7 @@ genvar k;
 generate
     for (k = 0; k < PIXELS_PER_BEAT; k = k+1) begin
 
-        axis_adder #(.DATA_WIDTH(2*PIXEL_SIZE), .mode(0)) muX_sq_plus_muY_sq_adder (
+        axis_adder_2 #(.DATA_WIDTH(2*PIXEL_SIZE), .mode(0)) muX_sq_plus_muY_sq_adder (
             .aclk(aclk),
             .aresetn(aresetn),
             .s_axis_tdata_x(muX_sq[k*(2*PIXEL_SIZE)+:2*PIXEL_SIZE]),
@@ -336,31 +331,19 @@ generate
             .s_axis_tvalid_y(muY_sq_valid),
             .s_axis_tready_y(muX_sq_plus_muY_sq_ready_2[k]),
             .s_axis_tlast_y(muY_sq_last),
-            .s_axis_tdata_z(0),
-            .s_axis_tvalid_z(1'b1),
-            .s_axis_tready_z(muX_sq_plus_muY_sq_ready_3[k]),
-            .s_axis_tlast_z(1'b1),
             .m_axis_tdata(muX_sq_plus_muY_sq[k*(2*PIXEL_SIZE+1)+:2*PIXEL_SIZE+1]),
             .m_axis_tvalid(muX_sq_plus_muY_sq_val[k]),
             .m_axis_tready(muX_sq_plus_muY_sq_plus_c1_ready_x),
             .m_axis_tlast(muX_sq_plus_muY_sq_la[k])
         );
 
-        axis_adder #(.DATA_WIDTH(2*PIXEL_SIZE), .mode(0)) buff (
+        axis_buff #( .S_AXIS_DATA_WIDTH(2*PIXEL_SIZE), .M_AXIS_DATA_WIDTH(2*PIXEL_SIZE)) buff(
             .aclk(aclk),
             .aresetn(aresetn),
-            .s_axis_tdata_x(int_muX_muY[k*(2*PIXEL_SIZE)+:2*PIXEL_SIZE]),
-            .s_axis_tvalid_x(int_muX_muY_times2_valid),
-            .s_axis_tready_x(buff_ready_1[k]),
-            .s_axis_tlast_x(int_muX_muY_times2_last),
-            .s_axis_tdata_y(0),
-            .s_axis_tvalid_y(1'b1),
-            .s_axis_tready_y(buff_ready_2[k]),
-            .s_axis_tlast_y(1'b1),
-            .s_axis_tdata_z(0),
-            .s_axis_tvalid_z(1'b1),
-            .s_axis_tready_z(buff_ready_3[k]),
-            .s_axis_tlast_z(1'b1),
+            .s_axis_tdata(int_muX_muY[k*(2*PIXEL_SIZE)+:2*PIXEL_SIZE]),
+            .s_axis_tvalid(int_muX_muY_times2_valid),
+            .s_axis_tready(buff_ready_1[k]),
+            .s_axis_tlast(int_muX_muY_times2_last),
             .m_axis_tdata(muX_muY[k*(2*PIXEL_SIZE)+:2*PIXEL_SIZE]),
             .m_axis_tvalid(muX_muY_val_1[k]),
             .m_axis_tready(muX_muY_times2_plus_c1_ready_x),
@@ -374,7 +357,7 @@ genvar l;
 generate
     for (l = 0; l < PIXELS_PER_BEAT; l = l+1) begin
 
-        axis_adder #(.DATA_WIDTH(2*PIXEL_SIZE+1), .mode(0)) muX_sq_plus_muY_sq_plus_c1_adder (
+        axis_adder_2 #(.DATA_WIDTH(2*PIXEL_SIZE+1), .mode(0)) muX_sq_plus_muY_sq_plus_c1_adder (
             .aclk(aclk),
             .aresetn(aresetn),
             .s_axis_tdata_x(muX_sq_plus_muY_sq[l*(2*PIXEL_SIZE+1)+:2*PIXEL_SIZE+1]),
@@ -385,17 +368,13 @@ generate
             .s_axis_tvalid_y(1'b1),
             .s_axis_tready_y(muX_sq_plus_muY_sq_plus_c1_ready_2[l]),
             .s_axis_tlast_y(1'b1),
-            .s_axis_tdata_z(0),
-            .s_axis_tvalid_z(1'b1),
-            .s_axis_tready_z(muX_sq_plus_muY_sq_plus_c1_ready_3[l]),
-            .s_axis_tlast_z(1'b1),
             .m_axis_tdata(denr_part_1_x[l*(2*PIXEL_SIZE+2)+:2*PIXEL_SIZE+2]),
             .m_axis_tvalid(denr_part_1_x_val[l]),
             .m_axis_tready(denr_x_multiplier_ready_x),
             .m_axis_tlast(denr_part_1_x_la[l])
         );
 
-        axis_adder #(.DATA_WIDTH(2*PIXEL_SIZE+1), .mode(0)) muX_muY_times2_plus_c1_adder (
+        axis_adder_2 #(.DATA_WIDTH(2*PIXEL_SIZE+1), .mode(0)) muX_muY_times2_plus_c1_adder (
             .aclk(aclk),
             .aresetn(aresetn),
             .s_axis_tdata_x(({1'b0, muX_muY[l*(2*PIXEL_SIZE)+:2*PIXEL_SIZE]} << 1)),
@@ -406,10 +385,6 @@ generate
             .s_axis_tvalid_y(1'b1),
             .s_axis_tready_y(muX_muY_times2_plus_c1_ready_2[l]),
             .s_axis_tlast_y(1'b1),
-            .s_axis_tdata_z(0),
-            .s_axis_tvalid_z(1'b1),
-            .s_axis_tready_z(muX_muY_times2_plus_c1_ready_3[l]),
-            .s_axis_tlast_z(1'b1),
             .m_axis_tdata(numr_part_1_x[l*(2*PIXEL_SIZE+2)+:2*PIXEL_SIZE+2]),
             .m_axis_tvalid(numr_part_1_x_val[l]),
             .m_axis_tready(numr_x_multiplier_ready_x),
@@ -423,16 +398,16 @@ genvar m;
 generate
     for (m = 0; m < PIXELS_PER_BEAT; m = m+1) begin : stage4_adders
 
-        wire signed [2*PIXEL_SIZE+3:0] raw_sum_x_full;
+        wire signed [2*PIXEL_SIZE+2:0] raw_sum_x_full;
         wire signed [2*PIXEL_SIZE+1:0] multiplied_sig_xy;
-        
-        wire [2*PIXEL_SIZE+1:0] c2_numr_padded = c2; 
+
+        wire [2*PIXEL_SIZE+1:0] c2_numr_padded = c2;
 
         assign multiplied_sig_xy = $signed({out_sig_xy[m*(2*PIXEL_SIZE+1) + 2*PIXEL_SIZE], out_sig_xy[m*(2*PIXEL_SIZE+1) +: (2*PIXEL_SIZE+1)]}) <<< 1;
-        assign stage4_sign_x[m] = raw_sum_x_full[2*PIXEL_SIZE+3];
+        assign stage4_sign_x[m] = raw_sum_x_full[2*PIXEL_SIZE+2];
 
-        axis_adder #( 
-            .DATA_WIDTH(2*PIXEL_SIZE+2), 
+        axis_adder_2 #(
+            .DATA_WIDTH(2*PIXEL_SIZE+2),
             .mode(1)
         ) numr_part_2_x_adder (
             .aclk(aclk),
@@ -445,17 +420,13 @@ generate
             .s_axis_tvalid_y(1'b1),
             .s_axis_tready_y(numr_part_2_x_ready_2[m]),
             .s_axis_tlast_y(1'b1),
-            .s_axis_tdata_z(18'd0),
-            .s_axis_tvalid_z(1'b1),
-            .s_axis_tready_z(numr_part_2_x_ready_3[m]),
-            .s_axis_tlast_z(1'b1),
             .m_axis_tdata(raw_sum_x_full),
             .m_axis_tvalid(numr_part_2_x_val[m]),
             .m_axis_tready(numr_x_multiplier_ready_y),
             .m_axis_tlast(numr_part_2_x_la[m])
         );
 
-        assign numr_part_2_x[m*(2*PIXEL_SIZE+2) +: (2*PIXEL_SIZE+2)] = raw_sum_x_full[2*PIXEL_SIZE+3] ? (~raw_sum_x_full[2*PIXEL_SIZE+1:0] + 1'b1) : raw_sum_x_full[2*PIXEL_SIZE+1:0];
+        assign numr_part_2_x[m*(2*PIXEL_SIZE+2) +: (2*PIXEL_SIZE+2)] = raw_sum_x_full[2*PIXEL_SIZE+2] ? (~raw_sum_x_full[2*PIXEL_SIZE+1:0] + 1'b1) : raw_sum_x_full[2*PIXEL_SIZE+1:0];
 
         axis_adder #(.DATA_WIDTH(2*PIXEL_SIZE), .mode(0)) denr_part_2_x_adder (
             .aclk(aclk),
