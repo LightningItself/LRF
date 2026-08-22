@@ -54,8 +54,8 @@ if {[file exists $IP_FILE]} {
 
 add_files -fileset sources_1 ${SRC_DIR}/multiplier.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_buff.v
-add_files -fileset sources_1 ${SRC_DIR}/axis_buff_depth.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_adder.v
+add_files -fileset sources_1 ${SRC_DIR}/axis_adder_2.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_sub.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_comparator.v
 add_files -fileset sources_1 ${SRC_DIR}/sig_xy.v
@@ -63,7 +63,9 @@ add_files -fileset sources_1 ${SRC_DIR}/hssim.v
 add_files -fileset sources_1 ${SRC_DIR}/hssim_top.v
 add_files -fileset sources_1 ${SRC_DIR}/conv_gauss.v
 add_files -fileset sources_1 ${SRC_DIR}/conv_sobel.v
+add_files -fileset sources_1 ${SRC_DIR}/skid_buff.v
 add_files -fileset sources_1 ${SRC_DIR}/sobel_hssim_top.v
+
 
 add_files -fileset sim_1 ${UTILS_SV_DIR}/sim_axis.sv
 set_property file_type SystemVerilog [get_files ${UTILS_SV_DIR}/sim_axis.sv]

@@ -34,7 +34,7 @@ puts "Generating vivado project..."
 create_project -force sim_project ${WORKSPACE_DIR}/sim_project
 
 add_files -fileset sources_1 ${SRC_DIR}/multiplier.v
-add_files -fileset sources_1 ${SRC_DIR}/axis_adder.v
+add_files -fileset sources_1 ${SRC_DIR}/axis_adder_2.v
 add_files -fileset sources_1 ${SRC_DIR}/fusion.v
 
 add_files -fileset sim_1 ${UTILS_SV_DIR}/sim_axis.sv
