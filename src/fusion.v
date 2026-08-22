@@ -30,8 +30,7 @@ module FUSION #(
 
 // Wire Declarations
 
-wire advance = ( fused_frame_tready || ~fused_frame_tvalid);
-wire last = old_frame_tlast & new_frame_tlast & del_gauss_tlast;
+wire advance = (fused_frame_tready | ~fused_frame_tvalid);
 
 wire [DATA_WIDTH-1:0] dbar;
 
@@ -52,7 +51,6 @@ wire [PIXELS_PER_BEAT-1:0] final_adder_ready_1, final_adder_ready_2, final_adder
 wire final_adder_ready_x = final_adder_ready_1[0];
 wire final_adder_ready_y = final_adder_ready_2[0];
 wire final_adder_ready_z = final_adder_ready_3[0];
-wire adder_ready = final_adder_ready_x & final_adder_ready_y & final_adder_ready_z;
 wire final_valid = int_value_valid[0];
 wire final_last = int_value_last[0];
 
@@ -77,7 +75,7 @@ for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
         .s_axis_tlast_y(del_gauss_tlast),
         .m_axis_tdata(x_dbar[j*2*PIXEL_SIZE+:2*PIXEL_SIZE]),
         .m_axis_tvalid(x_dbar_valid_1[j]),
-        .m_axis_tready(adder_ready),
+        .m_axis_tready(final_adder_ready_x),
         .m_axis_tlast(x_dbar_last_1[j])
     );
 
@@ -94,7 +92,7 @@ for(j=0; j<PIXELS_PER_BEAT; j=j+1) begin
         .s_axis_tlast_y(del_gauss_tlast),
         .m_axis_tdata(y_d[j*2*PIXEL_SIZE+:2*PIXEL_SIZE]),
         .m_axis_tvalid(y_d_valid_1[j]),
-        .m_axis_tready(adder_ready),
+        .m_axis_tready(final_adder_ready_x),
         .m_axis_tlast(y_d_last_1[j])
     );
 
@@ -149,8 +147,8 @@ always @(posedge aclk) begin
     end
 end
 
-assign old_frame_tready = x_dbar_mult_ready_x & x_dbar_mult_ready_y & y_d_mult_ready_x & y_d_mult_ready_y & new_frame_tvalid & del_gauss_tvalid;
-assign new_frame_tready = x_dbar_mult_ready_x & x_dbar_mult_ready_y & y_d_mult_ready_x & y_d_mult_ready_y & del_gauss_tvalid & old_frame_tvalid;
-assign del_gauss_tready = x_dbar_mult_ready_x & x_dbar_mult_ready_y & y_d_mult_ready_x & y_d_mult_ready_y & new_frame_tvalid & old_frame_tvalid;
+assign old_frame_tready = x_dbar_mult_ready_x & new_frame_tvalid & del_gauss_tvalid;
+assign new_frame_tready = x_dbar_mult_ready_x & del_gauss_tvalid & old_frame_tvalid;
+assign del_gauss_tready = x_dbar_mult_ready_x & & new_frame_tvalid & old_frame_tvalid;
 
 endmodule
