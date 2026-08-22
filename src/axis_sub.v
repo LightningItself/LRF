@@ -19,10 +19,7 @@ module AXIS_SUB #(
     output reg                   m_axis_tlast
 );
 
-wire advance = (m_axis_tready || !m_axis_tvalid);
-
-assign s_axis_a_tready = advance && s_axis_b_tvalid;
-assign s_axis_b_tready = advance && s_axis_a_tvalid;
+wire advance = (m_axis_tready | !m_axis_tvalid);
 
 always @(posedge aclk) begin
     if (!aresetn) begin
@@ -31,17 +28,20 @@ always @(posedge aclk) begin
         m_axis_tlast  <= 1'b0;
     end 
     else begin
-        if (s_axis_a_tvalid & s_axis_a_tready & s_axis_b_tvalid & s_axis_b_tready) begin
+        if (s_axis_a_tvalid & s_axis_a_tready) begin
             m_axis_tdata  <= $signed({1'b0, s_axis_a_tdata}) - $signed({1'b0, s_axis_b_tdata});
             m_axis_tvalid <= 1'b1;
-            m_axis_tlast  <= s_axis_a_tlast & s_axis_b_tlast;
+            m_axis_tlast  <= s_axis_a_tlast;
         end 
-        else if (m_axis_tvalid && m_axis_tready) begin
+        else if (m_axis_tvalid & m_axis_tready) begin
             m_axis_tdata  <= {(DATA_WIDTH+1){1'b0}};
             m_axis_tvalid <= 1'b0;
             m_axis_tlast  <= 1'b0;
         end
     end
 end
+
+assign s_axis_a_tready = advance & s_axis_b_tvalid;
+assign s_axis_b_tready = advance & s_axis_a_tvalid;
 
 endmodule

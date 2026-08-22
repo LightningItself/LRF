@@ -23,16 +23,12 @@ module axis_add_sub #(
     output reg                  m_axis_tlast
 );
 
-wire pair_last = s_axis_tlast_x & s_axis_tlast_y & s_axis_tlast_z;
-wire pair_valid = s_axis_tvalid_x & s_axis_tvalid_y & s_axis_tvalid_z;
-
-// stage 1: subtract
-(* keep = "true" *) reg [DATA_WIDTH:0]  sub_stage;
+reg [DATA_WIDTH:0] sub_stage;
 reg [DATA_WIDTH-1:0] z_stage;
 reg sub_stage_valid, sub_stage_last;
 
-wire stage2_advance = (m_axis_tready || !m_axis_tvalid);
-wire stage1_advance = stage2_advance || !sub_stage_valid;
+wire stage2_advance = (m_axis_tready | !m_axis_tvalid);
+wire stage1_advance = (stage2_advance | !sub_stage_valid);
 
 always @(posedge aclk) begin
     if(!aresetn) begin
@@ -42,11 +38,11 @@ always @(posedge aclk) begin
         sub_stage_last <= 0;
     end
     else begin
-        if(pair_valid && s_axis_tready_x && s_axis_tready_y && s_axis_tready_z) begin
+        if(s_axis_tvalid_x & s_axis_tready_x) begin
             sub_stage <= (mode == 0) ? (s_axis_tdata_x - s_axis_tdata_y) : ($signed(s_axis_tdata_x) - $signed(s_axis_tdata_y));
             z_stage <= s_axis_tdata_z;
             sub_stage_valid <= 1;
-            sub_stage_last <= pair_last;
+            sub_stage_last <= s_axis_tlast_x;
         end
         else if(stage2_advance) begin
             sub_stage_valid <= 0;
@@ -55,7 +51,6 @@ always @(posedge aclk) begin
     end
 end
 
-// stage 2: add
 always@(posedge aclk) begin
     if(!aresetn) begin
         m_axis_tdata <= 0;
@@ -63,12 +58,12 @@ always@(posedge aclk) begin
         m_axis_tlast <= 0;
     end
     else begin
-        if(sub_stage_valid && stage2_advance) begin
+        if(sub_stage_valid & stage2_advance) begin
             m_axis_tdata <= (mode == 0) ? (sub_stage + z_stage) : ($signed(sub_stage) + $signed(z_stage));
             m_axis_tvalid <= 1;
             m_axis_tlast <= sub_stage_last;
         end
-        else if(m_axis_tvalid && m_axis_tready) begin
+        else if(m_axis_tvalid & m_axis_tready) begin
             m_axis_tdata <= 0;
             m_axis_tvalid <= 0; 
             m_axis_tlast <= 0;
@@ -76,8 +71,8 @@ always@(posedge aclk) begin
     end
 end
 
-assign s_axis_tready_x = stage1_advance && s_axis_tvalid_y && s_axis_tvalid_z;
-assign s_axis_tready_y = stage1_advance && s_axis_tvalid_x && s_axis_tvalid_z;
-assign s_axis_tready_z = stage1_advance && s_axis_tvalid_x && s_axis_tvalid_y;
+assign s_axis_tready_x = stage1_advance & s_axis_tvalid_y & s_axis_tvalid_z;
+assign s_axis_tready_y = stage1_advance & s_axis_tvalid_x & s_axis_tvalid_z;
+assign s_axis_tready_z = stage1_advance & s_axis_tvalid_x & s_axis_tvalid_y;
 
 endmodule
