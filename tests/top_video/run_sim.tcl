@@ -66,6 +66,7 @@ if {[file exists $FIFO_IP_FILE]} {
 
 add_files -fileset sources_1 ${SRC_DIR}/multiplier.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_adder.v
+add_files -fileset sources_1 ${SRC_DIR}/axis_adder_2.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_sub.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_buff.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_comparator.v
@@ -80,6 +81,7 @@ add_files -fileset sources_1 ${SRC_DIR}/sobel_hssim_top.v
 add_files -fileset sources_1 ${SRC_DIR}/fusion.v
 add_files -fileset sources_1 ${SRC_DIR}/fusion_top.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_add_sub.v
+add_files -fileset sources_1 ${SRC_DIR}/skid_buff.v
 add_files -fileset sources_1 ${SRC_DIR}/top.v
 
 add_files -fileset sim_1 ${UTILS_SV_DIR}/sim_axis.sv
