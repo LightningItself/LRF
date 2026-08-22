@@ -73,37 +73,101 @@ reg [PIXELS_PER_BEAT-1:0] numr_x_sign_3,numr_z_sign_3;
 
 // DataPath
 
+wire [DATA_WIDTH-1:0] avg_map_buff_1;
+wire avg_map_valid_buff_1, avg_map_last_buff_1, avg_map_buffer_1_ready;
+
+axis_buff #( .S_AXIS_DATA_WIDTH(DATA_WIDTH), .M_AXIS_DATA_WIDTH(DATA_WIDTH)) avg_map_buffer_1(
+    .aclk(aclk),
+    .aresetn(aresetn),
+    .s_axis_tdata(avg_map),
+    .s_axis_tvalid(maps_valid),
+    .s_axis_tready(avg_map_buffer_1_ready),
+    .s_axis_tlast(avg_map_last),
+    .m_axis_tdata(avg_map_buff_1),
+    .m_axis_tvalid(avg_map_valid_buff_1),
+    .m_axis_tready(hssim_old_avg_ready_2),
+    .m_axis_tlast(avg_map_last_buff_1)
+);
+
+wire [DATA_WIDTH-1:0] avg_map_buff_2;
+wire avg_map_valid_buff_2, avg_map_last_buff_2, avg_map_buffer_2_ready;
+
+axis_buff #( .S_AXIS_DATA_WIDTH(DATA_WIDTH), .M_AXIS_DATA_WIDTH(DATA_WIDTH)) avg_map_buffer_2(
+    .aclk(aclk),
+    .aresetn(aresetn),
+    .s_axis_tdata(avg_map),
+    .s_axis_tvalid(maps_valid),
+    .s_axis_tready(avg_map_buffer_2_ready),
+    .s_axis_tlast(avg_map_last),
+    .m_axis_tdata(avg_map_buff_2),
+    .m_axis_tvalid(avg_map_valid_buff_2),
+    .m_axis_tready(hssim_avg_new_ready_1),
+    .m_axis_tlast(avg_map_last_buff_2)
+);
+
+wire [DATA_WIDTH-1:0] old_map_buff;
+wire old_map_valid_buff, old_map_last_buff, old_map_buffer_ready;
+
+axis_buff #( .S_AXIS_DATA_WIDTH(DATA_WIDTH), .M_AXIS_DATA_WIDTH(DATA_WIDTH)) old_map_buffer(
+    .aclk(aclk),
+    .aresetn(aresetn),
+    .s_axis_tdata(old_map),
+    .s_axis_tvalid(maps_valid),
+    .s_axis_tready(old_map_buffer_ready),
+    .s_axis_tlast(old_map_last),
+    .m_axis_tdata(old_map_buff),
+    .m_axis_tvalid(old_map_valid_buff),
+    .m_axis_tready(hssim_old_avg_ready_1),
+    .m_axis_tlast(old_map_last_buff)
+);
+
+wire [DATA_WIDTH-1:0] new_map_buff;
+wire new_map_valid_buff, new_map_last_buff, new_map_buffer_ready;
+
+axis_buff #( .S_AXIS_DATA_WIDTH(DATA_WIDTH), .M_AXIS_DATA_WIDTH(DATA_WIDTH)) new_map_buffer(
+    .aclk(aclk),
+    .aresetn(aresetn),
+    .s_axis_tdata(new_map),
+    .s_axis_tvalid(maps_valid),
+    .s_axis_tready(new_map_buffer_ready),
+    .s_axis_tlast(new_map_last),
+    .m_axis_tdata(new_map_buff),
+    .m_axis_tvalid(new_map_valid_buff),
+    .m_axis_tready(hssim_avg_new_ready_2),
+    .m_axis_tlast(new_map_last_buff)
+);
+
 HSSIM #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .PIXEL_SIZE(PIXEL_SIZE), .IMAGE_DIM(IMAGE_DIM)) old_avg (
     .aclk(aclk),
     .aresetn(aresetn),
-    .map_x(old_map),
-    .map_x_valid(maps_valid),
+    .map_x(old_map_buff),
+    .map_x_valid(old_map_valid_buff),
     .map_x_ready(hssim_old_avg_ready_1),
-    .map_x_last(old_map_last),
-    .map_y(avg_map),
-    .map_y_valid(maps_valid),
+    .map_x_last(old_map_last_buff),
+    .map_y(avg_map_buff_1),
+    .map_y_valid(avg_map_valid_buff_1),
     .map_y_ready(hssim_old_avg_ready_2),
-    .map_y_last(avg_map_last),
+    .map_y_last(avg_map_last_buff_1),
     .sign_numr_denr(hssim_out_old_avg),
     .out_valid(hssim_out_old_avg_valid),
-    .out_ready(p1_mult_ready_x & p2_mult_ready_y & p1_mult_ready_y & p2_mult_ready_x),
+    .out_ready(p1_mult_ready_x),
     .out_last(hssim_out_old_avg_last)
 );
 
 HSSIM #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .PIXEL_SIZE(PIXEL_SIZE), .IMAGE_DIM(IMAGE_DIM)) avg_new (
     .aclk(aclk),
     .aresetn(aresetn),
-    .map_x(avg_map),
-    .map_x_valid(maps_valid),
+    .map_x(avg_map_buff_2),
+    .map_x_valid(avg_map_valid_buff_2),
     .map_x_ready(hssim_avg_new_ready_1),
-    .map_x_last(avg_map_last),
-    .map_y(new_map),
-    .map_y_valid(maps_valid),
+    .map_x_last(avg_map_last_buff_2),
+    .map_y(new_map_buff),
+    .map_y_valid(new_map_valid_buff),
     .map_y_ready(hssim_avg_new_ready_2),
-    .map_y_last(new_map_last),
+    .map_y_last(new_map_last_buff),
     .sign_numr_denr(hssim_out_avg_new),
     .out_valid(hssim_out_avg_new_valid),
-    .out_ready(p1_mult_ready_y & p2_mult_ready_x & p1_mult_ready_x & p2_mult_ready_y),
+    .out_ready(p1_mult_ready_y),
     .out_last(hssim_out_avg_new_last)
 );
 
@@ -123,7 +187,7 @@ generate
             .s_axis_tlast_y(hssim_out_avg_new_last),
             .m_axis_tdata(p1[i*4*(2*PIXEL_SIZE+2)+:4*(2*PIXEL_SIZE+2)]),
             .m_axis_tvalid(p1_valid_1[i]),
-            .m_axis_tready(comp_ready_x & comp_ready_y),
+            .m_axis_tready(comp_ready_x),
             .m_axis_tlast(p1_last_1[i])
         );
 
@@ -140,7 +204,7 @@ generate
             .s_axis_tlast_y(hssim_out_old_avg_last),
             .m_axis_tdata(p2[i*4*(2*PIXEL_SIZE+2)+:4*(2*PIXEL_SIZE+2)]),
             .m_axis_tvalid(p2_valid_1[i]),
-            .m_axis_tready(comp_ready_x & comp_ready_y),
+            .m_axis_tready(comp_ready_x),
             .m_axis_tlast(p2_last_1[i])
         );
     end
@@ -152,7 +216,7 @@ always @(posedge aclk) begin
         numr_z_sign_1 <= 0;
     end
     else begin
-        if(p1_mult_ready_x & p1_mult_ready_y & p2_mult_ready_x & p2_mult_ready_y & hssim_out_old_avg_valid & hssim_out_avg_new_valid) begin
+        if(p1_mult_ready_x & hssim_out_old_avg_valid) begin
             numr_x_sign_1 <= numr_x_sign;
             numr_z_sign_1 <= numr_z_sign;
         end
@@ -191,7 +255,7 @@ always @(posedge aclk) begin
         p2_buff_1_valid <= 0;
     end
     else begin
-        if(comp_ready_x & comp_ready_y & p1_valid & p2_valid) begin
+        if(comp_ready_x & & p1_valid) begin
             numr_x_sign_2 <= numr_x_sign_1;
             numr_z_sign_2 <= numr_z_sign_1;
             p1_buff_1 <= p1;
@@ -215,7 +279,7 @@ always @(posedge aclk) begin
         p2_buff_2_valid <= 0;
     end
     else begin
-        if(advance || !comp_valid) begin
+        if(advance | !comp_valid) begin
             numr_x_sign_3 <= numr_x_sign_2;
             numr_z_sign_3 <= numr_z_sign_2;
             p1_buff_2 <= p1_buff_1;
@@ -263,15 +327,15 @@ always @(posedge aclk) begin
             del_valid <= 1'b1;
             del_last <= comp_last;
         end
-        else if (del_ready && del_valid) begin
+        else if (del_ready & del_valid) begin
             del_valid <= 1'b0;
             del_last <= 1'b0;
         end
     end
 end
 
-assign old_map_ready = hssim_old_avg_ready_1 & hssim_old_avg_ready_2 & hssim_avg_new_ready_1 & hssim_avg_new_ready_2 & avg_map_valid & new_map_valid;
-assign avg_map_ready = hssim_old_avg_ready_1 & hssim_old_avg_ready_2 & hssim_avg_new_ready_1 & hssim_avg_new_ready_2 & old_map_valid & new_map_valid;
-assign new_map_ready = hssim_old_avg_ready_1 & hssim_old_avg_ready_2 & hssim_avg_new_ready_1 & hssim_avg_new_ready_2 & old_map_valid & avg_map_valid;
+assign old_map_ready = old_map_buffer_ready & avg_map_valid & new_map_valid;
+assign avg_map_ready = avg_map_buffer_1_ready & old_map_valid & new_map_valid;
+assign new_map_ready = new_map_buffer_ready & old_map_valid & avg_map_valid;
 
 endmodule
