@@ -42,15 +42,13 @@ wire x_dbar_mult_ready_y = x_dbar_mult_ready_2[0];
 wire x_dbar_valid = x_dbar_valid_1[0];
 wire x_dbar_last = x_dbar_last_1[0];
 wire y_d_mult_ready_x = y_d_mult_ready_1[0];
-wire y_d_mult_ready_y = y_d_mult_ready_2[0];
 wire y_d_valid = y_d_valid_1[0];
 wire y_d_last = y_d_last_1[0];
 
 wire [((2*PIXEL_SIZE)+2)*PIXELS_PER_BEAT-1:0] int_value;
-wire [PIXELS_PER_BEAT-1:0] final_adder_ready_1, final_adder_ready_2, final_adder_ready_3, int_value_valid, int_value_last;
+wire [PIXELS_PER_BEAT-1:0] final_adder_ready_1, final_adder_ready_2, int_value_valid, int_value_last;
 wire final_adder_ready_x = final_adder_ready_1[0];
 wire final_adder_ready_y = final_adder_ready_2[0];
-wire final_adder_ready_z = final_adder_ready_3[0];
 wire final_valid = int_value_valid[0];
 wire final_last = int_value_last[0];
 
@@ -102,7 +100,7 @@ endgenerate
 genvar k;
 generate 
     for(k=0; k<PIXELS_PER_BEAT; k=k+1) begin
-        axis_adder #(.DATA_WIDTH(2*PIXEL_SIZE), .mode(0)) final_adder (
+        axis_adder_2 #(.DATA_WIDTH(2*PIXEL_SIZE), .mode(0)) final_adder (
             .aclk(aclk),
             .aresetn(aresetn),
             .s_axis_tdata_x(x_dbar[k*2*PIXEL_SIZE+:2*PIXEL_SIZE]),
@@ -113,10 +111,6 @@ generate
             .s_axis_tvalid_y(y_d_valid),
             .s_axis_tready_y(final_adder_ready_2[k]),
             .s_axis_tlast_y(y_d_last),
-            .s_axis_tdata_z(0),
-            .s_axis_tvalid_z(1),
-            .s_axis_tready_z(final_adder_ready_3[k]),
-            .s_axis_tlast_z(1),
             .m_axis_tdata(int_value[k*((2*PIXEL_SIZE)+2)+:(2*PIXEL_SIZE)+2]),
             .m_axis_tvalid(int_value_valid[k]),
             .m_axis_tready(advance),
@@ -148,7 +142,7 @@ always @(posedge aclk) begin
 end
 
 assign old_frame_tready = x_dbar_mult_ready_x & new_frame_tvalid & del_gauss_tvalid;
-assign new_frame_tready = x_dbar_mult_ready_x & del_gauss_tvalid & old_frame_tvalid;
-assign del_gauss_tready = x_dbar_mult_ready_x & & new_frame_tvalid & old_frame_tvalid;
+assign new_frame_tready = y_d_mult_ready_x & del_gauss_tvalid & old_frame_tvalid;
+assign del_gauss_tready = x_dbar_mult_ready_y & & new_frame_tvalid & old_frame_tvalid;
 
 endmodule
