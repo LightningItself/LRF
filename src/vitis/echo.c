@@ -7,7 +7,6 @@
 #include "lwip/err.h"
 #include "lwip/tcp.h"
 #include "netif/xadapter.h"
-#include "sleep.h"
 #if defined (__arm__) || defined (__aarch64__)
 #include "xil_printf.h"
 #endif
@@ -33,9 +32,21 @@ volatile int bytes_received = 0;
 volatile int all_frames_received = 0;
 volatile int total_bytes_received = 0;
 static int i = 0;
-volatile int number = 0;  
+volatile int number = 0;
 static int status = 0;
-XTime t1, t2;
+u64 t1, t2;
+static inline u64 read_cntpct(void)
+{
+    u64 val;
+    asm volatile("mrs %0, cntpct_el0" : "=r" (val));
+    return val;
+}
+static inline u64 read_cntfrq(void)
+{
+    u64 val;
+    asm volatile("mrs %0, cntfrq_el0" : "=r" (val));
+    return val;
+}
 static inline void* get_frame_ptr(int index) {
     return (void *)(DDR_BASE_ADDR + (index * FRAME_SIZE_BYTES));
 }
@@ -87,11 +98,11 @@ int receive_fused_frame_via_dma_polling() {
     }
     while (XAxiDma_Busy(&fusion_sys.dma_inst, XAXIDMA_DEVICE_TO_DMA));
     if(number == 0) {
-        XTime_GetTime(&t1);
+        t1 = read_cntpct();
     }
     number++;
     if(number == (NUM_FRAMES-FRAMES_PER_FUSION+1)) {
-        XTime_GetTime(&t2);
+        t2 = read_cntpct();
     }
     return 0;
 }
@@ -107,7 +118,7 @@ int tcp_send_frame(unsigned char *frame, int len)
         int chunk = len - offset;
         if (chunk > TCP_CHUNK_SIZE) chunk = TCP_CHUNK_SIZE;
         while (tcp_sndbuf(client_pcb) < chunk) {
-            xemacif_input(echo_netif); /* Keep TCP alive while waiting for buffer space */
+            xemacif_input(echo_netif);
         }
         err = tcp_write(client_pcb, frame + offset, chunk, TCP_WRITE_FLAG_COPY);
         if (err != ERR_OK) {
@@ -125,7 +136,6 @@ void fusion_system_polling(void)
     void* new_frame;
     void* old_frame;
     int fusion_count = 0;
-    xil_printf("--- Beginning Fusion DMA Transfers ---\r\n");
     for(i = 0; i < (NUM_FRAMES-FRAMES_PER_FUSION+1); i++) {
         for(int j = 0; j <= FRAMES_PER_FUSION; j++) {
             new_idx = i+j;
@@ -137,14 +147,12 @@ void fusion_system_polling(void)
                     xil_printf("DMA MM2S failed on new frame %d\r\n", new_idx);
                     return;
                 }
-                xil_printf("DMA MM2S success on new frame %d\r\n", new_idx);
             }
             else if(j == FRAMES_PER_FUSION) {
                 if (send_frame_via_dma_polling(old_frame) != 0) {
                     xil_printf("DMA MM2S failed on old frame %d\r\n", old_idx);
                     return;
                 }
-                xil_printf("DMA MM2S success on old frame %d\r\n", old_idx);
                 if (receive_fused_frame_via_dma_polling() != 0) {
                     xil_printf("DMA S2MM failed on fusion %d\r\n", fusion_count);
                     return;
@@ -153,20 +161,18 @@ void fusion_system_polling(void)
                     xil_printf("TCP send failed on fusion %d\r\n", fusion_count);
                     return;
                 }
-                xil_printf("Fusion %d complete and sent.\r\n", fusion_count);
                 fusion_count++;
             }
         }
     }
-    xil_printf("--- All Fusion Processing Complete ---\r\n");
-    double elpased_cycles = (double) (t2-t1);
-    double elapsed_seconds = (double)(t2-t1) / (double)COUNTS_PER_SECOND;
-    double elapsed_us = elapsed_seconds * 1000000.0;
-    double avg_period_us = elapsed_us / (double)(NUM_FRAMES - FRAMES_PER_FUSION);
-    double throughput_Bps = FRAME_SIZE_BYTES / (avg_period_us / 1000000.0);
-    xil_printf("Elapsed cycles: %lu\r\n", (unsigned long)elapsed_cycles);
-    xil_printf("Avg period per fusion: %.2f us\r\n", avg_period_us);
-    xil_printf("Avg throughput: %.4f MB/s\r\n", throughput_Bps / 1000000.0);
+    u64 elapsed_cycles = (t2 - t1);
+    u64 elapsed_us = (elapsed_cycles * 1000000ULL) / (u64)read_cntfrq();
+
+    u64 throughput_MBps_x10000 = ((u64)FRAME_SIZE_BYTES * 10000ULL * (NUM_FRAMES - FRAMES_PER_FUSION)) / elapsed_us;
+    u64 throughput_MBps_whole = throughput_MBps_x10000 / 10000ULL;
+    u64 throughput_MBps_frac  = throughput_MBps_x10000 % 10000ULL;
+
+    xil_printf("Avg throughput: %lu.%04lu MB/s\r\n", (unsigned long)throughput_MBps_whole, (unsigned long)throughput_MBps_frac);
 }
 int transfer_data() {
     static int init_start = 0;
@@ -180,11 +186,7 @@ int transfer_data() {
     }
     return 0;
 }
-void print_app_header()
-{
-    xil_printf("\n\r\n\r----- Fusion Application ------\n\r");
-    xil_printf("Waiting for %d frames on port %d...\n\r", NUM_FRAMES, TCP_PORT);
-}
+void print_app_header(){ }
 err_t recv_callback(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err)
 {
     struct pbuf *q;
@@ -208,9 +210,7 @@ err_t recv_callback(void *arg, struct tcp_pcb *tpcb, struct pbuf *p, err_t err)
         while (bytes_received >= FRAME_SIZE_BYTES) {
             bytes_received -= FRAME_SIZE_BYTES;
             frame_count++;
-            xil_printf("Stored Frame %d/%d\r\n", frame_count, NUM_FRAMES);
             if (frame_count >= NUM_FRAMES) {
-                xil_printf("All %d frames received. Starting Fusion...\r\n", NUM_FRAMES);
                 all_frames_received = 1;
                 tcp_recv(tpcb, NULL);
                 break;
@@ -227,7 +227,6 @@ err_t accept_callback(void *arg, struct tcp_pcb *newpcb, err_t err)
     xil_printf("Client connected\r\n");
     client_pcb = newpcb;
     tcp_recv(client_pcb, recv_callback);
-    xil_printf("Passed recv_callback\r\n");
     return ERR_OK;
 }
 int start_application()
@@ -236,25 +235,21 @@ int start_application()
     err_t err;
     unsigned port = 5001;
     server_pcb = tcp_new_ip_type(IPADDR_TYPE_ANY);
-    if (!server_pcb) {  
+    if (!server_pcb) {
         xil_printf("Error creating PCB.\r\n");
         return -1;
     }
-    xil_printf("Created PCB\r\n");
     err = tcp_bind(server_pcb, IP_ANY_TYPE, port);
     if (err != ERR_OK) {
         xil_printf("Unable to bind to port %d: err = %d\n\r", port, err);
         return -2;
     }
-    xil_printf("Binding Done\r\n");
     tcp_arg(server_pcb, NULL);
     server_pcb = tcp_listen(server_pcb);
     if (!server_pcb) {
         xil_printf("tcp_listen failed\r\n");
         return -3;
     }
-    xil_printf("Listen\r\n");    
     tcp_accept(server_pcb, accept_callback);
-    xil_printf("Passed accept_callback\r\n");  
     return 0;
 }
