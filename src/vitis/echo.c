@@ -7,6 +7,7 @@
 #include "lwip/err.h"
 #include "lwip/tcp.h"
 #include "netif/xadapter.h"
+#include "sleep.h"
 #if defined (__arm__) || defined (__aarch64__)
 #include "xil_printf.h"
 #endif
@@ -30,8 +31,11 @@ FusionSystem_t fusion_sys;
 volatile int frame_count = 0;
 volatile int bytes_received = 0;
 volatile int all_frames_received = 0;
-volatile int total_bytes_received = 0;  
+volatile int total_bytes_received = 0;
+static int i = 0;
+volatile int number = 0;  
 static int status = 0;
+XTime t1, t2;
 static inline void* get_frame_ptr(int index) {
     return (void *)(DDR_BASE_ADDR + (index * FRAME_SIZE_BYTES));
 }
@@ -82,6 +86,13 @@ int receive_fused_frame_via_dma_polling() {
         return -1;
     }
     while (XAxiDma_Busy(&fusion_sys.dma_inst, XAXIDMA_DEVICE_TO_DMA));
+    if(number == 0) {
+        XTime_GetTime(&t1);
+    }
+    number++;
+    if(number == (NUM_FRAMES-FRAMES_PER_FUSION+1)) {
+        XTime_GetTime(&t2);
+    }
     return 0;
 }
 int tcp_send_frame(unsigned char *frame, int len)
@@ -115,7 +126,7 @@ void fusion_system_polling(void)
     void* old_frame;
     int fusion_count = 0;
     xil_printf("--- Beginning Fusion DMA Transfers ---\r\n");
-    for(int i = 0; i < (NUM_FRAMES-FRAMES_PER_FUSION+1); i++) {
+    for(i = 0; i < (NUM_FRAMES-FRAMES_PER_FUSION+1); i++) {
         for(int j = 0; j <= FRAMES_PER_FUSION; j++) {
             new_idx = i+j;
             old_idx = old_frame_index(i);
@@ -148,6 +159,14 @@ void fusion_system_polling(void)
         }
     }
     xil_printf("--- All Fusion Processing Complete ---\r\n");
+    double elpased_cycles = (double) (t2-t1);
+    double elapsed_seconds = (double)(t2-t1) / (double)COUNTS_PER_SECOND;
+    double elapsed_us = elapsed_seconds * 1000000.0;
+    double avg_period_us = elapsed_us / (double)(NUM_FRAMES - FRAMES_PER_FUSION);
+    double throughput_Bps = FRAME_SIZE_BYTES / (avg_period_us / 1000000.0);
+    xil_printf("Elapsed cycles: %lu\r\n", (unsigned long)elapsed_cycles);
+    xil_printf("Avg period per fusion: %.2f us\r\n", avg_period_us);
+    xil_printf("Avg throughput: %.4f MB/s\r\n", throughput_Bps / 1000000.0);
 }
 int transfer_data() {
     static int init_start = 0;
