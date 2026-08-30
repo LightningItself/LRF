@@ -39,6 +39,10 @@ wire [DATA_WIDTH-1:0] mu_x_s, mu_y_s;
 wire mu_valid_x_s, mu_valid_y_s, mu_last_x_s, mu_last_y_s;
 wire mu_x_skid_ready, mu_y_skid_ready;
 
+wire [DATA_WIDTH-1:0] mu_x_b, mu_y_b;
+wire mu_valid_x_b, mu_valid_y_b, mu_last_x_b, mu_last_y_b;
+wire mu_x_buff_ready, mu_y_buff_ready;
+
 wire [2*DATA_WIDTH-1:0] mu_x_mu_y;
 wire [PIXELS_PER_BEAT-1:0] mu_x_mu_y_val;
 wire [PIXELS_PER_BEAT-1:0] mu_x_mu_y_la;
@@ -63,6 +67,10 @@ wire [CONV_GAUSS_INPUT_WIDTH*PIXELS_PER_BEAT-1:0] mult_xy_s;
 wire mult_xy_valid_s, mult_xy_last_s;
 wire mult1_skid_ready;
 
+wire [CONV_GAUSS_INPUT_WIDTH*PIXELS_PER_BEAT-1:0] mult_xy_sb;
+wire mult_xy_valid_sb, mult_xy_last_sb;
+wire mult1_buff_ready;
+
 wire [CONV_GAUSS_INPUT_WIDTH*PIXELS_PER_BEAT-1:0] out_gauss_xy;
 wire out_gauss_xy_valid, out_gauss_xy_last;
 
@@ -85,7 +93,7 @@ axis_skid_buff #(
     .s_axis_tlast(mu_last_x),
     .m_axis_tdata(mu_x_s),
     .m_axis_tvalid(mu_valid_x_s),
-    .m_axis_tready(mul2_x_ready[0]),
+    .m_axis_tready(mu_x_buff_ready),
     .m_axis_tlast(mu_last_x_s)
 );
 
@@ -100,8 +108,40 @@ axis_skid_buff #(
     .s_axis_tlast(mu_last_y),
     .m_axis_tdata(mu_y_s),
     .m_axis_tvalid(mu_valid_y_s),
-    .m_axis_tready(mul2_y_ready[0]),
+    .m_axis_tready(mu_y_buff_ready),
     .m_axis_tlast(mu_last_y_s)
+);
+
+axis_buff #(
+    .S_AXIS_DATA_WIDTH(DATA_WIDTH),
+    .M_AXIS_DATA_WIDTH(DATA_WIDTH)
+) buff_mu_x (
+    .aclk(aclk),
+    .aresetn(aresetn),
+    .s_axis_tdata(mu_x_s),
+    .s_axis_tvalid(mu_valid_x_s),
+    .s_axis_tready(mu_x_buff_ready),
+    .s_axis_tlast(mu_last_x_s),
+    .m_axis_tdata(mu_x_b),
+    .m_axis_tvalid(mu_valid_x_b),
+    .m_axis_tready(mul2_x_ready[0]),
+    .m_axis_tlast(mu_last_x_b)
+);
+
+axis_buff #(
+    .S_AXIS_DATA_WIDTH(DATA_WIDTH),
+    .M_AXIS_DATA_WIDTH(DATA_WIDTH)
+) buff_mu_y (
+    .aclk(aclk),
+    .aresetn(aresetn),
+    .s_axis_tdata(mu_y_s),
+    .s_axis_tvalid(mu_valid_y_s),
+    .s_axis_tready(mu_y_buff_ready),
+    .s_axis_tlast(mu_last_y_s),
+    .m_axis_tdata(mu_y_b),
+    .m_axis_tvalid(mu_valid_y_b),
+    .m_axis_tready(mul2_y_ready[0]),
+    .m_axis_tlast(mu_last_y_b)
 );
 
 genvar k;
@@ -110,14 +150,14 @@ generate
         MULTIPLIER #(.DATA_WIDTH(PIXEL_SIZE), .mode(0)) mult2 (
             .aclk(aclk),
             .aresetn(aresetn),
-            .s_axis_tdata_x(mu_x_s[k*PIXEL_SIZE +:PIXEL_SIZE]),
-            .s_axis_tvalid_x(mu_valid_x_s),
+            .s_axis_tdata_x(mu_x_b[k*PIXEL_SIZE +:PIXEL_SIZE]),
+            .s_axis_tvalid_x(mu_valid_x_b),
             .s_axis_tready_x(mul2_x_ready[k]),
-            .s_axis_tlast_x(mu_last_x_s),
-            .s_axis_tdata_y(mu_y_s[k*PIXEL_SIZE +:PIXEL_SIZE]),
-            .s_axis_tvalid_y(mu_valid_x_s),
+            .s_axis_tlast_x(mu_last_x_b),
+            .s_axis_tdata_y(mu_y_b[k*PIXEL_SIZE +:PIXEL_SIZE]),
+            .s_axis_tvalid_y(mu_valid_x_b),
             .s_axis_tready_y(mul2_y_ready[k]),
-            .s_axis_tlast_y(mu_last_y_s),
+            .s_axis_tlast_y(mu_last_y_b),
             .m_axis_tdata(mu_x_mu_y[k*2*PIXEL_SIZE +: 2*PIXEL_SIZE]),
             .m_axis_tvalid(mu_x_mu_y_val[k]),
             .m_axis_tready(sub_b_ready),
@@ -159,11 +199,27 @@ axis_skid_buff #(
     .s_axis_tlast(mult_xy_last),
     .m_axis_tdata(mult_xy_s),
     .m_axis_tvalid(mult_xy_valid_s),
-    .m_axis_tready(gauss_xy_ready),
+    .m_axis_tready(mult1_buff_ready),
     .m_axis_tlast(mult_xy_last_s)
 );
 
-CONV_GAUSS #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) gauss_xy (aclk, aresetn, mult_xy_s, mult_xy_valid_s, gauss_xy_ready, mult_xy_last_s, out_gauss_xy, out_gauss_xy_valid, sub_a_ready, out_gauss_xy_last);
+axis_buff #(
+    .S_AXIS_DATA_WIDTH(CONV_GAUSS_INPUT_WIDTH*PIXELS_PER_BEAT),
+    .M_AXIS_DATA_WIDTH(CONV_GAUSS_INPUT_WIDTH*PIXELS_PER_BEAT)
+) buff_mult1 (
+    .aclk(aclk),
+    .aresetn(aresetn),
+    .s_axis_tdata(mult_xy_s),
+    .s_axis_tvalid(mult_xy_valid_s),
+    .s_axis_tready(mult1_buff_ready),
+    .s_axis_tlast(mult_xy_last_s),
+    .m_axis_tdata(mult_xy_sb),
+    .m_axis_tvalid(mult_xy_valid_sb),
+    .m_axis_tready(gauss_xy_ready),
+    .m_axis_tlast(mult_xy_last_sb)
+);
+
+CONV_GAUSS #(PIXELS_PER_BEAT, CONV_GAUSS_INPUT_WIDTH, IMAGE_DIM) gauss_xy (aclk, aresetn, mult_xy_sb, mult_xy_valid_sb, gauss_xy_ready, mult_xy_last_sb, out_gauss_xy, out_gauss_xy_valid, sub_a_ready, out_gauss_xy_last);
 
 genvar i;
 generate begin

@@ -117,6 +117,9 @@ wire buff_map_x_ready, buff_map_y_ready;
 wire [DATA_WIDTH-1:0] buff_out_mu_x, buff_out_mu_y;
 wire buff_out_mu_x_ready, buff_out_mu_y_ready, buff_out_mu_x_valid, buff_out_mu_y_valid, buff_out_mu_x_last, buff_out_mu_y_last;
 
+wire [DATA_WIDTH-1:0] buff_out_mu_x2, buff_out_mu_y2;
+wire buff_out_mu_x2_ready, buff_out_mu_y2_ready, buff_out_mu_x2_valid, buff_out_mu_y2_valid, buff_out_mu_x2_last, buff_out_mu_y2_last;
+
 axis_buff #( .S_AXIS_DATA_WIDTH(DATA_WIDTH), .M_AXIS_DATA_WIDTH(DATA_WIDTH) )buff_map_x (
     .aclk(aclk),
     .aresetn(aresetn),
@@ -241,7 +244,7 @@ axis_buff #( .S_AXIS_DATA_WIDTH(DATA_WIDTH), .M_AXIS_DATA_WIDTH(DATA_WIDTH) )buf
     .s_axis_tlast(out_mu_x_last),
     .m_axis_tdata(buff_out_mu_x),
     .m_axis_tvalid(buff_out_mu_x_valid),
-    .m_axis_tready(muX_sq_ready_x),
+    .m_axis_tready(buff_out_mu_x2_ready),
     .m_axis_tlast(buff_out_mu_x_last)
 );
 
@@ -254,8 +257,34 @@ axis_buff #( .S_AXIS_DATA_WIDTH(DATA_WIDTH), .M_AXIS_DATA_WIDTH(DATA_WIDTH) )buf
     .s_axis_tlast(out_mu_y_last),
     .m_axis_tdata(buff_out_mu_y),
     .m_axis_tvalid(buff_out_mu_y_valid),
-    .m_axis_tready(muY_sq_ready_x),
+    .m_axis_tready(buff_out_mu_y2_ready),
     .m_axis_tlast(buff_out_mu_y_last)
+);
+
+axis_buff #( .S_AXIS_DATA_WIDTH(DATA_WIDTH), .M_AXIS_DATA_WIDTH(DATA_WIDTH) )buffer_out_mu_x2 (
+    .aclk(aclk),
+    .aresetn(aresetn),
+    .s_axis_tdata(buff_out_mu_x),
+    .s_axis_tvalid(buff_out_mu_x_valid),
+    .s_axis_tready(buff_out_mu_x2_ready),
+    .s_axis_tlast(buff_out_mu_x_last),
+    .m_axis_tdata(buff_out_mu_x2),
+    .m_axis_tvalid(buff_out_mu_x2_valid),
+    .m_axis_tready(muX_sq_ready_x),
+    .m_axis_tlast(buff_out_mu_x2_last)
+);
+
+axis_buff #( .S_AXIS_DATA_WIDTH(DATA_WIDTH), .M_AXIS_DATA_WIDTH(DATA_WIDTH) )buffer_out_mu_y2 (
+    .aclk(aclk),
+    .aresetn(aresetn),
+    .s_axis_tdata(buff_out_mu_y),
+    .s_axis_tvalid(buff_out_mu_y_valid),
+    .s_axis_tready(buff_out_mu_y2_ready),
+    .s_axis_tlast(buff_out_mu_y_last),
+    .m_axis_tdata(buff_out_mu_y2),
+    .m_axis_tvalid(buff_out_mu_y2_valid),
+    .m_axis_tready(muY_sq_ready_x),
+    .m_axis_tlast(buff_out_mu_y2_last)
 );
 
 genvar j;
@@ -265,14 +294,14 @@ generate
         MULTIPLIER #(.DATA_WIDTH(PIXEL_SIZE), .mode(0)) muX_sq_multiplier (
             .aclk(aclk),
             .aresetn(aresetn),
-            .s_axis_tdata_x(buff_out_mu_x[j*PIXEL_SIZE+:PIXEL_SIZE]),
-            .s_axis_tvalid_x(buff_out_mu_x_valid),
+            .s_axis_tdata_x(buff_out_mu_x2[j*PIXEL_SIZE+:PIXEL_SIZE]),
+            .s_axis_tvalid_x(buff_out_mu_x2_valid),
             .s_axis_tready_x(muX_sq_ready_1[j]),
-            .s_axis_tlast_x(buff_out_mu_x_last),
-            .s_axis_tdata_y(buff_out_mu_x[j*PIXEL_SIZE+:PIXEL_SIZE]),
-            .s_axis_tvalid_y(buff_out_mu_x_valid),
+            .s_axis_tlast_x(buff_out_mu_x2_last),
+            .s_axis_tdata_y(buff_out_mu_x2[j*PIXEL_SIZE+:PIXEL_SIZE]),
+            .s_axis_tvalid_y(buff_out_mu_x2_valid),
             .s_axis_tready_y(muX_sq_ready_2[j]),
-            .s_axis_tlast_y(buff_out_mu_x_last),
+            .s_axis_tlast_y(buff_out_mu_x2_last),
             .m_axis_tdata(muX_sq[j*(2*PIXEL_SIZE)+:2*PIXEL_SIZE]),
             .m_axis_tvalid(muX_sq_val[j]),
             .m_axis_tready(muX_sq_plus_muY_sq_ready_x),
@@ -282,14 +311,14 @@ generate
         MULTIPLIER #(.DATA_WIDTH(PIXEL_SIZE), .mode(0)) muY_sq_multiplier (
             .aclk(aclk),
             .aresetn(aresetn),
-            .s_axis_tdata_x(buff_out_mu_y[j*PIXEL_SIZE+:PIXEL_SIZE]),
-            .s_axis_tvalid_x(buff_out_mu_y_valid),
+            .s_axis_tdata_x(buff_out_mu_y2[j*PIXEL_SIZE+:PIXEL_SIZE]),
+            .s_axis_tvalid_x(buff_out_mu_y2_valid),
             .s_axis_tready_x(muY_sq_ready_1[j]),
-            .s_axis_tlast_x(buff_out_mu_y_last),
-            .s_axis_tdata_y(buff_out_mu_y[j*PIXEL_SIZE+:PIXEL_SIZE]),
-            .s_axis_tvalid_y(buff_out_mu_y_valid),
+            .s_axis_tlast_x(buff_out_mu_y2_last),
+            .s_axis_tdata_y(buff_out_mu_y2[j*PIXEL_SIZE+:PIXEL_SIZE]),
+            .s_axis_tvalid_y(buff_out_mu_y2_valid),
             .s_axis_tready_y(muY_sq_ready_2[j]),
-            .s_axis_tlast_y(buff_out_mu_y_last),
+            .s_axis_tlast_y(buff_out_mu_y2_last),
             .m_axis_tdata(muY_sq[j*(2*PIXEL_SIZE)+:2*PIXEL_SIZE]),
             .m_axis_tvalid(muY_sq_val[j]),
             .m_axis_tready(muX_sq_plus_muY_sq_ready_y),
@@ -299,14 +328,14 @@ generate
         MULTIPLIER #(.DATA_WIDTH(PIXEL_SIZE), .mode(0)) muX_muY_multiplier (
             .aclk(aclk),
             .aresetn(aresetn),
-            .s_axis_tdata_x(buff_out_mu_x[j*PIXEL_SIZE+:PIXEL_SIZE]),
-            .s_axis_tvalid_x(buff_out_mu_x_valid),
+            .s_axis_tdata_x(buff_out_mu_x2[j*PIXEL_SIZE+:PIXEL_SIZE]),
+            .s_axis_tvalid_x(buff_out_mu_x2_valid),
             .s_axis_tready_x(muX_muY_ready_1[j]),
-            .s_axis_tlast_x(buff_out_mu_x_last),
-            .s_axis_tdata_y(buff_out_mu_y[j*PIXEL_SIZE+:PIXEL_SIZE]),
-            .s_axis_tvalid_y(buff_out_mu_y_valid),
+            .s_axis_tlast_x(buff_out_mu_x2_last),
+            .s_axis_tdata_y(buff_out_mu_y2[j*PIXEL_SIZE+:PIXEL_SIZE]),
+            .s_axis_tvalid_y(buff_out_mu_y2_valid),
             .s_axis_tready_y(muX_muY_ready_2[j]),
-            .s_axis_tlast_y(buff_out_mu_y_last),
+            .s_axis_tlast_y(buff_out_mu_y2_last),
             .m_axis_tdata(int_muX_muY[j*(2*PIXEL_SIZE)+:2*PIXEL_SIZE]),
             .m_axis_tvalid(muX_muY_val[j]),
             .m_axis_tready(buff_ready_x),
