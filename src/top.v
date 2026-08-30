@@ -69,9 +69,9 @@ wire add_sub_last = int_add_sub_out_last[0];
 // avg lsu wires
 wire [DATA_WIDTH+(N_FUSE_COUNT)*PIXELS_PER_BEAT-1:0] avg_buff_out;
 wire avg_buff_out_valid, avg_buff_out_last, avg_lsu_ready;
-wire [DATA_WIDTH+(N_FUSE_COUNT)*PIXELS_PER_BEAT-1:0] avg_buff_in = (first) ? iframex16 : ((frame_counter == FUSE_COUNT) ? add_sub_out : 0);
-wire avg_buff_in_valid = (first) ? valid_buff_new : ((frame_counter == FUSE_COUNT) ? add_sub_valid : 0);
-wire avg_buff_in_last = (first) ? last_buff_new : ((frame_counter == FUSE_COUNT) ? add_sub_last : 0);
+wire [DATA_WIDTH+(N_FUSE_COUNT)*PIXELS_PER_BEAT-1:0] avg_buff_in = (first) ? iframex16 : ((frame_counter == 16) ? add_sub_out : 0);
+wire avg_buff_in_valid = (first) ? valid_buff_new : ((frame_counter == 16) ? add_sub_valid : 0);
+wire avg_buff_in_last = (first) ? last_buff_new : ((frame_counter == 16) ? add_sub_last : 0);
 
 // fuse lsu wires
 wire [DATA_WIDTH-1:0] fetched_frame;
@@ -135,7 +135,7 @@ always @(posedge s_axis_aclk) begin
     else begin
         case(state)
             NEW: begin
-                if(out_fused_frame_last & fuse_ready & (frame_counter == (FUSE_COUNT-1))) begin
+                if(out_fused_frame_last & fuse_ready & (frame_counter == 15)) begin
                     state <= OLD;
                 end
             end
