@@ -17,7 +17,7 @@ extern volatile int TcpSlowTmrFlag;
 #define IMAGE_DIM           512
 #define FRAME_SIZE_BYTES    (IMAGE_DIM * IMAGE_DIM)
 #define NUM_FRAMES          300
-#define FRAMES_PER_FUSION   16
+#define FRAMES_PER_FUSION   4
 #define DDR_BASE_ADDR       0x10000000
 #define FUSED_FRAME_ADDR    (DDR_BASE_ADDR + (NUM_FRAMES * FRAME_SIZE_BYTES))
 #define TCP_PORT            5001

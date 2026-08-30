@@ -20,101 +20,125 @@ module CONV_GAUSS #(
     output reg                    m_axis_tlast
 );
 
-localparam BUFF_DEPTH = IMAGE_WIDTH / PIXELS_PER_BEAT;
+localparam BUFF_DEPTH    = IMAGE_WIDTH / PIXELS_PER_BEAT;
+localparam COL_PTR_WIDTH = $clog2(BUFF_DEPTH);
+localparam VERT_WIDTH    = PIXEL_SIZE + 2;
 
 reg [DATA_WIDTH-1:0] buff_top [BUFF_DEPTH-1:0];
 reg [DATA_WIDTH-1:0] buff_mid [BUFF_DEPTH-1:0];
 
-localparam COL_PTR_WIDTH = $clog2(BUFF_DEPTH);
+wire advance = (m_axis_tready || !m_axis_tvalid);
+assign s_axis_tready = advance;
 
-reg [15:0] row_ptr;
-reg [COL_PTR_WIDTH-1:0] col_ptr;
+reg [DATA_WIDTH-1:0] tdata_s0;
+reg                  tvalid_s0;
+reg                  tlast_s0;
 
+always @(posedge aclk) begin
+    if (~aresetn) begin
+        tdata_s0  <= 0;
+        tvalid_s0 <= 0;
+        tlast_s0  <= 0;
+    end
+    else if (advance) begin
+        tdata_s0  <= s_axis_tdata;
+        tvalid_s0 <= s_axis_tvalid;
+        tlast_s0  <= s_axis_tlast;
+    end
+end
+
+reg [15:0]               row_ptr;
+reg [COL_PTR_WIDTH-1:0]  col_ptr;
 wire [COL_PTR_WIDTH-1:0] col_ptr_next = col_ptr + 1;
 
-reg [DATA_WIDTH-1:0] out;
-reg [2*PIXEL_SIZE-1:0] last_top; // last 2 pixels of previous beat of top buffer
-reg [2*PIXEL_SIZE-1:0] last_mid;
-reg [2*PIXEL_SIZE-1:0] last_bot;
-
-// always remember that Block RAM has a read latency of 1 cycle, so the beat read in current cycle will be available for use in next cycle, so we prefetch the beat required in next cycle in previous cycle. So we used col_ptr_next and buff_top/mid_out
 reg [DATA_WIDTH-1:0] buff_top_out;
 reg [DATA_WIDTH-1:0] buff_mid_out;
 
+reg [VERT_WIDTH-1:0] vert_s1 [PIXELS_PER_BEAT-1:0];
+reg                  valid_s1;
+reg                  tlast_s1;
+reg                  row_lt2_s1;
+reg                  col_zero_s1;
 
-integer i;
+integer p;
 always @(posedge aclk) begin
-    if(~aresetn) begin
-        row_ptr <= 0;
-        col_ptr <= 0;
-
-        m_axis_tvalid <= 0;
-        m_axis_tlast <= 0;
-        m_axis_tdata <= 0;
-
+    if (~aresetn) begin
+        row_ptr      <= 0;
+        col_ptr      <= 0;
         buff_top_out <= 0;
         buff_mid_out <= 0;
-
-        last_top <= 0;
-        last_mid <= 0;
-        last_bot <= 0;
+        valid_s1     <= 0;
+        tlast_s1     <= 0;
+        row_lt2_s1   <= 0;
+        col_zero_s1  <= 0;
+        for (p = 0; p < PIXELS_PER_BEAT; p = p + 1)
+            vert_s1[p] <= 0;
     end
-    else begin
-        if(s_axis_tvalid & s_axis_tready) begin
-            // understood why we cant use buff_top/mid directly for conv, other reason is that we are writing to the buffer and reading from same address in same cycle, so data we are writing will not be available at output of buffer in same cycle, it will be available in next cycle, so we need to use separate registers to hold the prefetched data for convolution in next cycle. Also, we are writing the incoming data into buffer and using it for convolution in same cycle, so we need to use separate registers to hold the incoming data for convolution in current cycle
-            buff_top[col_ptr] <= buff_mid[col_ptr]; 
-            buff_mid[col_ptr] <= s_axis_tdata;
+    else if (advance) begin
+        valid_s1 <= tvalid_s0;
+        if (tvalid_s0) begin
+            buff_top[col_ptr] <= buff_mid[col_ptr];
+            buff_mid[col_ptr] <= tdata_s0;
 
-            // we shifted the current beats of same column every cycle, so that after the last beat, the rows are already arranged properly for next streaming row and we can directly use the streaming row as 3rd row for conv.
-
-            buff_top_out <= buff_top[col_ptr_next]; 
+            buff_top_out <= buff_top[col_ptr_next];
             buff_mid_out <= buff_mid[col_ptr_next];
 
-            // on same cycle, we wrote and read from different addresses of buff_top/mid which is not a problem as Block RAM is dual ported.
-            
             col_ptr <= col_ptr + 1;
-            if(col_ptr == BUFF_DEPTH - 1) begin
-                row_ptr <= (s_axis_tlast) ? 0 : row_ptr + 1;
-            end
+            if (col_ptr == BUFF_DEPTH - 1)
+                row_ptr <= (tlast_s0) ? 0 : row_ptr + 1;
 
-            m_axis_tvalid <= 1;
+            row_lt2_s1  <= (row_ptr < 2);
+            col_zero_s1 <= (col_ptr == 0);
+            tlast_s1    <= tlast_s0;
 
-            // 1 2 1
-            // 2 4 2
-            // 1 2 1
-
-            // first output pixel of beat will be the conv output centered around last pixel of previous beat
-            // for first 2 rows, there are no top rows for them and for first beat, there is no left pixel for first pixel in first beat of row
-            m_axis_tdata[0 +: PIXEL_SIZE] <= (row_ptr < 2 | col_ptr==0) ? 0 : (
-                                              ({4'b0, last_top[0+: PIXEL_SIZE]}   ) + ({4'b0, last_top[PIXEL_SIZE +: PIXEL_SIZE]}<<1) + ({4'b0, buff_top_out[0+: PIXEL_SIZE]}   ) + 
-                                              ({4'b0, last_mid[0+: PIXEL_SIZE]}<<1) + ({4'b0, last_mid[PIXEL_SIZE +: PIXEL_SIZE]}<<2) + ({4'b0, buff_mid_out[0+: PIXEL_SIZE]}<<1) +
-                                              ({4'b0, last_bot[0+: PIXEL_SIZE]}   ) + ({4'b0, last_bot[PIXEL_SIZE +: PIXEL_SIZE]}<<1) + ({4'b0, s_axis_tdata[0+: PIXEL_SIZE]}   )) >> 4;
-
-            // second output pixel of beat will be the conv output centered around first pixel of current beat
-            m_axis_tdata[PIXEL_SIZE +: PIXEL_SIZE] <= (row_ptr < 2 | col_ptr==0) ? 0 : (
-                                                       ({4'b0, last_top[PIXEL_SIZE +: PIXEL_SIZE]}   ) + ({4'b0, buff_top_out[0 +: PIXEL_SIZE]}<<1) + ({4'b0, buff_top_out[PIXEL_SIZE+: PIXEL_SIZE]}   ) + 
-                                                       ({4'b0, last_mid[PIXEL_SIZE +: PIXEL_SIZE]}<<1) + ({4'b0, buff_mid_out[0 +: PIXEL_SIZE]}<<2) + ({4'b0, buff_mid_out[PIXEL_SIZE+: PIXEL_SIZE]}<<1) +
-                                                       ({4'b0, last_bot[PIXEL_SIZE +: PIXEL_SIZE]}   ) + ({4'b0, s_axis_tdata[0 +: PIXEL_SIZE]}<<1) + ({4'b0, s_axis_tdata[PIXEL_SIZE+: PIXEL_SIZE]}   )) >> 4;
-            for(i = 2; i < PIXELS_PER_BEAT; i = i + 1) begin
-                m_axis_tdata[i*PIXEL_SIZE +: PIXEL_SIZE] <= (row_ptr < 2) ? 0 : (
-                                                            ({4'b0, buff_top_out[(i-2)*PIXEL_SIZE +: PIXEL_SIZE]}     ) + ({4'b0, buff_top_out[(i-1)*PIXEL_SIZE +: PIXEL_SIZE]}<<1) + ({4'b0, buff_top_out[i*PIXEL_SIZE +: PIXEL_SIZE]}     ) + 
-                                                            ({4'b0, buff_mid_out[(i-2)*PIXEL_SIZE +: PIXEL_SIZE]}<<1) + ({4'b0, buff_mid_out[(i-1)*PIXEL_SIZE +: PIXEL_SIZE]}<<2) + ({4'b0, buff_mid_out[i*PIXEL_SIZE +: PIXEL_SIZE]}<<1) +
-                                                            ({4'b0, s_axis_tdata[(i-2)*PIXEL_SIZE +: PIXEL_SIZE]}     ) + ({4'b0, s_axis_tdata[(i-1)*PIXEL_SIZE +: PIXEL_SIZE]}<<1) + ({4'b0, s_axis_tdata[i*PIXEL_SIZE +: PIXEL_SIZE]}     )) >> 4;
-            end
-            last_top <= buff_top[col_ptr][DATA_WIDTH-1 -: 2*PIXEL_SIZE]; // last 2 pixels of current column beat of top buffer will be needed for convolution of next beat
-            last_mid <= buff_mid[col_ptr][DATA_WIDTH-1 -: 2*PIXEL_SIZE];
-            last_bot <= s_axis_tdata[DATA_WIDTH-1 -: 2*PIXEL_SIZE];
-            
-            m_axis_tlast <= s_axis_tlast;
+            for (p = 0; p < PIXELS_PER_BEAT; p = p + 1)
+                vert_s1[p] <= {2'b0, buff_top_out[p*PIXEL_SIZE +: PIXEL_SIZE]}
+                            + ({2'b0, buff_mid_out[p*PIXEL_SIZE +: PIXEL_SIZE]} << 1)
+                            + {2'b0, tdata_s0[p*PIXEL_SIZE +: PIXEL_SIZE]};
         end
-        else if(m_axis_tvalid & m_axis_tready) begin
-            m_axis_tvalid <= 0;
-            m_axis_tlast <= 0;
-            m_axis_tdata <= 0;
+        else begin
+            tlast_s1 <= 1'b0;
         end
     end
 end
 
-assign s_axis_tready = (~m_axis_tvalid | m_axis_tready);
+reg [VERT_WIDTH-1:0] last_vert0, last_vert1;
+
+integer q;
+always @(posedge aclk) begin
+    if (~aresetn) begin
+        m_axis_tvalid <= 0;
+        m_axis_tlast  <= 0;
+        m_axis_tdata  <= 0;
+        last_vert0    <= 0;
+        last_vert1    <= 0;
+    end
+    else if (advance) begin
+        m_axis_tvalid <= valid_s1;
+        m_axis_tlast  <= tlast_s1;
+
+        if (valid_s1) begin
+            for (q = 0; q < PIXELS_PER_BEAT; q = q + 1) begin
+                if (row_lt2_s1 || (col_zero_s1 && q < 2))
+                    m_axis_tdata[q*PIXEL_SIZE +: PIXEL_SIZE] <= 0;
+                else if (q == 0)
+                    m_axis_tdata[q*PIXEL_SIZE +: PIXEL_SIZE] <=
+                        ({2'b0, last_vert0} + ({2'b0, last_vert1} << 1) + {2'b0, vert_s1[0]}) >> 4;
+                else if (q == 1)
+                    m_axis_tdata[q*PIXEL_SIZE +: PIXEL_SIZE] <=
+                        ({2'b0, last_vert1} + ({2'b0, vert_s1[0]} << 1) + {2'b0, vert_s1[1]}) >> 4;
+                else
+                    m_axis_tdata[q*PIXEL_SIZE +: PIXEL_SIZE] <=
+                        ({2'b0, vert_s1[q-2]} + ({2'b0, vert_s1[q-1]} << 1) + {2'b0, vert_s1[q]}) >> 4;
+            end
+
+            last_vert0 <= vert_s1[PIXELS_PER_BEAT-2];
+            last_vert1 <= vert_s1[PIXELS_PER_BEAT-1];
+        end
+        else begin
+            m_axis_tdata <= 0;
+        end
+    end
+end
 
 endmodule
