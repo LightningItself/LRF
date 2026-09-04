@@ -83,6 +83,7 @@ add_files -fileset sources_1 ${SRC_DIR}/multiplier.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_adder.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_sub.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_buff.v
+add_files -fileset sources_1 ${SRC_DIR}/axis_buff_4.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_adder_2.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_comparator.v
 add_files -fileset sources_1 ${SRC_DIR}/sig_xy.v

@@ -6,10 +6,10 @@ module tb_top;
 localparam PIXELS_PER_BEAT  = 16;
 localparam IMAGE_DIM        = 512;
 localparam PIXEL_SIZE       = 8;
-localparam N_FUSE_COUNT     = 4;
-localparam DATA_WIDTH       = PIXEL_SIZE * PIXELS_PER_BEAT;   // 128
+localparam N_FUSE_COUNT     = 2;
+localparam DATA_WIDTH       = PIXEL_SIZE * PIXELS_PER_BEAT;
 localparam BEATS_PER_FRAME  = IMAGE_DIM * IMAGE_DIM / PIXELS_PER_BEAT;
-localparam FUSE_DEPTH       = 1 << N_FUSE_COUNT;              // 16
+localparam FUSE_DEPTH       = 1 << N_FUSE_COUNT;
 localparam OUTPUT_TIMEOUT_CYCLES = BEATS_PER_FRAME * 200;
  
 // ─── Clock / Reset ───────────────────────────────────────────────────────────

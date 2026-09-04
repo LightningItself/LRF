@@ -43,7 +43,7 @@ class axis_driver #(parameter DATA_WIDTH = 128);
         forever begin
             @(posedge vif.clk);
             if(!vif.tvalid || vif.tready) begin // if interface is ready
-                if ($urandom_range(0, 9) < 7) begin // 70% chance to send data
+                if ($urandom_range(0, 9) < 10) begin // 70% chance to send data
                     if(gen2drv.try_get(transaction)) begin
                         vif.tvalid <= 1;
                         vif.tdata <= transaction.tdata;
@@ -76,7 +76,7 @@ class axis_monitor #(parameter DATA_WIDTH = 128);
         axis_transaction #(DATA_WIDTH) transaction;
         forever begin
             @(posedge vif.clk);
-            vif.tready <= ($urandom_range(0, 9) < 7); // 70% chance to be ready to receive data each cycle, this creates backpressure 
+            vif.tready <= ($urandom_range(0, 9) < 10); // 70% chance to be ready to receive data each cycle, this creates backpressure 
             if (vif.tvalid && vif.tready) begin
                 transaction = new(vif.tdata, vif.tlast);
                 mon2scb.put(transaction); 

@@ -7,6 +7,8 @@ set IP_DIR "${SRC_DIR}/ips/cordic/cordic_0"
 set FIFO_IP_DIR "${SRC_DIR}/ips/fifo/axis_data_fifo_0"
 set DATA_DIR "../data/"
 
+# Define path to your waveform config file
+set WCFG_FILE [file normalize "/home/23EC01052/Desktop/my_branch/LRF/new_algo.wcfg"]
 
 if {[file exists $WORKSPACE_DIR]} { file delete -force $WORKSPACE_DIR }
 file mkdir $WORKSPACE_DIR
@@ -16,7 +18,6 @@ set OUTPUT_VIDEO_DIR    [file normalize "${WORKSPACE_DIR}/outputs"]
 set INPUT_IMG_COUNT     300
 file mkdir $OUTPUT_VIDEO_DIR
 
-
 puts "Generating vivado project..."
 create_project -force sim_project ${WORKSPACE_DIR}/sim_project -part xc7z010clg225-1
 
@@ -24,16 +25,13 @@ set IP_FILE "${IP_DIR}/cordic_0.xci"
 
 if {[file exists $IP_FILE]} {
     import_ip -files $IP_FILE -name cordic_0
-
     set CORDIC_IP [get_ips cordic_0]
-
     report_ip_status
     if {[catch {upgrade_ip $CORDIC_IP} upgrade_result]} {
         puts "WARNING: upgrade_ip reported: $upgrade_result"
     } else {
         puts $upgrade_result
     }
-
     reset_target all $CORDIC_IP
     generate_target all $CORDIC_IP
     export_ip_user_files -of_objects $CORDIC_IP -no_script -sync -force -quiet
@@ -46,16 +44,13 @@ set FIFO_IP_FILE "${FIFO_IP_DIR}/axis_data_fifo_0.xci"
 
 if {[file exists $FIFO_IP_FILE]} {
     import_ip -files $FIFO_IP_FILE -name axis_data_fifo_0
-
     set FIFO_IP [get_ips axis_data_fifo_0]
-
     report_ip_status
     if {[catch {upgrade_ip $FIFO_IP} upgrade_result]} {
         puts "WARNING: upgrade_ip reported: $upgrade_result"
     } else {
         puts $upgrade_result
     }
-
     reset_target all $FIFO_IP
     generate_target all $FIFO_IP
     export_ip_user_files -of_objects $FIFO_IP -no_script -sync -force -quiet
@@ -69,6 +64,7 @@ add_files -fileset sources_1 ${SRC_DIR}/axis_adder.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_adder_2.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_sub.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_buff.v
+add_files -fileset sources_1 ${SRC_DIR}/axis_buff_4.v
 add_files -fileset sources_1 ${SRC_DIR}/axis_comparator.v
 add_files -fileset sources_1 ${SRC_DIR}/lsu.v
 add_files -fileset sources_1 ${SRC_DIR}/lsu_valid.v
@@ -90,9 +86,7 @@ set_property file_type SystemVerilog [get_files ${UTILS_SV_DIR}/sim_axis.sv]
 add_files -fileset sim_1 ${TEST_DIR}/tb_top_video.sv
 set_property file_type SystemVerilog [get_files ${TEST_DIR}/tb_top_video.sv]
 
-# Include Path Setup: Looks for tb_config.svh generated in workspace
 set_property include_dirs [list $WORKSPACE_DIR $TEST_DIR] [get_filesets sim_1]
-
 set_property top tb_top [get_filesets sim_1]
 set_property top_lib xil_defaultlib [get_filesets sim_1]
 
@@ -103,6 +97,22 @@ set_property -name {xsim.simulate.xsim.more_options} \
             -testplusarg TOTAL_FRAMES=$INPUT_IMG_COUNT" \
     -objects [get_filesets sim_1]
 
-puts "Running Simulation..."
+set_property -name {xsim.simulate.runtime} -value {0ns} -objects [get_filesets sim_1]
+
+# Attach the WCFG file to the simulation so it opens automatically
+if {[file exists $WCFG_FILE]} {
+    add_files -fileset sim_1 -norecurse $WCFG_FILE
+    set_property xsim.view $WCFG_FILE [get_filesets sim_1]
+} else {
+    puts "WARNING: Custom waveform file not found at $WCFG_FILE"
+}
+
+puts "Launching Simulation for SAIF logging..."
 launch_simulation
+open_saif [file normalize "${WORKSPACE_DIR}/power_activity.saif"]
+log_saif [get_objects -r /tb_top/dut/*]
+
+puts "Running 300 frames..."
 run all
+close_saif
+puts "SAIF generation complete at ${WORKSPACE_DIR}/power_activity.saif"
