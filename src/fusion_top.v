@@ -32,22 +32,13 @@ wire inputs_valid = s_axis_old_fused_tvalid & s_axis_avg_tvalid & s_axis_new_tva
 
 wire [DATA_WIDTH-1:0] del;
 wire del_valid, del_last, sob_hssim_ready_x, sob_hssim_ready_y, sob_hssim_ready_z;
-wire sobel_del_ready;
-wire skid1_sready_raw;
 wire old_gauss_buff_free = ~old_gauss_buff_valid;
 
 wire [DATA_WIDTH-1:0] old_fifo_out, new_fifo_out;
 wire old_fifo_ready, old_fifo_out_valid, old_fifo_out_last, new_fifo_ready, new_fifo_out_valid, new_fifo_out_last;
 
-wire [DATA_WIDTH-1:0] gauss_in_tdata;
-wire gauss_in_tvalid, gauss_in_tlast;
-
 wire [DATA_WIDTH-1:0] gauss_del;
 wire gauss_ready, gauss_del_valid, gauss_del_last;
-wire gauss_del_ready;
-
-wire [DATA_WIDTH-1:0] fusion_del_in_tdata;
-wire fusion_del_in_tvalid, fusion_del_in_tlast;
 
 reg [DATA_WIDTH-1:0] old_gauss_buff, new_gauss_buff;
 reg old_gauss_buff_valid, old_gauss_buff_last, new_gauss_buff_valid, new_gauss_buff_last;
@@ -83,7 +74,7 @@ SOBEL_HSSIM_TOP #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .PIXEL_SIZE(PIXEL_SIZE), .
     .new_map_last(s_axis_new_tlast),
     .del(del),
     .del_valid(del_valid),
-    .del_ready(sobel_del_ready),
+    .del_ready(gauss_ready),
     .del_last(del_last)
 );
 
@@ -96,7 +87,7 @@ axis_data_fifo_0 old_fifo (
     .s_axis_tlast(s_axis_old_fused_tlast),
     .m_axis_tdata(old_fifo_out),
     .m_axis_tvalid(old_fifo_out_valid),
-    .m_axis_tready(sobel_del_ready & del_valid),
+    .m_axis_tready(gauss_ready & del_valid),
     .m_axis_tlast(old_fifo_out_last)
 );
 
@@ -109,49 +100,21 @@ axis_data_fifo_0 new_fifo (
     .s_axis_tlast(s_axis_new_tlast),
     .m_axis_tdata(new_fifo_out),
     .m_axis_tvalid(new_fifo_out_valid),
-    .m_axis_tready(sobel_del_ready & del_valid),
+    .m_axis_tready(gauss_ready & del_valid),
     .m_axis_tlast(new_fifo_out_last)
 );
-
-axis_skid_buff #( .DATA_WIDTH(DATA_WIDTH)) skid_sobel_gauss (
-    .aclk(aclk),
-    .aresetn(aresetn),
-    .s_axis_tdata(del),
-    .s_axis_tvalid(del_valid & old_gauss_buff_free),
-    .s_axis_tready(skid1_sready_raw),
-    .s_axis_tlast(del_last),
-    .m_axis_tdata(gauss_in_tdata),
-    .m_axis_tvalid(gauss_in_tvalid),
-    .m_axis_tready(gauss_ready),
-    .m_axis_tlast(gauss_in_tlast)
-);
-
-assign sobel_del_ready = skid1_sready_raw & old_gauss_buff_free;
 
 CONV_GAUSS #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .PIXEL_SIZE(PIXEL_SIZE), .IMAGE_WIDTH(IMAGE_DIM)) gauss(
     .aclk(aclk),
     .aresetn(aresetn),
-    .s_axis_tdata(gauss_in_tdata),
-    .s_axis_tvalid(gauss_in_tvalid),
+    .s_axis_tdata(del),
+    .s_axis_tvalid(del_valid),
     .s_axis_tready(gauss_ready),
-    .s_axis_tlast(gauss_in_tlast),
+    .s_axis_tlast(del_last),
     .m_axis_tdata(gauss_del),
     .m_axis_tvalid(gauss_del_valid),
-    .m_axis_tready(gauss_del_ready),
-    .m_axis_tlast(gauss_del_last)
-);
-
-axis_skid_buff #( .DATA_WIDTH(DATA_WIDTH)) skid_gauss_fusion (
-    .aclk(aclk),
-    .aresetn(aresetn),
-    .s_axis_tdata(gauss_del),
-    .s_axis_tvalid(gauss_del_valid),
-    .s_axis_tready(gauss_del_ready),
-    .s_axis_tlast(gauss_del_last),
-    .m_axis_tdata(fusion_del_in_tdata),
-    .m_axis_tvalid(fusion_del_in_tvalid),
     .m_axis_tready(fusion_ready_z),
-    .m_axis_tlast(fusion_del_in_tlast)
+    .m_axis_tlast(gauss_del_last)
 );
 
 always @(posedge aclk) begin
@@ -167,7 +130,7 @@ always @(posedge aclk) begin
         del_gauss_buff_last <= 0;
     end
     else begin
-        if(sobel_del_ready & del_valid) begin
+        if(gauss_ready & del_valid) begin
             old_gauss_buff <= old_fifo_out;
             new_gauss_buff <= new_fifo_out;
             old_gauss_buff_valid <= 1;
@@ -179,7 +142,7 @@ always @(posedge aclk) begin
             del_gauss_buff_last <= del_last;
 
         end
-        else if(fusion_ready_z & fusion_del_in_tvalid) begin
+        else if(fusion_ready_z & gauss_del_valid) begin
             old_gauss_buff_valid <= 0;
             old_gauss_buff_last <= 0;
             new_gauss_buff_valid <= 0;
@@ -201,22 +164,22 @@ FUSION #( .PIXELS_PER_BEAT(PIXELS_PER_BEAT), .IMAGE_DIM(IMAGE_DIM), .PIXEL_SIZE(
     .new_frame_tvalid(new_gauss_buff_valid),
     .new_frame_tready(fusion_ready_y),
     .new_frame_tlast(new_gauss_buff_last),
-    .del_gauss(fusion_del_in_tdata),
-    .del_gauss_tvalid(fusion_del_in_tvalid),
+    .del_gauss(gauss_del),
+    .del_gauss_tvalid(gauss_del_valid),
     .del_gauss_tready(fusion_ready_z),
-    .del_gauss_tlast(fusion_del_in_tlast),
+    .del_gauss_tlast(gauss_del_last),
     .fused_frame(fusion_out),
     .fused_frame_tvalid(fusion_out_valid),
     .fused_frame_tready(advance),
     .fused_frame_tlast(fusion_out_last)
 );
 
-axis_data_fifo_0 fifo_1 (
-    .s_axis_aclk(aclk), 
-    .s_axis_aresetn(aresetn),
-    .s_axis_tdata(old_gauss_buff),        
-    .s_axis_tvalid(old_gauss_buff_valid & fusion_ready_x),    
-    .s_axis_tready(fifo_1_ready),      
+axis_buff_4 #( .DATA_WIDTH(DATA_WIDTH)) fifo_1 (
+    .aclk(aclk),
+    .aresetn(aresetn),
+    .s_axis_tdata(old_gauss_buff),
+    .s_axis_tvalid(old_gauss_buff_valid & fusion_ready_x),
+    .s_axis_tready(fifo_1_ready),
     .s_axis_tlast(old_gauss_buff_last),
     .m_axis_tdata(old_fusion_buff),
     .m_axis_tvalid(old_fusion_buff_valid),
@@ -224,12 +187,12 @@ axis_data_fifo_0 fifo_1 (
     .m_axis_tlast(old_fusion_buff_last)
 );
 
-axis_data_fifo_0 fifo_2 (
-    .s_axis_aclk(aclk), 
-    .s_axis_aresetn(aresetn),
-    .s_axis_tdata(del_gauss_buff),        
-    .s_axis_tvalid(del_gauss_buff_valid & fusion_ready_x),    
-    .s_axis_tready(fifo_2_ready),      
+axis_buff_4 #( .DATA_WIDTH(DATA_WIDTH)) fifo_2 (
+    .aclk(aclk),
+    .aresetn(aresetn),
+    .s_axis_tdata(del_gauss_buff),
+    .s_axis_tvalid(del_gauss_buff_valid & fusion_ready_x),
+    .s_axis_tready(fifo_2_ready),
     .s_axis_tlast(del_gauss_buff_last),
     .m_axis_tdata(fusion_del),
     .m_axis_tvalid(fusion_del_valid),
