@@ -107,12 +107,6 @@ if {[file exists $WCFG_FILE]} {
     puts "WARNING: Custom waveform file not found at $WCFG_FILE"
 }
 
-puts "Launching Simulation for SAIF logging..."
-launch_simulation
-open_saif [file normalize "${WORKSPACE_DIR}/power_activity.saif"]
-log_saif [get_objects -r /tb_top/dut/*]
-
 puts "Running 300 frames..."
+launch_simulation
 run all
-close_saif
-puts "SAIF generation complete at ${WORKSPACE_DIR}/power_activity.saif"

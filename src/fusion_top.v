@@ -32,7 +32,6 @@ wire inputs_valid = s_axis_old_fused_tvalid & s_axis_avg_tvalid & s_axis_new_tva
 
 wire [DATA_WIDTH-1:0] del;
 wire del_valid, del_last, sob_hssim_ready_x, sob_hssim_ready_y, sob_hssim_ready_z;
-wire old_gauss_buff_free = ~old_gauss_buff_valid;
 
 wire [DATA_WIDTH-1:0] old_fifo_out, new_fifo_out;
 wire old_fifo_ready, old_fifo_out_valid, old_fifo_out_last, new_fifo_ready, new_fifo_out_valid, new_fifo_out_last;
